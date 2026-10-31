@@ -739,3 +739,20 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** sem instalar nada, escreveu um vetorizador só com Pillow: refez a máscara pelas cores, traçou os contornos, suavizou e preencheu com degradês tirados das cores originais. Trocou o PNG pelo SVG em todas as telas; 78 testes passando; push e site público reiniciado.
 
 ---
+
+## Prompt 63 — 31/10/2026, 12:36 (BRT) — autor: João — ferramenta: Claude Code
+
+> PORQUE VOCE TIROU A LOGO DE ALGUNS LUGARES QUE ELA ESTAVA (TIPO NA PAGINA DE ENTRAR POR EXEMPLO?) E  LOGO FICOU COM O TAMANHO TODO ESTRANHO E SEM RESPONSIVIDADE! TEM QUE FICAR IGUAL ESTAVA ANTES, MAS COM A IMAGEM EM SVG NO MESMO ESTILO DA ANTERIOR! NAO ERA PARA VOCE PROPOR UM NOVO DESIGN!
+
+**Resumo da resposta da IA:** explicou que só a extensão do arquivo tinha mudado nas telas; o SVG não tinha largura e altura próprias e por isso o navegador esticava ou sumia com ele. Deu ao SVG o mesmo tamanho natural do PNG (351×151) e mediu as telas: tamanho igual ao de antes. Push e site público reiniciado.
+
+---
+
+## Prompt 64 — 31/10/2026, 12:41 (BRT) — autor: João — ferramenta: Claude Code
+
+> Ache onde está a parte com o progresso, tipo duolingo, com as bolinhas, com o cenário. Nao sei porque mas quando Thiago fez o merge com a parte do Caua ele falou que voce tirou isso. Volte com essa parte porque estava boa. Voce nao chegou a executar esse prompt antes.
+> Tente novamente
+
+**Resumo da resposta da IA:** conferiu que nenhum merge do Thiago está no GitHub e que a trilha (mundos, bolinhas e cenário) continua na tela inicial do aluno da branch `thiago/prototipo-neuro`. Ela parecia vazia porque a turma tinha uma aula só, que vira uma bolinha só. Criou no banco local 5 aulas reais de Frações com questões (conteúdo do professor, sem respostas inventadas); agora a trilha mostra as fases. A versão rica que o Thiago lembrava usava dados de exemplo da ferramenta de desenvolvedor, que saiu por ser dado inventado.
+
+---
