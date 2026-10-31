@@ -11,11 +11,17 @@
 {% if turmas %}
   <ul class="space-y-3">
     {% for turma in turmas %}
-      <li>
-        <a href="{% url 'turmas:detalhe' turma.pk %}" class="cartao block hover:ring-2 hover:ring-indigo-200">
+      <li class="cartao flex flex-wrap items-center justify-between gap-3">
+        <a href="{% url 'turmas:detalhe' turma.pk %}" class="hover:underline">
           <span class="text-lg font-medium">{{ turma.nome }}</span>
           <span class="block text-sm text-slate-600">{{ turma.num_alunos }} aluno{{ turma.num_alunos|pluralize }} · {{ turma.num_aulas }} aula{{ turma.num_aulas|pluralize }}</span>
         </a>
+        <span class="flex items-center gap-3">
+          {% if turma.sugestoes_pendentes %}
+            <span class="etiqueta bg-indigo-600 text-white">{{ turma.sugestoes_pendentes }} sugest{{ turma.sugestoes_pendentes|pluralize:"ão,ões" }}</span>
+          {% endif %}
+          <a href="{% url 'painel:turma' turma.pk %}" class="btn-sec">Painel</a>
+        </span>
       </li>
     {% endfor %}
   </ul>

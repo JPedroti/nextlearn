@@ -6,4 +6,5 @@ app_name = "painel"
 
 urlpatterns = [
     path("", views.inicio, name="inicio"),
+    path("turmas/<int:pk>/painel/", views.turma, name="turma"),
 ]

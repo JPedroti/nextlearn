@@ -14,6 +14,7 @@ from .context_processors import CHAVE_SESSAO
 from .forms import ApoiosForm, QuestionarioForm
 from .models import PREFERENCIAS, Perfil, RespostaQuestionario, SugestaoPerfil
 from .questionario import criar_sugestoes, respostas_legiveis
+from .sugestoes import sugerir_pelo_uso
 
 def _redirecionar_para_next(request, padrao, **kwargs):
     """Volta para a página de origem (campo `next`) se ela for deste site; senão, vai para `padrao`."""
@@ -46,6 +47,7 @@ def alternar_preferencia(request):
         id_aula = request.POST.get("aula", "")
         aula = Aula.objects.filter(pk=id_aula, turma=aluno.turma).first() if id_aula.isdigit() else None
         EventoUso.objects.create(aluno=aluno, aula=aula, tipo=f"ativou_{campo}")
+        sugerir_pelo_uso(aluno, campo)
 
     # A barra usa fetch (JavaScript) para não recarregar a página; sem JavaScript, o formulário volta para a página.
     if request.headers.get("X-Requested-With") == "fetch":

@@ -4,7 +4,10 @@
 
 {% block conteudo %}
 <a href="{% url 'painel:inicio' %}" class="voltar">← Minhas turmas</a>
-<h1 class="text-2xl font-semibold mt-3 mb-6">{{ turma.nome }}</h1>
+<div class="flex flex-wrap items-center justify-between gap-3 mt-3 mb-6">
+  <h1 class="text-2xl font-semibold">{{ turma.nome }}</h1>
+  <a href="{% url 'painel:turma' turma.pk %}" class="btn-sec">Painel da turma</a>
+</div>
 
 <section class="mb-8">
   <div class="flex items-center justify-between mb-3">
