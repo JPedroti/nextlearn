@@ -10,7 +10,7 @@
     <h1 class="text-2xl font-semibold">Versão: {{ apoios|join:" + " }}</h1>
     <p class="text-sm text-slate-600">
       {% if versao.aprovada %}Aprovada. Os alunos com esses apoios veem esta versão.{% else %}Gerada pela IA e ainda não aprovada.{% endif %}
-      Você pode corrigir o texto antes de aprovar.
+      Você pode corrigir o texto antes de aprovar. Confira se os enunciados adaptados preservaram o desafio da questão original, sem entregar a resposta.
     </p>
   </div>
   <form method="post" action="{% url 'aulas:gerar_versao' aula.pk versao.mascara %}" data-gerar>

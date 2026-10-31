@@ -327,7 +327,7 @@ def painel_aluno(request):
     desafios = [
         {"nome": "Mestre das 3 estrelas", "desc": "Tire 3 estrelas em 5 fases", "feito": min(tres, 5), "meta": 5},
         {"nome": "Explorador", "desc": "Complete um mundo inteiro (10 fases)", "feito": max((u["feitas"] for u in trilha), default=0), "meta": 10},
-        {"nome": "Memória de elefante", "desc": "Faça 3 revisões", "feito": 0, "meta": 3},
+        {"nome": "Memória de elefante", "desc": "Faça 3 revisões", "feito": min(3, len(request.session.get("revisoes_feitas", []))), "meta": 3},
     ]
     for dsf in desafios:
         dsf["pct"] = int(100 * dsf["feito"] / dsf["meta"])
@@ -765,11 +765,15 @@ def progresso(request):
 
     pos = {}
     for rs in sessoes.values():
+        if len(rs) < 3:          # só aulas com 3+ questões entram na comparação 1ª → última
+            continue
         for r in rs:
             pos.setdefault(r.questao.ordem, []).append(r.correta)
     acerto_pos = [round(100 * sum(v) / len(v)) for _, v in sorted(pos.items())]
-    tempos = [rs[0].tempo_ms / 60000 for rs in sessoes.values() if rs[0].tempo_ms]
+    # Ritmo médio POR QUESTÃO em cada sessão (o tempo total da aula depende do tamanho da aula, não do aluno)
+    tempos = [rs[0].tempo_ms / 1000 / len(rs) for rs in sessoes.values() if rs[0].tempo_ms and rs]
     cv = round(100 * statistics.pstdev(tempos) / statistics.mean(tempos)) if len(tempos) > 4 else None
+    revisoes = request.session.get("revisoes_feitas", [])
     seq, alertas = {}, 0
     for r in resp:
         mat = _materia(r.questao.aula.titulo)
@@ -807,8 +811,10 @@ def progresso(request):
         {"nome": "Regularidade", "cls": estado_cls, "txt": estado},
         {"nome": "3 erros seguidos na mesma matéria", "cls": "atencao" if alertas else "ok",
          "txt": f"{alertas} vez{'es' if alertas != 1 else ''}" + (" — vale mudar a estratégia (exemplo resolvido, pré-requisito)" if alertas else " — sem sinal")},
-        {"nome": "Regularidade do tempo de aula", "cls": "neutro", "txt": (f"variação de {cv}% entre aulas" if cv is not None else "poucos dados")
-         + ". Indicativo para pausas; não é diagnóstico (Kofler et al., 2013)."},
+        {"nome": "Oscilação do ritmo por questão", "cls": "neutro", "txt": (f"variação de {cv}% no tempo médio por questão entre sessões" if cv is not None else "poucos dados")
+         + ". Pista para ajustar o tamanho dos blocos; não é diagnóstico. A pesquisa (Kofler et al., 2013) mede tempo de reação dentro da sessão; aqui é só uma aproximação."},
+        {"nome": "Revisões feitas", "cls": "ok" if revisoes else "neutro",
+         "txt": f"{len(revisoes)} revisão(ões) registradas nesta sessão do navegador. Confirmam o \"dominado\" (protótipo; no app real vai para o EventoUso)."},
         {"nome": "Queda de acerto dentro da aula", "cls": "atencao" if acerto_pos and acerto_pos[0] - acerto_pos[-1] >= 30 else "ok",
          "txt": (f"{acerto_pos[0]}% na 1ª questão → {acerto_pos[-1]}% na última" if acerto_pos else "poucos dados")
          + ". Pode ser cansaço ou questões mais difíceis no fim: confira a ordem antes de concluir."},
@@ -887,3 +893,18 @@ def chat(request):
     historico = (historico + [{"role": "user", "content": pergunta[:400]}, {"role": "assistant", "content": resposta}])[-HISTORICO:]
     request.session["chat_next"] = historico
     return JsonResponse({"resposta": resposta, "origem": origem})
+
+
+@papel_requerido("aluno")
+def treino_concluido(request, tipo):
+    """Registra a conclusão de um treino (POST). Protótipo: guarda na sessão; no app real vira EventoUso."""
+    from django.http import JsonResponse
+    from django.utils import timezone
+
+    if request.method != "POST" or tipo not in TREINOS:
+        return JsonResponse({"ok": False}, status=400)
+    if tipo == "revisao":
+        feitas = request.session.get("revisoes_feitas", [])
+        feitas.append(timezone.now().isoformat())
+        request.session["revisoes_feitas"] = feitas[-20:]
+    return JsonResponse({"ok": True, "revisoes": len(request.session.get("revisoes_feitas", []))})

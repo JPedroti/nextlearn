@@ -84,13 +84,13 @@ AULAS = [
 
 
 # Versão aprovada (apoios foco + concreto = máscara 5) para a próxima tarefa do Davi
-VERSAO_RETA = (
-    "Passo 1. Pense numa régua de 0 até 1, como uma barra de chocolate.\n\n"
-    "Passo 2. Para 3/4, quebre a barra em 4 pedaços iguais.\n\n"
-    "Passo 3. Conte 3 pedaços a partir do 0. Onde parar, é o 3/4.",
-    ["Para marcar 1/3, em quantos pedaços iguais você quebra a barra de 0 a 1?",
-     "2 pedaços de 4 é o mesmo lugar que qual fração?",
-     "Se você pegar 4 pedaços de 4, chega em qual número?"],
+VERSAO_RETA = (  # mesma exigência da aula original: muda a forma (passos curtos + exemplo concreto), não o raciocínio
+    "Passo 1. A reta de 0 até 1 é como uma barra de chocolate inteira.\n\n"
+    "Passo 2. O número de baixo da fração diz em quantos pedaços iguais a barra é dividida.\n\n"
+    "Passo 3. O número de cima diz quantos pedaços contamos a partir do 0. Exemplo: 3/4.",
+    ["Para marcar 1/3 na reta, o espaço entre 0 e 1 é dividido em quantas partes iguais?",
+     "2/4 fica no mesmo ponto da reta que qual fração?",
+     "4/4 fica em cima de qual número da reta?"],
 )
 
 

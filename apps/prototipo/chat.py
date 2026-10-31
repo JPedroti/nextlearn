@@ -1,4 +1,10 @@
-"""Chat com o Next (mascote): a criança tira dúvidas sobre a PLATAFORMA.
+"""Dúvidas com o Next (mascote): a criança tira dúvidas sobre a PLATAFORMA.
+
+DECISÃO (auditoria de 31/10, alinhada a docs/RISCOS_LEGAIS.md e ao plano de negócio): o aluno NÃO conversa com
+IA generativa. O texto digitado pela criança nunca sai do servidor: as respostas vêm só da FAQ validada e dos
+botões de dúvidas rápidas. Motivos: Parecer CNE/CP 15/2026 (sem IA conversacional livre para crianças),
+LGPD arts. 11 e 14 (a criança pode digitar nome, escola ou condição de saúde) e termos dos provedores para menores.
+O código de IA abaixo fica desligado (USAR_IA = False) e só pode voltar com consentimento e revisão jurídica.
 
 Desenho para escalar (MVP → muitos alunos):
 1. Respostas prontas primeiro (FAQ por palavras-chave): as perguntas mais comuns não gastam IA nenhuma.
@@ -17,6 +23,7 @@ from django.core.cache import cache
 
 from .frases import _estilo
 
+USAR_IA = False          # ver DECISÃO no topo
 LIMITE_DIA = 30          # mensagens por aluno por dia (valor de produto, a calibrar)
 HISTORICO = 6            # mensagens anteriores mandadas como contexto
 
@@ -83,8 +90,11 @@ def responder(aluno_id, pergunta, historico, contexto, apoios, chamar_ia):
     if not pergunta:
         return "Pode perguntar! Eu explico como a plataforma funciona.", "vazio"
     pronta = resposta_faq(pergunta)
-    if pronta and len(pergunta) < 80:
+    if pronta:
         return pronta, "faq"
+    if not USAR_IA:
+        return ("Essa eu não sei. Eu explico como a plataforma funciona: escolha uma das perguntas abaixo. "
+                "Se for sobre a lição ou sobre você, fale com seu professor ou com sua família."), "faq"
 
     sistema = MANUAL + "\nEstilo da resposta: " + _estilo(apoios).replace("no máximo 14 palavras", "no máximo 40 palavras")
     sistema += f"\nContexto da tela (sem dados pessoais): {contexto}"

@@ -335,3 +335,9 @@ Registro cronológico e literal dos prompts que Thiago enviou à IA durante o ha
 > Faça um remuso de atualizacao para membros da minha equipe, mas é uma contextualizacao bem feita
 
 **Resumo da resposta da IA:** Escreveu o documento "NextLearn — Atualização do front (branch do protótipo)" para o time: contexto da branch (o que é e o que não é), como rodar e ver cada página, o que foi construído (entrada, login, trilha em mundos, 5 modos por perfil, notas, calendário, progresso, chat, ferramenta do dev), decisões e fundamentação (apoios, cores, ECA Digital, LGPD, revisão por especialistas), como conversa com o backend e o que falta nele, e as pendências (endereço da API, termos para menores, o que vai para a demo, validação real).
+
+## Prompt 42 — 31/10/2026, 10:15 (BRT) — autor: Thiago — ferramenta: Claude
+
+> Pedi para outra IA analisar, mas ela nao sabe como esta o git agora, entao pegue apenas o que se aplica ao nosso modelo atualmente. Isso fará toda diferença pois sao os parametros que vamos usar para adapatar a plataforma (anexo: auditoria crítica completa do NextLearn)
+
+**Resumo da resposta da IA:** Conferiu a auditoria contra o Git: confirmou que o commit 1337b4f (Cauã, 09h17) levou dados.py e contas_teste.py (aluno fictício) para a main, risco de "demo de fachada"; passou os comandos para o time remover. Aplicou na branch do protótipo o que valia: chat só com FAQ (texto da criança não vai para IA), revisões contadas de verdade, ritmo por questão em vez de tempo total da aula (rótulo honesto sobre Kofler 2013), queda de acerto só com aulas de 3+ questões, cláusula de invariância de exigência cognitiva no prompt e lembrete na aprovação do professor, versão adaptada de teste reescrita. 60 testes do time passando. Registrou tudo em docs/REVISAO_ESPECIALISTAS.md.

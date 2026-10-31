@@ -65,3 +65,17 @@ Elementos que valem para todos:
 3. Meta semanal e limite diário editáveis pela família e pelo professor.
 4. Pausa com timer visual opcional no modo missão/agenda.
 5. Testar com 5–8 alunos por modo e medir conclusão de sessão e frustração (METRICAS_ENSINO camada E).
+
+
+## 5. Auditoria externa (31/10, 10h) — o que se aplicava ao modelo atual e foi feito
+
+| Achado da auditoria | Aplicação no modelo atual |
+|---|---|
+| Chat mandava texto livre da criança para IA externa (contradiz RISCOS_LEGAIS e o plano: aluno não conversa com IA generativa) | **Feito:** "Dúvidas com o Next" responde só com FAQ validada e botões; o texto não sai do servidor (`USAR_IA = False` em `chat.py`) |
+| Desafio "3 revisões" fixo em 0; treino não gravava nada | **Feito:** conclusão do treino de revisão é registrada (sessão no protótipo; EventoUso no app real) e o contador sobe ao vivo |
+| Variação de tempo comparava aulas de tamanhos diferentes e citava Kofler 2013 como se fosse a mesma medida | **Feito:** ritmo médio **por questão** por sessão; rótulo "pista, não diagnóstico" explicando que é só aproximação |
+| Queda de acerto 1ª → última misturava aulas com poucas questões | **Feito:** só entram aulas com 3+ questões |
+| IA pode "mastigar" a resposta ao adaptar (viés de construto) | **Feito:** cláusula de invariância de exigência cognitiva em `ia/blocos/base.md` e lembrete na tela de aprovação do professor; versão adaptada do aluno de teste reescrita com a mesma exigência |
+| "Dominado" = 3 de 3 | Já era provisório até a revisão de 7 dias; não afirmar BKT no pitch: hoje é regra simples + revisão (BKT contextual fica para a v2) |
+| Mundos e mascote podem infantilizar no 8º/9º ano | Mantido; nos modos missão, agenda e limpo o cenário recolhe e a saturação cai. **Pendente:** tema sóbrio por etapa (8º ano+) |
+| `dados.py` e `contas_teste.py` (aluno fictício) foram para a **main** no commit 1337b4f (Cauã, 09h17) | **Ação do time:** remover da main antes das 12h (regra de "demo de fachada" do CLAUDE.md). Não foi feito daqui porque mexe na main do time |

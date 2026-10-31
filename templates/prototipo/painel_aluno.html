@@ -253,12 +253,13 @@
     <span>Fale com o Next</span>
   </button>
   <section class="chat" id="chat-next" data-chat hidden aria-labelledby="chat-titulo">
-    <header class="chat-topo"><h2 id="chat-titulo">Next responde</h2><button type="button" class="chat-fechar" data-chat-fechar aria-label="Fechar conversa">×</button></header>
+    <header class="chat-topo"><h2 id="chat-titulo">Dúvidas com o Next</h2><button type="button" class="chat-fechar" data-chat-fechar aria-label="Fechar conversa">×</button></header>
     <ol class="chat-msgs" data-chat-msgs aria-live="polite">
       <li class="msg next">Oi! Eu explico como a plataforma funciona. Pergunte sobre fases, estrelas, calendário ou treino.</li>
     </ol>
     <div class="chat-sugestoes" data-chat-sugestoes>
       <button type="button">Como ganho estrelas?</button><button type="button">O que é revisão?</button><button type="button">Onde vejo meus prazos?</button>
+      <button type="button">O que significam as cores?</button><button type="button">Como funciona a ofensiva?</button><button type="button">Como começo uma fase?</button>
     </div>
     <form class="chat-form" data-chat-form>
       {% csrf_token %}
@@ -266,7 +267,7 @@
       <input id="chat-texto" name="pergunta" maxlength="300" autocomplete="off" placeholder="Escreva sua pergunta">
       <button type="submit">Enviar</button>
     </form>
-    <p class="chat-aviso">O Next fala só sobre a plataforma. Não escreva telefone, endereço ou senha.</p>
+    <p class="chat-aviso">O Next responde dúvidas sobre a plataforma com respostas prontas. O que você escreve não é enviado para nenhuma IA.</p>
   </section>
 
   {% include "prototipo/_calendario.html" %}
