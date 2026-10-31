@@ -208,22 +208,34 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
+
+    /* --- Micro-interações --- */
+    a, button { transition: all .15s ease; }
+    a:hover { opacity: 0.85; }
+    .card-elevated:hover { border-color: #c7d2fe; }
+    .btn:active { transform: scale(0.97); }
+    .btn-secondary:active { transform: scale(0.97); }
   </style>
   <link rel="stylesheet" href="{% static 'css/preferencias.css' %}">
 </head>
 <body class="min-h-screen{% if preferencias.fonte_dislexia %} fonte-dislexia{% endif %}{% if preferencias.leitura_voz %} leitura-voz{% endif %}{% if preferencias.modo_limpo %} modo-limpo{% endif %}" style="background: var(--color-bg);">
   <header style="background: var(--color-surface); border-bottom: 1px solid var(--color-border);">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="{% url 'contas:inicio' %}" class="text-lg font-bold tracking-tight" style="color: var(--color-primary);">NextLearn</a>
+    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+      <a href="{% url 'contas:inicio' %}" class="text-lg font-bold tracking-tight" style="color: var(--color-primary); text-decoration: none;">NextLearn</a>
       {% if user.is_authenticated %}
-        <div class="flex items-center gap-4 text-sm">
-          <span class="text-meta">{{ user.get_full_name|default:user.username }} · {{ user.get_papel_display }}</span>
+        <div class="flex items-center gap-3">
+          <span class="text-xs" style="color: var(--color-text-muted);">
+            {{ user.get_full_name|default:user.username }}
+          </span>
+          <span class="text-xs tag {% if user.papel == 'professor' %}tag-indigo{% elif user.papel == 'familia' %}tag-green{% else %}tag-sky{% endif %}">
+            {{ user.get_papel_display }}
+          </span>
           {% if user.is_staff %}
-            <a href="{% url 'admin:index' %}" class="btn-ghost text-xs">Admin</a>
+            <a href="{% url 'admin:index' %}" class="text-xs" style="color: var(--color-text-muted);">Admin</a>
           {% endif %}
           <form method="post" action="{% url 'contas:sair' %}">
             {% csrf_token %}
-            <button type="submit" class="btn-ghost text-xs" style="color: var(--color-text-secondary);">Sair</button>
+            <button type="submit" class="text-xs font-medium" style="color: var(--color-text-muted); background: none; border: none; cursor: pointer; padding: 0;">Sair</button>
           </form>
         </div>
       {% endif %}

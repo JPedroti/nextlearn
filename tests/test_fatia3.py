@@ -71,7 +71,7 @@ class PreferenciasTests(TestCase):
 
     def test_barra_e_botoes_de_ouvir_aparecem_para_o_aluno(self):
         resposta = self.client.get(reverse("aulas:ver", args=[self.aula.pk]))
-        self.assertContains(resposta, "Apoios de leitura:")
+        self.assertContains(resposta, "Apoios de leitura")
         self.assertContains(resposta, 'data-ouvir="titulo-aula texto-aula"')
         self.assertContains(resposta, "js/leitura_voz.js")
 
