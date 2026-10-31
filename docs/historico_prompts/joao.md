@@ -329,3 +329,11 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** feitas em sequência, cada uma publicada na `main` com testes: Fatia 4 (família cadastrada pelo professor, questionário de 6 perguntas provisórias sem laudo, sugestões aceitas ou recusadas pelo professor); Fatia 3 (barra de apoios de leitura com OpenDyslexic, leitura em voz alta pela Web Speech API e modo limpo, padrão no perfil + escolha na sessão, EventoUso); Fatia 5 (painel da turma com acertos por aluno e por questão, comparação original × adaptada e sugestões a partir do uso); documentação final (arquitetura com diagramas validados, decisões, contexto com dados conferidos no Censo Escolar 2025 do Inep). 80 testes passando. No meio do trabalho, o Thiago juntou o repositório `learnext` à `main` com marcas de conflito no README, `.gitignore` e `.env.example`; a IA juntou os dois lados sem perder conteúdo, sem forçar push, e conferiu que não havia chaves no histórico. Horários do histórico corrigidos com o relógio real.
 
 ---
+
+## Prompt 32 — 31/10/2026, 05:55 (BRT) — autor: João — ferramenta: Claude Code
+
+> Analise o github e o que já foi feito (outros integrantes do grupo enviaram coisas, então sugiro que faça um pull) e explore a situação atual do projeto. Não esteja muito preso ao cronograma que fizemos porque o grupo está sendo bem flexível em relação a isso.
+
+**Resumo da resposta da IA:** fez fetch do GitHub: a `main` não mudou desde 01h45; chegou só a branch `thiago/prototipo-neuro`, um protótipo de design com dados de exemplo (paleta por apoio, aula em passos, barras de fração, painel com menu lateral). Rodou o protótipo para ver as telas, conferiu que não há chaves nos commits novos e que a branch partiu de uma `main` anterior às Fatias 3–5. Alertou que o protótipo não pode ir para a `main` nem para o deploy (dados inventados) e que o deploy é a maior pendência. 80 testes passando; cronograma atualizado.
+
+---

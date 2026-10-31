@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 01:44 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 05:57 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -58,7 +58,10 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ### Thiago (Produto: motor de IA, tela do aluno, preferências de interface)
 
-- ❔ Ainda não há prompts dele no histórico nem commits no repositório
+- ✅ Histórico de prompts 01–23 e `docs/mapeamento_pesquisa_app.md` (como a pesquisa vira os 3 apoios do app), por enquanto só na branch `thiago/prototipo-neuro`
+- 🔄 Branch `thiago/prototipo-neuro` (último commit às 05h12): protótipo de design navegável em `/prototipo/`, com paleta de cores por apoio (contraste conferido), aula em passos com barra de progresso para o apoio de foco, barras de fração para o concreto, painel do professor com menu lateral e a proposta de chamar a fonte de "Letras espaçadas"
+- ⚠️ O protótipo usa dados de exemplo (alunos "Aluno A–F" com acertos inventados). Ele mesmo avisa que não é a demo: **não pode ir para a `main` nem para o deploy** (regra de demo de fachada). O caminho é levar o visual aprovado para os templates reais
+- ⚠️ A branch partiu da `main` das 01h32, antes das Fatias 3, 4 e 5. O plano dela para a Fatia 3 (outro formato de `EventoUso`, view `aulas:evento`) já está feito de outro jeito na `main`. Antes de mexer em `base.html` e `ver_aula.html`, o Thiago atualiza a branch com a `main`
 - ✅ Pesquisas e materiais do repositório `learnext` juntados a este às 01h32 (`docs/*.md`, `db/`, `design/`, `prompts/0001–0020`)
 - ⚠️ Alinhar com a equipe: parte desse material descreve outra versão do produto (tabela de laudo, papel de AEE, perfis P1–P8, métricas em 6 camadas), diferente das decisões do `CLAUDE.md` (sem laudo, 3 apoios). A banca vai ler tudo; decidir se fica como pesquisa de apoio, com um aviso, ou se sai do repositório
 - ⚠️ O mockup em `design/` é uma tela estática: não pode aparecer no vídeo como se fosse o app funcionando (regra de demo de fachada)
@@ -78,6 +81,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 05:57 — Revisão do GitHub: nada novo na `main` desde 01h45; chegou a branch `thiago/prototipo-neuro` (protótipo de design com dados de exemplo, fora da demo). Nenhuma chave nos commits novos. Cauã e Gabriel ainda sem nada no repositório. 80 testes passando. O deploy continua sendo a maior pendência.
 - 31/10, 01:44 — Documentação final escrita (arquitetura com diagramas, decisões, contexto com dados conferidos no Inep). Todas as fatias do app concluídas no código; faltam deploy, provedor de IA e textos do Cauã.
 - 31/10, 01:39 — Fatia 5 concluída no código (painel da turma e sugestões a partir do uso); 80 testes passando. Material do Thiago (repositório learnext) juntado à `main`, com as marcas de conflito resolvidas.
 - 31/10, 01:33 — Fatia 3 concluída no código (barra de apoios de leitura, OpenDyslexic, voz, modo limpo, EventoUso); 70 testes passando.
