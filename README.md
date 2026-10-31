@@ -136,5 +136,15 @@ ia/            motor de IA: blocos do prompt (ia/blocos/), montagem do prompt e 
 templates/     páginas HTML
 static/        CSS, JS e fontes
 tests/         testes automatizados
-docs/          histórico de prompts e documentação
+docs/          cronograma, histórico de prompts e documentação
+```
+
+Material trazido do repositório `learnext`, em que o Thiago trabalhou antes de juntar com este (não é usado pelo app):
+
+```
+prompts/       prompts do Thiago naquele repositório, um arquivo por prompt
+docs/*.md      pesquisas: evidências sobre neurodivergência, métricas, riscos legais, tese de produto
+db/            esboço de banco em SQL (o app usa os modelos do Django em apps/*/models.py)
+design/        mockup da tela inicial do aluno
+scripts/       testar_chave.py: testa uma chave de API em endpoint compatível com OpenAI
 ```
