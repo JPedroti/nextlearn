@@ -104,6 +104,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 # --- Banco de dados --------------------------------------------------------
 # Sem DATABASE_URL, usa SQLite local (arquivo db.sqlite3).
 # Em produção, DATABASE_URL é a connection string do Postgres no Neon.
+# DATABASE_URL vazio (como no .env.example) conta como "sem DATABASE_URL"; senão o Django dá ImproperlyConfigured.
+if not os.environ.get("DATABASE_URL", "").strip():
+    os.environ.pop("DATABASE_URL", None)
 
 DATABASES = {
     "default": dj_database_url.config(

@@ -243,3 +243,9 @@ Registro cronológico e literal dos prompts que Thiago enviou à IA durante o ha
 > Na animacao do camaleao, o sol deve descer devagar e ao entrar na agua o camaleao deve criar guelras. Alem disso voc6e deve melhor a area de login, pelo menos do aluno. Ao abriri agora deve aparecer para mim as minhas estatisticas sobre as minhas notas, as minhas tarefas e opcoes para treinar. No caso você vai criar um perfil inteiro fake, apenas para simular se isso vai ser bem executado. Entao crie um perfil com alguma neuro divergencia. Isso deve seguir o que você ja sabe, sobre qauis parametros devem existir nessa pagina
 
 **Resumo da resposta da IA:** O sol agora desce devagar (pôr do sol) com o scroll e o Next ganha guelras ao entrar na água. Criou a área do aluno do protótipo (`/prototipo/aluno/inicio/`, para onde o login do aluno leva): uma ação principal por vez, média comparada só com ele mesmo, ofensiva semanal sem perda, tempo de estudo com o limite da família, notas por matéria e evolução, tarefas, três treinos (revisar erros, rápido, revisão de 7 dias) com uma questão por tela, apoios e preferências. O `contas_teste` agora cria o aluno fictício Davi (perfil de atenção/foco, típico do TDAH, + exemplos concretos) com 9 aulas feitas e 3 pendentes, tudo marcado como dado de teste local.
+
+## Prompt 30 — 31/10/2026, 03:54 (BRT) — autor: Thiago — ferramenta: Claude
+
+> ta dando o erro de improrpoly confinger
+
+**Resumo da resposta da IA:** O `ImproperlyConfigured` vinha do `DATABASE_URL=` vazio: uma janela do servidor aberta antes da correção do `.env` continuava com o valor vazio na memória. Ajustou o `settings.py` para tratar `DATABASE_URL` vazio como "usar SQLite" (vale também para quem copiar o `.env.example`) e pediu para fechar a janela antiga e rodar o `.bat` de novo.
