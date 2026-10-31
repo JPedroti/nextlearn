@@ -29,16 +29,14 @@
                  value="{{ form.username.value|default:'' }}"
                  autocomplete="username" required autofocus
                  class="w-full rounded-lg border px-3 py-2.5 text-sm"
-                 style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"
-                 placeholder="prof, daniel ou talita">
+                 style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
         </div>
         <div class="mb-6">
           <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Senha</label>
           <input type="password" name="password" id="{{ form.password.id_for_label }}"
                  autocomplete="current-password" required
                  class="w-full rounded-lg border px-3 py-2.5 text-sm"
-                 style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"
-                 placeholder="senha123">
+                 style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);">
         </div>
         <input type="hidden" name="next" value="{{ next }}">
         <button type="submit" class="btn w-full">Entrar</button>

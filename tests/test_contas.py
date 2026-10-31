@@ -35,6 +35,12 @@ class LoginTests(TestCase):
         resposta = self.client.post(reverse("contas:entrar"), {"username": "prof", "password": "errada"})
         self.assertEqual(resposta.status_code, 200)
         self.assertFalse(resposta.wsgi_request.user.is_authenticated)
+        self.assertContains(resposta, "mensagem-error")  # o aviso de usuário ou senha errados aparece
+
+    def test_tela_de_entrar_nao_sugere_usuario_nem_senha(self):
+        resposta = self.client.get(reverse("contas:entrar"))
+        self.assertNotContains(resposta, "placeholder=")
+        self.assertNotContains(resposta, "senha123")
 
     def test_aluno_nao_acessa_pagina_do_professor(self):
         criar_usuario("aluno", Usuario.Papel.ALUNO)
