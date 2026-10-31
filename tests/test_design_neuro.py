@@ -172,7 +172,9 @@ class MascoteTests(TestCase):
         professor = Usuario.objects.create_user("prof", password=SENHA, papel=Usuario.Papel.PROFESSOR)
         familia = Usuario.objects.create_user("mae", password=SENHA, papel=Usuario.Papel.FAMILIA)
         Usuario.objects.create_user("ana", password=SENHA, papel=Usuario.Papel.ALUNO)
-        self.assertContains(self.client.get(reverse("contas:entrar")), 'aria-label="Camaleão do NextLearn acenando"')
+        entrar = self.client.get(reverse("contas:entrar"))
+        self.assertContains(entrar, 'alt="Chamaleon"')
+        self.assertContains(entrar, 'alt="NextLearn"')
         casos = [
             ("prof", "painel:inicio", "Camaleão professor"),
             ("mae", "perfis:inicio", "Família de camaleões"),

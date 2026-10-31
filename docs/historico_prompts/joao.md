@@ -606,3 +606,12 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** avisou que o roteiro colado mostra funções que só existem nas branches de protótipo do Thiago (trilha, índice de acessibilidade, aula narrada, chat do mascote, combinados), não na `main` que vai para a banca, e que gravar isso seria risco de demo de fachada e de desencontro entre vídeo e código. Reescreveu `docs/roteiro_demo.md` com as falas exatas, cena a cena, para o app da `main` (cerca de 4min40), com fala alternativa se não houver chave de IA e um resumo do que cada pilar da banca procura.
 
 ---
+
+## Prompt 49 — 31/10/2026, 11:17 (BRT) — autor: João — ferramenta: Claude Code
+
+> @"C:\Users\jpspe\Downloads\Hackathon_LEPV_NextLearn.pdf"
+> vamos voltar, temporariamente, para o assunto do projeto em si. o arquivo anexo contem a logo. coloque a nossa logo
+
+**Resumo da resposta da IA:** tirou do PDF (plano de negócio, fora do repositório) as duas logos, nextlearn e Chamaleon; recortou as sobras brancas e deixou o fundo transparente (`static/img/`). Pôs a logo do nextlearn no topo de todas as páginas e as duas na tela de entrar, com texto alternativo para leitor de tela. Corrigiu um defeito da edição anterior (`<h1class=` sem espaço no título da tela de entrar). 132 testes passando.
+
+---
