@@ -9,9 +9,9 @@ echo Testando o envio uma vez (pode pedir login do GitHub na primeira vez)...
 call enviar_git.bat
 if errorlevel 1 exit /b 1
 schtasks /Create /F /SC MINUTE /MO 5 /TN "NextLearn envio git" /TR "wscript.exe \"%~dp0enviar_git_oculto.vbs\""
-schtasks /Create /F /SC ONLOGON /TN "NextLearn servidor" /TR "wscript.exe \"%~dp0servidor_oculto.vbs\""
-if errorlevel 1 ( echo Nao consegui criar a tarefa do servidor. & pause & exit /b 1 )
-schtasks /Run /TN "NextLearn servidor" >nul
+REM Site ligado ao entrar no Windows: atalho na pasta Inicializar (nao precisa de administrador)
+echo CreateObject("WScript.Shell").Run "wscript.exe ""%~dp0servidor_oculto.vbs""", 0, False> "%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\NextLearn servidor.vbs"
+wscript.exe "%~dp0servidor_oculto.vbs"
 timeout /t 4 >nul
 start "" http://127.0.0.1:8000/prototipo/entrar/
 echo.
