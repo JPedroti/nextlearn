@@ -207,3 +207,9 @@ Registro cronológico e literal dos prompts que Thiago enviou à IA durante o ha
 > Olha só, pegue o que for util e faça um branch só nosso por favor. No caso voc6e pode usar um back que nao esteja funcionando perfeitamente do jeito que pretendemos, mas que seja capaz de atender as minhas necessidades. Quero conseguir desenhar melhor como vai ser a estrutura do site, está muito longe do que eu pensei. Além disso, crie a skill design_neuro, com o objetivo de usar os parametros já discutidos a respeito dos perfis de neuro divergente, para construir a interface. Você também vai me dar uma sugestao de associação de uma paleta de cores com um determinado perfil.
 
 **Resumo da resposta da IA:** Criou a branch `thiago/prototipo-neuro` com um protótipo navegável (app `prototipo`, dados de exemplo só para desenhar a estrutura, fora da demo oficial), paletas por apoio com contraste verificado e a proposta da skill `design_neuro`.
+
+## Prompt 24 — 31/10/2026, 02:17 (BRT) — autor: Thiago — ferramenta: Claude
+
+> Não consegui abriri o site local, me ajude nisso por favor
+
+**Resumo da resposta da IA:** O `.env` local não tinha `DEBUG`/`SECRET_KEY`, o que faz o Django parar ao iniciar; completou o `.env` (fora do Git) e passou o passo a passo para rodar no Windows (venv, dependências, migrate, runserver) na branch do protótipo.
