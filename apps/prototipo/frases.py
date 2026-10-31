@@ -1,6 +1,6 @@
 """Falas do Next geradas pela IA (endpoint compatível com OpenAI), com cache e frases de reserva.
 
-Privacidade (LGPD/ECA Digital): a API recebe apenas matéria e assunto da aula, com regras de estilo derivadas dos apoios. Não enviamos nome, turma, nota ou progresso do aluno; o nome é incluído depois, no servidor. A chave fica no .env (IA_API_KEY) e nunca vai para o navegador nem para o Git.
+Privacidade (LGPD/ECA Digital): a API recebe apenas matéria e assunto da aula, com regras de estilo derivadas dos apoios. Não enviamos nome, turma, nota ou progresso do aluno; o nome é incluído depois, no servidor. A chave fica no .env (IA_API_KEY) e nunca vai para o navegador nem para o Git."""
 
 import hashlib
 import json

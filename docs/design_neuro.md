@@ -32,3 +32,32 @@ Prioridade quando há vários: modo limpo > foco > textual > concreto > base. Co
 - GOV.UK, "Dos and don'ts on designing for accessibility" (pôster para usuários autistas).
 - Okabe & Ito, paleta segura para daltonismo.
 - W3C WCAG 2.2.
+
+## Cores por perfil (ferramenta do desenvolvedor e cenários da trilha)
+
+O aluno nunca vê o rótulo; na escola, quem liga a interface são os apoios do professor. Para o time comparar,
+a área do aluno tem a "Ferramenta do desenvolvedor" (só com `DEBUG=True`), em `apps/prototipo/perfis_dev.py`.
+
+| Perfil (dev) | Apoios | Tema | Saturação do cenário | Por quê |
+|---|---|---|---|---|
+| Sem adaptação | — | Aurora | 1,0 | Referência |
+| TDAH (P3) | foco | Oceano | 0,75, menos elementos | Memória de trabalho (Kofler 2020): menos estímulos competindo, um destaque |
+| TEA (P4) / TEA+TDAH | foco + textual | Brisa | 0,45, poucos elementos | Sensibilidade sensorial: cores simples e suaves, nada se mexe (GOV.UK; NCAEP 2020) |
+| Dislexia (P1) | textual + ouvir + letras espaçadas | Pergaminho | 0,8 | Fundo creme e texto cinza-escuro reduzem brilho (BDA); espaçamento (Zorzi 2012) |
+| Discalculia (P5) | concreto | Parque | 1,0 | Cor como código de quantidade, Okabe-Ito |
+| TDL (P2) | textual + concreto | Pergaminho | 0,85 | Linguagem simples + apoio visual |
+| DI / ritmo (P7) | foco + concreto | Parque | 0,95, poucos elementos | Concreto e passos curtos |
+| TDC (P6) | — (alvos maiores) | Aurora | 1,0 | WCAG 2.5.5: alvos de 56–96 px |
+| Altas habilidades (P8) | — | Aurora | 1,1 | Cenário completo |
+
+Os números de saturação e densidade são valor de produto, a calibrar com uso real.
+
+## Mundos da trilha (`apps/prototipo/ambientes.py`)
+
+- No máximo **10 fases por mundo**; depois começa outro mundo, mesmo na mesma matéria (Matemática → Matemática II).
+- 12 ambientes: Deserto (pirâmides, oásis, camelos, cactos, dunas), Floresta, Fundo do mar, Polo de gelo, Espaço,
+  Vulcão, Savana, Cidade, Praia, Caverna de cristal, Selva tropical, Montanhas e campos.
+- Cada mundo usa uma semente (aluno + matéria + parte) que muda a ordem, o lado, o tamanho e o tom das cores
+  dos elementos, para parecer novo. O perfil ajusta a saturação e a quantidade de elementos.
+- O Next fica ao lado da fase atual, com uma fala gerada pela IA (`apps/prototipo/frases.py`): só o contexto da fase
+  vai para a IA (sem nome nem dados do aluno), com cache de 1 hora e frases de reserva se a IA não responder.

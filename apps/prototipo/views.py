@@ -310,7 +310,8 @@ def painel_aluno(request):
 
     perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
     a, tema, intensidade = _apoios_visuais(perfil, perfil_dev)
-    trilha = _trilha(contexto, aluno, a, intensidade)
+    ambiente_dev = request.GET.get("ambiente", "") if settings.DEBUG else ""
+    trilha = _trilha(contexto, aluno, a, intensidade, ambiente_dev)
     for u in trilha:
         for no in u["nos"]:
             if no["url"] == "treino:revisao":
@@ -320,7 +321,7 @@ def painel_aluno(request):
     contexto.update(aluno=aluno, perfil=perfil, apoios=perfil.nomes_apoios() if perfil else [],
                     foco=a["foco"], textual=a["textual"], concreto=a["concreto"], limpo=a["limpo"], voz=a["voz"],
                     letras=a["letras"], alvos=a["alvos"], tema=tema, tema_nome=TEMAS_ALUNO[tema],
-                    dev=settings.DEBUG, perfil_dev=perfil_dev, perfis_dev=PERFIS_DEV, ia=status_ia(),
+                    dev=settings.DEBUG, perfil_dev=perfil_dev, ambiente_dev=ambiente_dev, ambientes=AMBIENTES_LISTA(), perfis_dev=PERFIS_DEV, ia=status_ia(),
                     trilha=trilha, mundo_atual=mundo_atual, cartoes=cartoes,
                     faixas=[faixa_nota(n) for n in (10, 9, 7.5, 6, 3)],
                     hoje=hoje, materias=sorted({n["materia"] for n in notas}),
@@ -376,7 +377,7 @@ ICONE_MATERIA = {"Matemática": "fracao", "Português": "livro", "Ciências": "g
 ROMANOS = ["", " II", " III", " IV", " V", " VI"]
 
 
-def _trilha(contexto, aluno, apoios, intensidade):
+def _trilha(contexto, aluno, apoios, intensidade, ambiente_forcado=""):
     """Trilha estilo jogo. Cada mundo (ambiente) tem no máximo 10 fases; depois começa outro mundo,
     mesmo que a matéria seja a mesma (Matemática → Matemática II). O cenário é gerado por ambiente + semente."""
     from .ambientes import AMBIENTES, FASES_POR_AMBIENTE, cenario
@@ -422,6 +423,8 @@ def _trilha(contexto, aluno, apoios, intensidade):
                         n_ocultas += 1
             altura = 140 + 118 * sum(1 for n in nos if not n.get("oculta"))
             atual = any(n["estado"] == "atual" for n in nos)
+            if atual and ambiente_forcado:  # ferramenta do desenvolvedor: ver o mundo atual em outro ambiente
+                amb = next((x for x in AMBIENTES if x["id"] == ambiente_forcado), amb)
             concluido = feitas_m == len(bloco)
             mundos.append({
                 "materia": materia, "nome": materia + ROMANOS[min(parte, len(ROMANOS) - 1)], "numero": n_mundo,
@@ -434,6 +437,12 @@ def _trilha(contexto, aluno, apoios, intensidade):
     for m in mundos:
         m["aberta"] = m["atual"] or not foco
     return mundos
+
+
+def AMBIENTES_LISTA():
+    from .ambientes import AMBIENTES
+
+    return [(a["id"], a["nome"]) for a in AMBIENTES]
 
 
 def reverse_aula(pk):

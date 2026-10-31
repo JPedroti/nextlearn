@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
 </head>
-<body data-perfil-dev="{{ perfil_dev }}" class="tema-{{ tema|default:'base' }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}{% if concreto %} apoio-concreto{% endif %}{% if limpo %} modo-limpo{% endif %}{% if voz %} com-voz{% endif %}{% if letras %} letras-espacadas{% endif %}{% if alvos %} alvos-grandes{% endif %}" data-padrao-movimento="{% if foco or limpo %}0{% else %}1{% endif %}">
+<body data-perfil-dev="{{ perfil_dev }}" data-ambiente-dev="{{ ambiente_dev }}" class="tema-{{ tema|default:'base' }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}{% if concreto %} apoio-concreto{% endif %}{% if limpo %} modo-limpo{% endif %}{% if voz %} com-voz{% endif %}{% if letras %} letras-espacadas{% endif %}{% if alvos %} alvos-grandes{% endif %}" data-padrao-movimento="{% if foco or limpo %}0{% else %}1{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
     <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn</a>
@@ -211,6 +211,11 @@
           {% for p in perfis_dev %}<option value="{{ p.id }}" {% if p.id == perfil_dev %}selected{% endif %}>{{ p.nome }}</option>{% endfor %}
         </select>
         {% for p in perfis_dev %}{% if p.id == perfil_dev %}<p class="dev-desc">{{ p.desc }}</p>{% endif %}{% endfor %}
+        <label for="ambiente">Ambiente do mundo atual</label>
+        <select id="ambiente" name="ambiente" onchange="this.form.submit()">
+          <option value="">Automático</option>
+          {% for id, nome in ambientes %}<option value="{{ id }}" {% if id == ambiente_dev %}selected{% endif %}>{{ nome }}</option>{% endfor %}
+        </select>
         <p class="dev-desc">Mundo atual: {{ mundo_atual.cenario.nome }} · IA das falas: {% if ia.endpoint and ia.chave %}configurada{% elif ia.chave %}chave ok, falta API_BASE_URL{% else %}sem chave{% endif %} · <span data-origem-fala>…</span></p>
       </form>
     </details>

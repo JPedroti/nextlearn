@@ -340,3 +340,5 @@ body.apoio-foco .progresso span { transition: none; }
 .dev select { min-height: 44px; border-radius: 10px; padding: 0 10px; font: inherit; }
 .dev-desc { margin: 0; color: #D1D5DB; }
 @media (max-width: 520px) { .dev { position: static; margin: 0 16px 24px; max-width: none; } }
+body.tema-brisa .no-bt, body.tema-brisa .nota-cartao { filter: saturate(.7); }  /* TEA: menos saturação também nas fases */
+.dev, .dev * { letter-spacing: normal !important; word-spacing: normal !important; line-height: 1.45; }

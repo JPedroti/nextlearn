@@ -30,7 +30,7 @@
   // Fala do Next (IA no servidor, com reserva). Só o texto vem para o navegador.
   var falaEl = $("[data-fala-next]");
   if (falaEl) {
-    fetch("/prototipo/aluno/fala/" + (b.dataset.perfilDev ? "?perfil_dev=" + encodeURIComponent(b.dataset.perfilDev) : ""), { credentials: "same-origin" })
+    fetch("/prototipo/aluno/fala/?perfil_dev=" + encodeURIComponent(b.dataset.perfilDev || "") + "&ambiente=" + encodeURIComponent(b.dataset.ambienteDev || ""), { credentials: "same-origin" })
       .then(function (r) { return r.json(); })
       .then(function (d) { if (d.fala) falaEl.textContent = d.fala; var o = $("[data-origem-fala]"); if (o) o.textContent = "fala: " + d.origem; })
       .catch(function () {});
