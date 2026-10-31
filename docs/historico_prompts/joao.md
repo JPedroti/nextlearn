@@ -215,3 +215,11 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** criado `docs/cronograma.md` (prazos, entregas da Fase 1, fatias e tarefas por integrante, com status concluída/em andamento/a fazer/pendência/sem informação e registro de atualizações). Nova seção 0 do CLAUDE.md: em toda conversa nova, a IA pergunta quem é o integrante, registra o prompt, resume o status a partir do cronograma e o mantém atualizado. `AGENTS.md` aponta outras ferramentas de IA para o CLAUDE.md.
 
 ---
+
+## Prompt 19 — 31/10/2026, 00:50 (BRT) — autor: João — ferramenta: Claude Code
+
+> Testar o deploy
+
+**Resumo da resposta da IA:** `nextlearn.onrender.com` responde, mas é outro projeto (Express, de jan/2025), não o nosso. O João confirmou que o serviço ainda não foi criado. `check --deploy` sem problemas graves (só avisos de HSTS e redirecionamento HTTPS, que o Render já faz). Passo a passo do Neon e do Render reenviado; o teste no ar fica para quando o serviço existir. Cronograma atualizado.
+
+---

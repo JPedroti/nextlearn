@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 30/10/2026, 23:52 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 00:50 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -19,7 +19,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 | Entrega | Responsável | Status | Observação |
 |---|---|---|---|
-| Deploy da aplicação para a banca testar | João | ⚠️ | Configuração pronta no repositório (`render.yaml`, `build.sh`). Falta criar o serviço no painel do Render, testar no ar e pôr o link no README |
+| Deploy da aplicação para a banca testar | João | ⚠️ | Configuração pronta no repositório (`render.yaml`, `build.sh`) e conferida com `check --deploy`. O serviço no Render ainda não foi criado (00h50). Depois: testar no ar e pôr o link no README. O endereço `nextlearn.onrender.com` é de outro projeto; o nosso vai ter um sufixo |
 | Vídeo de demo (até 5 min) | Cauã (roteiro e narração), Gabriel (edição) | ❔ | |
 | Plano de negócio em PDF | Gabriel | ❔ | |
 | Repositório público ou com acesso para a banca | João | ⏳ | Fazer antes das 12h: o agente que avalia o pilar Tech precisa ler o código |
@@ -70,4 +70,5 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 00:50 — Teste do deploy pedido; o serviço no Render ainda não existe. Passo a passo reenviado ao João.
 - 30/10, 23:52 — Cronograma criado. Fatias 0, 1 e 2 concluídas no código, adiantadas em relação ao plano. O deploy ainda não foi feito (João).
