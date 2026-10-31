@@ -78,3 +78,19 @@ def status_ia():
     base = os.environ.get("IA_BASE_URL") or os.environ.get("API_BASE_URL", "")
     chave = os.environ.get("IA_API_KEY") or os.environ.get("API_KEY")
     return {"chave": bool(chave), "endpoint": bool(base)}
+
+
+def chamar_chat(mensagens, max_tokens=160):
+    """Chamada genérica ao endpoint compatível com OpenAI. Devolve o texto ou None (sem quebrar a página)."""
+    chave = os.environ.get("IA_API_KEY") or os.environ.get("API_KEY")
+    base = os.environ.get("IA_BASE_URL") or os.environ.get("API_BASE_URL", "")
+    if not chave or not base:
+        return None
+    corpo = {"model": os.environ.get("IA_MODELO") or "gpt-4o-mini", "temperature": 0.5, "max_tokens": max_tokens, "messages": mensagens}
+    req = urllib.request.Request(base.rstrip("/") + "/chat/completions", data=json.dumps(corpo).encode(),
+                                 headers={"Authorization": f"Bearer {chave}", "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=12) as r:
+            return json.load(r)["choices"][0]["message"]["content"].strip() or None
+    except Exception:
+        return None

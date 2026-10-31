@@ -51,6 +51,31 @@
   escalarMapas(); addEventListener("resize", escalarMapas);
   $$("details.unidade").forEach(function (d) { d.addEventListener("toggle", escalarMapas); });
 
+  // ---------- Chat com o Next ----------
+  var chatBox = $("[data-chat]"), chatBt = $("[data-chat-abrir]");
+  if (chatBox) {
+    var msgs = $("[data-chat-msgs]"), form = $("[data-chat-form]"), campo = $("#chat-texto");
+    function abrirChat(abrir) { chatBox.hidden = !abrir; chatBt.setAttribute("aria-expanded", abrir ? "true" : "false"); if (abrir) campo.focus(); }
+    chatBt.addEventListener("click", function () { abrirChat(chatBox.hidden); });
+    $("[data-chat-fechar]").addEventListener("click", function () { abrirChat(false); chatBt.focus(); });
+    function falar(texto, quem) { var li = el("li", "msg " + quem, texto); msgs.appendChild(li); msgs.scrollTop = msgs.scrollHeight; return li; }
+    function enviar(pergunta) {
+      pergunta = pergunta.trim(); if (!pergunta) return;
+      falar(pergunta, "eu"); campo.value = "";
+      var pensando = falar("…", "next pensando");
+      var url = "/prototipo/aluno/chat/" + (b.dataset.perfilDev ? "?perfil_dev=" + encodeURIComponent(b.dataset.perfilDev) : "");
+      fetch(url, { method: "POST", credentials: "same-origin",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value },
+        body: JSON.stringify({ pergunta: pergunta }) })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { pensando.className = "msg next"; pensando.textContent = d.resposta; pensando.dataset.origem = d.origem; })
+        .catch(function () { pensando.className = "msg next"; pensando.textContent = "Não consegui responder agora. Tente de novo daqui a pouco."; });
+    }
+    form.addEventListener("submit", function (e) { e.preventDefault(); enviar(campo.value); });
+    $$("[data-chat-sugestoes] button").forEach(function (bt) { bt.addEventListener("click", function () { enviar(bt.textContent); }); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !chatBox.hidden) abrirChat(false); });
+  }
+
   var fonte = $("#dados-painel");
   if (!fonte) return;
   var D = JSON.parse(fonte.textContent);

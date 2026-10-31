@@ -714,3 +714,38 @@ def comparar(request):
         "pagina": pagina if pagina in ("inicio", "progresso") else "inicio",
         "perfis": [p for p in PERFIS_DEV if p["id"]], "ambientes": [(x["id"], x["nome"]) for x in AMBIENTES],
     })
+
+
+@papel_requerido("aluno")
+def chat(request):
+    """Chat do Next (POST). Guarda só as últimas mensagens na sessão do próprio aluno."""
+    import json as _json
+
+    from django.conf import settings
+    from django.http import JsonResponse
+
+    from .chat import HISTORICO, responder
+    from .frases import chamar_chat
+
+    if request.method != "POST":
+        return JsonResponse({"erro": "use POST"}, status=405)
+    aluno = _aluno_logado(request)
+    if not aluno:
+        return JsonResponse({"resposta": "Seu usuário ainda não está numa turma.", "origem": "erro"})
+    try:
+        pergunta = _json.loads(request.body or b"{}").get("pergunta", "")
+    except ValueError:
+        pergunta = ""
+    perfil = getattr(aluno, "perfil", None)
+    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    a, _, _ = _apoios_visuais(perfil, perfil_dev)
+    d = _dados_aluno(aluno)
+    contexto = {"fase_atual": d["proxima"]["assunto"] if d["proxima"] else None,
+                "materia": d["proxima"]["materia"] if d["proxima"] else None,
+                "aulas_feitas": len(d["feitas"]), "ofensiva_semanas": d["ofensiva"]}
+    historico = request.session.get("chat_next", [])
+    resposta, origem = responder(aluno.pk, pergunta, historico, contexto,
+                                 {k: a[k] for k in ("foco", "textual", "concreto")}, chamar_chat)
+    historico = (historico + [{"role": "user", "content": pergunta[:400]}, {"role": "assistant", "content": resposta}])[-HISTORICO:]
+    request.session["chat_next"] = historico
+    return JsonResponse({"resposta": resposta, "origem": origem})

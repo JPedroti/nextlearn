@@ -229,6 +229,28 @@
   </aside>
   {% endif %}
 
+  <!-- Chat com o Next: dúvidas sobre a plataforma -->
+  <button type="button" class="chat-abrir" data-chat-abrir aria-expanded="false" aria-controls="chat-next">
+    <span class="chat-rosto" aria-hidden="true" data-pose="normal">{% include "prototipo/_next.html" %}</span>
+    <span>Fale com o Next</span>
+  </button>
+  <section class="chat" id="chat-next" data-chat hidden aria-labelledby="chat-titulo">
+    <header class="chat-topo"><h2 id="chat-titulo">Next responde</h2><button type="button" class="chat-fechar" data-chat-fechar aria-label="Fechar conversa">×</button></header>
+    <ol class="chat-msgs" data-chat-msgs aria-live="polite">
+      <li class="msg next">Oi! Eu explico como a plataforma funciona. Pergunte sobre fases, estrelas, calendário ou treino.</li>
+    </ol>
+    <div class="chat-sugestoes" data-chat-sugestoes>
+      <button type="button">Como ganho estrelas?</button><button type="button">O que é revisão?</button><button type="button">Onde vejo meus prazos?</button>
+    </div>
+    <form class="chat-form" data-chat-form>
+      {% csrf_token %}
+      <label for="chat-texto" class="vis-oculto">Sua pergunta</label>
+      <input id="chat-texto" name="pergunta" maxlength="300" autocomplete="off" placeholder="Escreva sua pergunta">
+      <button type="submit">Enviar</button>
+    </form>
+    <p class="chat-aviso">O Next fala só sobre a plataforma. Não escreva telefone, endereço ou senha.</p>
+  </section>
+
   {% include "prototipo/_calendario.html" %}
   <script id="dados-painel" type="application/json">{{ dados_json|safe }}</script>
   {% endif %}

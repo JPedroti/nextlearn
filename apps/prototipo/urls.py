@@ -11,6 +11,7 @@ urlpatterns = [
     path("_versao/", views.versao, name="versao"),
     path("aluno/inicio/", views.painel_aluno, name="painel_aluno"),
     path("aluno/fala/", views.fala, name="fala"),
+    path("aluno/chat/", views.chat, name="chat"),
     path("aluno/progresso/", views.progresso, name="progresso"),
     path("dev/comparar/", views.comparar, name="comparar"),
     path("aluno/treino/<str:tipo>/", views.treino, name="treino"),
