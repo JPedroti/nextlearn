@@ -120,3 +120,8 @@
 .marca-logo { height: 34px; width: auto; vertical-align: middle; }
 .pg-hero .camaleao { flex-shrink: 0; }
 .pg-hero .camaleao { background: var(--cartao, #FFFFFF); border-radius: 20px; padding: 6px 10px; }
+/* Tamanho do camaleão (a branch não usa Tailwind, então o tamanho vem daqui) */
+.camaleao { width: 150px; height: 96px; display: block; }
+@media (max-width: 640px) { .camaleao { width: 110px; height: 70px; } }
+/* Nome do aluno sem quebrar linha na tabela do professor */
+.pg table td:first-child, .pg table th:first-child { white-space: nowrap; }
