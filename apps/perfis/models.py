@@ -61,19 +61,6 @@ class Perfil(models.Model):
         "Modo limpo", default=False, help_text="Tela com menos cores e enfeites, e letra maior."
     )
 
-    contexto_familia = models.TextField(
-        "Contexto compartilhado pela família",
-        blank=True,
-        help_text="Informações que a família compartilhou sobre como o aluno aprende. O professor revisa e edita. "
-        "Quando preenchido, é incluído como contexto adicional na geração das aulas adaptadas.",
-    )
-    historico_ia = models.TextField(
-        "Histórico de interações",
-        blank=True,
-        help_text="Registro acumulado de interações do aluno com as versões adaptadas: "
-        "quais máscaras foram usadas, quantos acertos, quais apoios de leitura foram ativados. "
-        "Incluído no system prompt para dar contexto real à IA.",
-    )
     revisado_pelo_professor = models.BooleanField(default=False)
     atualizado_em = models.DateTimeField(auto_now=True)
 
@@ -90,13 +77,6 @@ class Perfil(models.Model):
     def nomes_preferencias(self):
         return [self._meta.get_field(campo).verbose_name for campo in PREFERENCIAS if getattr(self, campo)]
 
-    def acrescentar_ao_historico(self, linha):
-        """Adiciona uma linha ao histórico de interações, mantendo no máximo as 20 mais recentes."""
-        linhas = [l for l in self.historico_ia.strip().split("\n") if l.strip()] if self.historico_ia else []
-        linhas.append(linha)
-        self.historico_ia = "\n".join(linhas[-20:])
-        self.save(update_fields=["historico_ia"])
-
 
 class RespostaQuestionario(models.Model):
     """Respostas da família sobre o dia a dia do aluno. Sem laudo e sem diagnóstico."""
@@ -112,7 +92,8 @@ class RespostaQuestionario(models.Model):
     observacoes = models.TextField(
         "O que mais o professor deve saber?",
         blank=True,
-        help_text="Informações que a família quer compartilhar sobre como o aluno aprende melhor.",
+        help_text="Informações que a família quer compartilhar sobre como o aluno aprende melhor. "
+        "Só o professor lê; não vai para a IA.",
     )
     preenchido_por = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="questionarios_preenchidos"
@@ -137,7 +118,7 @@ class SugestaoPerfil(models.Model):
     class Origem(models.TextChoices):
         QUESTIONARIO = "questionario", "Questionário da família"
         USO = "uso", "Uso da plataforma"
-        PADRAO_ERRO = "padrao_erro", "Padrão de erro detectado"
+        PADRAO_ERRO = "padrao_erro", "Acertos nas aulas"
 
     CAMPOS = [
         ("foco", "Atenção e foco"),

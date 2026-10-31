@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST
 
 from apps.aulas.models import Aula, EventoUso, Resposta
 from apps.contas.decorators import papel_requerido
+from apps.painel.resumo import placar
 from apps.turmas.models import Aluno
 
 from .context_processors import CHAVE_SESSAO
@@ -15,6 +16,7 @@ from .forms import ApoiosForm, QuestionarioForm
 from .models import PREFERENCIAS, Perfil, RespostaQuestionario, SugestaoPerfil
 from .questionario import criar_sugestoes, respostas_legiveis
 from .sugestoes import sugerir_pelo_uso
+
 
 def _redirecionar_para_next(request, padrao, **kwargs):
     """Volta para a página de origem (campo `next`) se ela for deste site; senão, vai para `padrao`."""
@@ -95,12 +97,6 @@ def questionario(request, aluno_pk):
                 preenchido_por=request.user,
             )
             criar_sugestoes(resposta)
-            # Levar as observações para o perfil, para o professor revisar
-            if dados["observacoes"].strip():
-                perfil, _ = Perfil.objects.get_or_create(aluno=aluno)
-                if not perfil.revisado_pelo_professor:
-                    perfil.contexto_familia = dados["observacoes"].strip()
-                    perfil.save(update_fields=["contexto_familia"])
         messages.success(request, "Obrigado! Suas respostas foram enviadas para o professor, que vai decidir os melhores apoios para o aluno.")
         return redirect("perfis:inicio")
     return render(request, "perfis/questionario.html", {"aluno": aluno, "form": form, "anterior": anterior})
@@ -108,60 +104,31 @@ def questionario(request, aluno_pk):
 
 @papel_requerido("familia")
 def relatorio(request, aluno_pk):
-    """Relatório detalhado de performance do aluno para a família."""
-    aluno = get_object_or_404(
-        Aluno.objects.select_related("usuario", "turma", "perfil"),
-        pk=aluno_pk,
-        responsavel=request.user,
-    )
-    perfil = aluno.perfil if hasattr(aluno, "perfil") else None
+    """Números reais do próprio filho para a família: acertos, versão original × adaptada e apoios de leitura usados."""
+    aluno = get_object_or_404(Aluno.objects.select_related("usuario", "turma"), pk=aluno_pk, responsavel=request.user)
+    perfil, _ = Perfil.objects.get_or_create(aluno=aluno)
+    respostas = list(Resposta.objects.filter(aluno=aluno).select_related("questao"))
+    original = placar([r for r in respostas if r.versao_mascara == 0])
+    adaptada = placar([r for r in respostas if r.versao_mascara != 0])
+    diferenca = adaptada["pct"] - original["pct"] if original["total"] and adaptada["total"] else None
 
-    # Respostas do aluno
-    respostas = list(
-        Resposta.objects.filter(aluno=aluno)
-        .select_related("questao__aula")
-        .order_by("-criado_em")
-    )
-    total_respostas = len(respostas)
-    acertos = sum(1 for r in respostas if r.correta)
-
-    # Aulas respondidas
-    aulas_ids = list(dict.fromkeys(r.questao.aula_id for r in respostas))
-    aulas_respondidas = len(aulas_ids)
-
-    # Comparação: original vs adaptada
-    originais = [r for r in respostas if r.versao_mascara == 0]
-    adaptadas = [r for r in respostas if r.versao_mascara != 0]
-
-    pct_original = round(100 * sum(1 for r in originais if r.correta) / len(originais)) if originais else None
-    pct_adaptada = round(100 * sum(1 for r in adaptadas if r.correta) / len(adaptadas)) if adaptadas else None
-
-    # Preferências mais usadas
-    from apps.aulas.models import EventoUso
-    usos = (
-        EventoUso.objects.filter(aluno=aluno)
-        .values("tipo")
-        .annotate(vezes=Count("id"))
-        .order_by("-vezes")
-    )
-    rotulos_uso = {
-        "ativou_fonte_dislexia": "Fonte para dislexia",
-        "ativou_leitura_voz": "Leitura em voz alta",
-        "ativou_modo_limpo": "Modo limpo",
-    }
+    vezes = dict(EventoUso.objects.filter(aluno=aluno).values_list("tipo").annotate(vezes=Count("id")))
+    usos = [
+        {"rotulo": Perfil._meta.get_field(campo).verbose_name, "vezes": vezes[f"ativou_{campo}"]}
+        for campo in PREFERENCIAS
+        if vezes.get(f"ativou_{campo}")
+    ]
 
     contexto = {
         "aluno": aluno,
         "perfil": perfil,
-        "total_respostas": total_respostas,
-        "acertos": acertos,
-        "pct_total": round(100 * acertos / total_respostas) if total_respostas else None,
-        "aulas_respondidas": aulas_respondidas,
-        "pct_original": pct_original,
-        "pct_adaptada": pct_adaptada,
-        "num_original": len(originais),
-        "num_adaptada": len(adaptadas),
-        "usos": [{"rotulo": rotulos_uso.get(u["tipo"], u["tipo"]), "vezes": u["vezes"]} for u in usos],
+        "geral": placar(respostas),
+        "aulas_respondidas": len({r.questao.aula_id for r in respostas}),
+        "original": original,
+        "adaptada": adaptada,
+        "diferenca": diferenca,
+        "diferenca_absoluta": abs(diferenca) if diferenca is not None else None,
+        "usos": usos,
     }
     return render(request, "perfis/relatorio.html", contexto)
 
