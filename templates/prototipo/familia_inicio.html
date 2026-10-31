@@ -67,7 +67,7 @@
         {% empty %}<p class="vazio">Nenhum apoio especial ligado: {{ aluno.usuario.first_name }} segue a aula original. Se vocês notam alguma dificuldade, respondam o questionário (seção 4).</p>{% endfor %}
       </div>
       {% if dem.prefs %}<p class="mini">Na tela, {{ aluno.usuario.first_name }} também escolheu: {{ dem.prefs|join:" " }}</p>{% endif %}
-      <p class="pg-nota">Apoio não é diagnóstico. Não pedimos laudo (Decreto 12.686/2025).</p>
+      <p class="pg-nota">Apoio não é diagnóstico: não pedimos laudo nem exame.</p>
     </section>
 
     <section id="casa" class="secao-familia">
@@ -104,7 +104,7 @@
         </form>
         <article class="cartao-pg">
           <h3>Questionário do dia a dia</h3>
-          {% if questionario %}<p>Respondido. O professor recebeu as sugestões e decide os apoios.</p>{% else %}<p>Seis perguntas simples sobre como é o estudo em casa. Sem laudo e sem diagnóstico; viram sugestões para o professor.</p>{% endif %}
+          {% if questionario %}<p>Respondido. O professor recebeu as sugestões e decide os apoios.</p>{% else %}<p>Nove perguntas simples sobre como é o estudo em casa. Sem laudo e sem diagnóstico; viram sugestões para o professor.</p>{% endif %}
           <a class="btn-contorno" href="{% url 'perfis:questionario' aluno.pk %}">{% if questionario %}Responder de novo{% else %}Responder agora{% endif %}</a>
           <h3 class="sub-h">Transparência e dados</h3>
           <ul class="lista-simples">
