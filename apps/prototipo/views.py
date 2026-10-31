@@ -303,17 +303,25 @@ def painel_aluno(request):
     dados = {"hoje": hoje.date().isoformat(), "eventos": eventos, "minutos": minutos, "notas": notas,
              "pendentes": pendentes_js, "feitas": feitas_js, "limite": LIMITE_DIARIO_MIN, "meta": META_SEMANAL}
 
-    ver = request.GET.get("ver", "")
-    a, tema = _apoios_visuais(perfil, ver)
-    trilha = _trilha(contexto, a["foco"])
+    from django.conf import settings
+
+    from .frases import status_ia
+    from .perfis_dev import PERFIS_DEV
+
+    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    a, tema, intensidade = _apoios_visuais(perfil, perfil_dev)
+    trilha = _trilha(contexto, aluno, a, intensidade)
     for u in trilha:
         for no in u["nos"]:
             if no["url"] == "treino:revisao":
                 no["url"] = reverse("prototipo:treino", args=["revisao"])
+    mundo_atual = next((u for u in trilha if u["atual"]), trilha[0] if trilha else None)
     cartoes = [dict(i, faixa=faixa_nota(i["nota"])) for i in contexto["feitas"]]  # mais recentes primeiro
     contexto.update(aluno=aluno, perfil=perfil, apoios=perfil.nomes_apoios() if perfil else [],
                     foco=a["foco"], textual=a["textual"], concreto=a["concreto"], limpo=a["limpo"], voz=a["voz"],
-                    tema=tema, tema_nome=TEMAS_ALUNO[tema], ver=ver, ver_como=VER_COMO, trilha=trilha, cartoes=cartoes,
+                    letras=a["letras"], alvos=a["alvos"], tema=tema, tema_nome=TEMAS_ALUNO[tema],
+                    dev=settings.DEBUG, perfil_dev=perfil_dev, perfis_dev=PERFIS_DEV, ia=status_ia(),
+                    trilha=trilha, mundo_atual=mundo_atual, cartoes=cartoes,
                     faixas=[faixa_nota(n) for n in (10, 9, 7.5, 6, 3)],
                     hoje=hoje, materias=sorted({n["materia"] for n in notas}),
                     dados_json=json.dumps(dados, ensure_ascii=False))
@@ -336,74 +344,96 @@ def faixa_nota(nota):
             return {"classe": classe, "rotulo": rotulo, "simbolo": simbolo}
 
 
-# Tema visual por apoio (docs/design_neuro.md). Prioridade: limpo > foco > textual > concreto > base.
+# Tema visual por apoio (docs/design_neuro.md). Prioridade: limpo > foco+textual (brisa) > foco > textual > concreto > base.
 TEMAS_ALUNO = {
-    "base": "Aurora", "foco": "Oceano", "textual": "Pergaminho", "concreto": "Parque", "limpo": "Limpo",
+    "base": "Aurora", "foco": "Oceano", "brisa": "Brisa", "textual": "Pergaminho", "concreto": "Parque", "limpo": "Limpo",
 }
-VER_COMO = [  # pré-visualização do protótipo: mesmo aluno, outro conjunto de apoios
-    ("", "Davi (perfil real do teste)"), ("base", "Sem apoios"), ("foco", "Foco"),
-    ("textual", "Leitura"), ("concreto", "Concreto"), ("limpo", "Modo limpo"),
-]
 
 
-def _apoios_visuais(perfil, ver):
-    a = {"foco": False, "textual": False, "concreto": False, "limpo": False, "voz": False}
-    if ver in ("base", "foco", "textual", "concreto", "limpo"):
-        if ver != "base":
-            a[ver] = True
-        a["voz"] = ver == "textual"
-    elif perfil:
-        a.update(foco=perfil.foco, textual=perfil.textual, concreto=perfil.concreto, limpo=perfil.modo_limpo, voz=perfil.leitura_voz)
-    tema = next((t for t in ("limpo", "foco", "textual", "concreto") if a[t]), "base")
-    return a, tema
+def _apoios_visuais(perfil, perfil_dev):
+    """Apoios que valem na tela. Com a ferramenta do desenvolvedor, simula um perfil; senão, usa o do banco."""
+    from .perfis_dev import POR_ID, intensidade_por_apoios
+
+    a = {"foco": False, "textual": False, "concreto": False, "limpo": False, "voz": False, "letras": False, "alvos": False}
+    dev = POR_ID.get(perfil_dev) if perfil_dev else None
+    if dev and "apoios" in dev:
+        a.update(dev["apoios"])
+        a.update(dev.get("prefs", {}))
+        return a, dev["tema"], dev["int"]
+    if perfil:
+        a.update(foco=perfil.foco, textual=perfil.textual, concreto=perfil.concreto, limpo=perfil.modo_limpo,
+                 voz=perfil.leitura_voz, letras=perfil.fonte_dislexia)
+    if a["limpo"]:
+        tema = "limpo"
+    elif a["foco"] and a["textual"]:
+        tema = "brisa"
+    else:
+        tema = next((t for t in ("foco", "textual", "concreto") if a[t]), "base")
+    return a, tema, intensidade_por_apoios(a)
 
 
 ICONE_MATERIA = {"Matemática": "fracao", "Português": "livro", "Ciências": "gota"}
+ROMANOS = ["", " II", " III", " IV", " V", " VI"]
 
 
-def _trilha(contexto, foco):
-    """Trilha estilo jogo: uma unidade por matéria; nós feitos (com estrelas e cor da nota), o atual e os próximos."""
+def _trilha(contexto, aluno, apoios, intensidade):
+    """Trilha estilo jogo. Cada mundo (ambiente) tem no máximo 10 fases; depois começa outro mundo,
+    mesmo que a matéria seja a mesma (Matemática → Matemática II). O cenário é gerado por ambiente + semente."""
+    from .ambientes import AMBIENTES, FASES_POR_AMBIENTE, cenario
+
+    foco = apoios["foco"]
     proxima = contexto["proxima"]
-    unidades = {}
+    por_materia = {}
     for i in sorted(contexto["feitas"], key=lambda x: x["quando"]):
-        unidades.setdefault(i["materia"], []).append(("feita", i))
+        por_materia.setdefault(i["materia"], []).append(("feita", i))
     for i in contexto["pendentes"]:
-        unidades.setdefault(i["materia"], []).append(("nova", i))
+        por_materia.setdefault(i["materia"], []).append(("nova", i))
+
+    mundos, n_mundo = [], 0
     zigue = [0, 56, 84, 56, 0, -56, -84, -56]
-    saida = []
-    for n_unid, (materia, itens) in enumerate(sorted(unidades.items(), key=lambda kv: (proxima is None or kv[0] != proxima["materia"], kv[0]))):
-        nos, feitas_u = [], 0
-        for k, (estado, i) in enumerate(itens):
-            no = {"titulo": i["assunto"], "url": reverse_aula(i["aula"].pk), "icone": ICONE_MATERIA.get(materia, "estrela")}
-            if estado == "feita":
-                feitas_u += 1
-                no.update(estado="feita", nota=i["nota"], estrelas=range(i["acertos"]), vazias=range(i["total"] - i["acertos"]),
-                          faixa=faixa_nota(i["nota"]), detalhe=f"{i['acertos']} de {i['total']} certas")
-            elif proxima and i["aula"].pk == proxima["aula"].pk:
-                no.update(estado="atual")
-            else:
-                no.update(estado="bloqueada")
-            nos.append(no)
-            if estado == "feita" and feitas_u % 3 == 0:
-                nos.append({"estado": "revisao", "titulo": "Revisão", "url": "treino:revisao", "icone": "revisao"})
-        for k, no in enumerate(nos):
-            no["deslocamento"] = zigue[k % len(zigue)]
-        # Apoio de foco: mostra só os 2 próximos nós bloqueados; o resto vira "+N" (menos coisa na tela)
-        n_ocultas, vistas = 0, 0
-        if foco:
-            for no in nos:
-                if no["estado"] == "bloqueada":
+    for materia in sorted(por_materia):
+        itens = por_materia[materia]
+        for k in range(0, len(itens), FASES_POR_AMBIENTE):
+            bloco = itens[k:k + FASES_POR_AMBIENTE]
+            parte = k // FASES_POR_AMBIENTE
+            amb = AMBIENTES[(n_mundo + aluno.pk) % len(AMBIENTES)]
+            n_mundo += 1
+            nos, feitas_m = [], 0
+            for estado, i in bloco:
+                no = {"titulo": i["assunto"], "url": reverse_aula(i["aula"].pk), "icone": ICONE_MATERIA.get(materia, "estrela")}
+                if estado == "feita":
+                    feitas_m += 1
+                    no.update(estado="feita", nota=i["nota"], estrelas=range(i["acertos"]), vazias=range(i["total"] - i["acertos"]),
+                              faixa=faixa_nota(i["nota"]), detalhe=f"{i['acertos']} de {i['total']} certas")
+                elif proxima and i["aula"].pk == proxima["aula"].pk:
+                    no.update(estado="atual")
+                else:
+                    no.update(estado="bloqueada")
+                nos.append(no)
+                if estado == "feita" and feitas_m % 3 == 0:
+                    nos.append({"estado": "revisao", "titulo": "Revisão", "url": "treino:revisao", "icone": "revisao"})
+            n_ocultas, vistas = 0, 0
+            for j, no in enumerate(nos):
+                no["deslocamento"] = zigue[j % len(zigue)]
+                if foco and no["estado"] == "bloqueada":
                     vistas += 1
                     if vistas > 2:
                         no["oculta"] = True
                         n_ocultas += 1
-        atual = any(n["estado"] == "atual" for n in nos)
-        saida.append({
-            "materia": materia, "numero": n_unid + 1, "nos": nos, "feitas": feitas_u, "total": len(itens),
-            "pct": int(100 * feitas_u / len(itens)) if itens else 0, "atual": atual, "aberta": atual or not foco,
-            "icone": ICONE_MATERIA.get(materia, "estrela"), "n_ocultas": n_ocultas,
-        })
-    return saida
+            altura = 140 + 118 * sum(1 for n in nos if not n.get("oculta"))
+            atual = any(n["estado"] == "atual" for n in nos)
+            concluido = feitas_m == len(bloco)
+            mundos.append({
+                "materia": materia, "nome": materia + ROMANOS[min(parte, len(ROMANOS) - 1)], "numero": n_mundo,
+                "nos": nos, "feitas": feitas_m, "total": len(bloco), "pct": int(100 * feitas_m / len(bloco)),
+                "atual": atual, "concluido": concluido, "icone": ICONE_MATERIA.get(materia, "estrela"), "n_ocultas": n_ocultas,
+                "cenario": cenario(amb["id"], f"{aluno.pk}-{materia}-{parte}", altura, intensidade), "altura": altura,
+            })
+    # Ordem: o mundo atual primeiro; com foco, só ele aberto
+    mundos.sort(key=lambda m: (not m["atual"], m["concluido"], m["materia"], m["numero"]))
+    for m in mundos:
+        m["aberta"] = m["atual"] or not foco
+    return mundos
 
 
 def reverse_aula(pk):
@@ -472,3 +502,30 @@ def versao(request):
             if arq.is_file() and arq.suffix in (".html", ".css", ".js", ".py"):
                 maior = max(maior, arq.stat().st_mtime)
     return JsonResponse({"v": maior})
+
+
+@papel_requerido("aluno")
+def fala(request):
+    """Fala do Next para a fase atual. A API recebe só assunto da aula e apoios, sem dados de desempenho."""
+    from django.conf import settings
+    from django.http import JsonResponse
+
+    from .frases import fala_do_next
+
+    aluno = _aluno_logado(request)
+    if not aluno:
+        return JsonResponse({"fala": "Oi! Eu sou o Next.", "origem": "reserva"})
+    perfil = getattr(aluno, "perfil", None)
+    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    a, _, _ = _apoios_visuais(perfil, perfil_dev)
+    dados_aluno = _dados_aluno(aluno)
+    proxima = dados_aluno["proxima"]
+    contexto = {
+        "materia": proxima["materia"] if proxima else "",
+        "assunto": proxima["assunto"] if proxima else "",
+    }
+    texto, origem = fala_do_next(
+        aluno.pk, contexto, {k: a[k] for k in ("foco", "textual", "concreto")},
+        nome=aluno.usuario.first_name,
+    )
+    return JsonResponse({"fala": texto, "origem": origem})

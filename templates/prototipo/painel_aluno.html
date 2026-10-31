@@ -1,4 +1,4 @@
-{% load static %}<!DOCTYPE html>
+{% load static l10n %}<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
 </head>
-<body class="tema-{{ tema|default:'base' }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}{% if concreto %} apoio-concreto{% endif %}{% if limpo %} modo-limpo{% endif %}{% if voz %} com-voz{% endif %}" data-padrao-movimento="{% if foco or limpo %}0{% else %}1{% endif %}">
+<body data-perfil-dev="{{ perfil_dev }}" class="tema-{{ tema|default:'base' }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}{% if concreto %} apoio-concreto{% endif %}{% if limpo %} modo-limpo{% endif %}{% if voz %} com-voz{% endif %}{% if letras %} letras-espacadas{% endif %}{% if alvos %} alvos-grandes{% endif %}" data-padrao-movimento="{% if foco or limpo %}0{% else %}1{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
     <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn</a>
@@ -49,40 +49,51 @@
 
       <div class="trilha" aria-label="Minha trilha">
         {% for u in trilha %}
-          <details class="unidade" {% if u.aberta %}open{% endif %}>
-            <summary class="unidade-faixa u{{ forloop.counter }}">
+          <details class="unidade{% if u.cenario.escuro %} escuro{% endif %}" {% if u.aberta %}open{% endif %}
+                   style="--ceu: {{ u.cenario.cor.ceu }}; --chao: {{ u.cenario.cor.chao }}; --amb-a: {{ u.cenario.cor.a }}; --amb-c: {{ u.cenario.cor.c }}">
+            <summary class="unidade-faixa">
               <span class="u-icone" aria-hidden="true"><svg><use href="#i-{{ u.icone }}"/></svg></span>
-              <span class="u-texto"><span class="u-num">Unidade {{ u.numero }}</span><strong>{{ u.materia }}</strong></span>
+              <span class="u-texto"><span class="u-num">Mundo {{ u.numero }} · {{ u.cenario.nome }}</span><strong class="mundo-nome">{{ u.nome }}</strong></span>
               <span class="u-prog" role="img" aria-label="{{ u.feitas }} de {{ u.total }} fases feitas"><span style="width: {{ u.pct }}%"></span></span>
               <span class="u-conta">{{ u.feitas }}/{{ u.total }}</span>
             </summary>
-            <ol class="caminho">
-              {% for no in u.nos %}{% if not no.oculta %}
-                <li class="no no-{{ no.estado }}" style="--x: {{ no.deslocamento }}px">
-                  {% if no.estado == "feita" %}
-                    <a class="no-bt {{ no.faixa.classe }}" href="{{ no.url }}" aria-label="{{ no.titulo }}: {{ no.detalhe }}, {{ no.faixa.rotulo }}">
-                      <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}check{% endif %}"/></svg>
-                    </a>
-                    <span class="no-estrelas" aria-hidden="true">{% for e in no.estrelas %}<i class="cheia">★</i>{% endfor %}{% for e in no.vazias %}<i>★</i>{% endfor %}</span>
-                    {% if textual or not foco %}<span class="no-nome">{{ no.titulo }}</span>{% endif %}
-                  {% elif no.estado == "atual" %}
-                    <span class="balao-fase">Começar!</span>
-                    <a class="no-bt" href="{{ no.url }}" aria-label="Fase atual: {{ no.titulo }}. Começar">
-                      <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}estrela{% endif %}"/></svg>
-                    </a>
-                    <span class="no-nome forte">{{ no.titulo }}</span>
-                    <span class="next-trilha" aria-hidden="true" data-pose="livro">{% include "prototipo/_next.html" %}</span>
-                  {% elif no.estado == "revisao" %}
-                    <a class="no-bt" href="{{ no.url }}" aria-label="Revisão: treino para não esquecer"><svg aria-hidden="true"><use href="#i-revisao"/></svg></a>
-                    <span class="no-nome">Revisão</span>
-                  {% else %}
-                    <span class="no-bt" role="img" aria-label="{{ no.titulo }}: fase bloqueada, vem depois"><svg aria-hidden="true"><use href="#i-cadeado"/></svg></span>
-                    {% if textual or not foco %}<span class="no-nome">{{ no.titulo }}</span>{% endif %}
-                  {% endif %}
-                </li>
-              {% endif %}{% endfor %}
-              {% if u.n_ocultas %}<li class="no no-mais" style="--x: 0px"><span>+{{ u.n_ocultas }} fase{{ u.n_ocultas|pluralize }} depois</span></li>{% endif %}
-            </ol>
+            <div class="mundo" style="min-height: {{ u.altura|unlocalize }}px">
+              <div class="cenario" aria-hidden="true">
+                {% for e in u.cenario.elementos %}
+                  <svg class="elem elem-{{ e.tipo }}{% if e.espelhar %} espelhar{% endif %}" viewBox="0 0 100 100" style="left: {{ e.x|unlocalize }}%; top: {{ e.y|unlocalize }}px; width: {{ e.tam|unlocalize }}px; height: {{ e.tam|unlocalize }}px">{{ e.svg|safe }}</svg>
+                {% endfor %}
+              </div>
+              <ol class="caminho">
+                {% for no in u.nos %}{% if not no.oculta %}
+                  <li class="no no-{{ no.estado }}" style="--x: {{ no.deslocamento }}px">
+                    {% if no.estado == "feita" %}
+                      <a class="no-bt {{ no.faixa.classe }}" href="{{ no.url }}" aria-label="{{ no.titulo }}: {{ no.detalhe }}, {{ no.faixa.rotulo }}">
+                        <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}check{% endif %}"/></svg>
+                      </a>
+                      <span class="no-estrelas" aria-hidden="true">{% for e in no.estrelas %}<i class="cheia">★</i>{% endfor %}{% for e in no.vazias %}<i>★</i>{% endfor %}</span>
+                      <span class="no-nome">{{ no.titulo }}</span>
+                    {% elif no.estado == "atual" %}
+                      <div class="next-no" aria-live="polite">
+                        <p class="fala-next" data-fala-next>{% if foco %}Próxima fase: {{ no.titulo }}.{% else %}Vamos nessa? Eu vou junto!{% endif %}</p>
+                        <span class="next-trilha" aria-hidden="true" data-pose="livro">{% include "prototipo/_next.html" %}</span>
+                      </div>
+                      <a class="no-bt" href="{{ no.url }}" aria-label="Fase atual: {{ no.titulo }}. Começar">
+                        <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}estrela{% endif %}"/></svg>
+                      </a>
+                      <span class="no-nome forte">{{ no.titulo }}</span>
+                    {% elif no.estado == "revisao" %}
+                      <a class="no-bt" href="{{ no.url }}" aria-label="Revisão: treino para não esquecer"><svg aria-hidden="true"><use href="#i-revisao"/></svg></a>
+                      <span class="no-nome">Revisão</span>
+                    {% else %}
+                      <span class="no-bt" role="img" aria-label="{{ no.titulo }}: fase bloqueada, vem depois"><svg aria-hidden="true"><use href="#i-cadeado"/></svg></span>
+                      <span class="no-nome">{{ no.titulo }}</span>
+                    {% endif %}
+                  </li>
+                {% endif %}{% endfor %}
+                {% if u.n_ocultas %}<li class="no no-mais" style="--x: 0px"><span>+{{ u.n_ocultas }} fase{{ u.n_ocultas|pluralize }} depois</span></li>{% endif %}
+                {% if u.concluido %}<li class="no no-fim" style="--x: 0px"><span>Mundo concluído! Próximo mundo abaixo.</span></li>{% endif %}
+              </ol>
+            </div>
           </details>
         {% endfor %}
       </div>
@@ -174,7 +185,7 @@
         <h2 id="pref-titulo">Do meu jeito</h2>
         <p class="mini">Apoios do professor: {% for x in apoios %}{{ x }}{% if not forloop.last %}, {% endif %}{% empty %}nenhum (aula original){% endfor %}.</p>
         <div class="prefs">
-          <button type="button" class="interruptor" data-pref="letras" aria-pressed="false">Letras espaçadas</button>
+          <button type="button" class="interruptor" data-pref="letras" aria-pressed="{% if letras %}true{% else %}false{% endif %}">Letras espaçadas</button>
           <button type="button" class="interruptor" data-pref="voz" aria-pressed="{% if voz %}true{% else %}false{% endif %}">Botões de ouvir</button>
           <button type="button" class="interruptor" data-pref="limpo" aria-pressed="{% if limpo %}true{% else %}false{% endif %}">Modo limpo</button>
           <button type="button" class="interruptor" data-pref="movimento" aria-pressed="{% if foco or limpo %}false{% else %}true{% endif %}">Animações</button>
@@ -190,11 +201,21 @@
     </div>
   </main>
 
-  <aside class="ver-como" aria-label="Pré-visualizar outro perfil (protótipo)">
-    <span>Protótipo · ver como:</span>
-    {% for chave, nome in ver_como %}<a href="?ver={{ chave }}" {% if chave == ver %}aria-current="page"{% endif %}>{{ nome }}</a>{% endfor %}
-    <span class="tema-nome">Tema: {{ tema_nome }}</span>
+  {% if dev %}
+  <aside class="dev" aria-label="Ferramenta do desenvolvedor">
+    <details>
+      <summary>Ferramenta do desenvolvedor · {{ tema_nome }}</summary>
+      <form method="get" class="dev-form">
+        <label for="perfil_dev">Simular perfil (só para o time; o aluno nunca vê estes rótulos)</label>
+        <select id="perfil_dev" name="perfil_dev" onchange="this.form.submit()">
+          {% for p in perfis_dev %}<option value="{{ p.id }}" {% if p.id == perfil_dev %}selected{% endif %}>{{ p.nome }}</option>{% endfor %}
+        </select>
+        {% for p in perfis_dev %}{% if p.id == perfil_dev %}<p class="dev-desc">{{ p.desc }}</p>{% endif %}{% endfor %}
+        <p class="dev-desc">Mundo atual: {{ mundo_atual.cenario.nome }} · IA das falas: {% if ia.endpoint and ia.chave %}configurada{% elif ia.chave %}chave ok, falta API_BASE_URL{% else %}sem chave{% endif %} · <span data-origem-fala>…</span></p>
+      </form>
+    </details>
   </aside>
+  {% endif %}
 
   {% include "prototipo/_calendario.html" %}
   <script id="dados-painel" type="application/json">{{ dados_json|safe }}</script>

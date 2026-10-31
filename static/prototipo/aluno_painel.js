@@ -10,7 +10,7 @@
   // ---------- Preferências (só para o aluno, na hora) ----------
   var classes = { letras: "letras-espacadas", voz: "com-voz", limpo: "modo-limpo", movimento: "com-movimento" };
   $$("[data-pref]").forEach(function (bt) {
-    var k = bt.dataset.pref, salvo = ler(k);
+    var k = bt.dataset.pref, salvo = b.dataset.perfilDev ? null : ler(k);   // simulação do dev ignora o que ficou salvo
     var ligado = salvo === null ? bt.getAttribute("aria-pressed") === "true" : salvo === "1";
     function aplicar() { bt.setAttribute("aria-pressed", ligado ? "true" : "false"); b.classList.toggle(classes[k], ligado); }
     aplicar();
@@ -26,6 +26,15 @@
       msg.textContent = bt.dataset.humor === "dificil" ? "Obrigado por contar. Amanhã a gente vai com calma." : "Obrigado por contar!";
     });
   });
+
+  // Fala do Next (IA no servidor, com reserva). Só o texto vem para o navegador.
+  var falaEl = $("[data-fala-next]");
+  if (falaEl) {
+    fetch("/prototipo/aluno/fala/" + (b.dataset.perfilDev ? "?perfil_dev=" + encodeURIComponent(b.dataset.perfilDev) : ""), { credentials: "same-origin" })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (d.fala) falaEl.textContent = d.fala; var o = $("[data-origem-fala]"); if (o) o.textContent = "fala: " + d.origem; })
+      .catch(function () {});
+  }
 
   var fonte = $("#dados-painel");
   if (!fonte) return;

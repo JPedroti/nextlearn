@@ -10,6 +10,7 @@ urlpatterns = [
     path("login/", views.Login.as_view(), name="login"),
     path("_versao/", views.versao, name="versao"),
     path("aluno/inicio/", views.painel_aluno, name="painel_aluno"),
+    path("aluno/fala/", views.fala, name="fala"),
     path("aluno/treino/<str:tipo>/", views.treino, name="treino"),
     path("aluno/", views.aluno, name="aluno"),
     path("aluno/aula/", views.aula, name="aula"),

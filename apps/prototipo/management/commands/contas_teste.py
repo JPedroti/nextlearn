@@ -81,6 +81,8 @@ AULAS = [
       ("'Ela estudou' indica uma ação:", ["que vai acontecer", "que já aconteceu", "acontecendo agora", "impossível"], 1)], None, 0, 0),
 ]
 
+
+
 # Versão aprovada (apoios foco + concreto = máscara 5) para a próxima tarefa do Davi
 VERSAO_RETA = (
     "Passo 1. Pense numa régua de 0 até 1, como uma barra de chocolate.\n\n"
