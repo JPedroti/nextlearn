@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block titulo %}Apoios de {{ aluno }} · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'turmas:detalhe' aluno.turma.pk %}" class="voltar">← {{ aluno.turma.nome }}</a>
+<div class="cartao max-w-xl mt-3">
+  <h1 class="text-2xl font-semibold mb-1">Apoios de {{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</h1>
+  <p class="text-sm text-slate-600 mb-6">
+    Marque o que ajuda este aluno a aprender. Cada combinação de apoios gera uma versão da mesma aula,
+    que você revisa antes de chegar ao aluno. Sem nenhum apoio marcado, ele vê a aula original.
+  </p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for campo in form %}
+      <label class="flex items-start gap-3 mb-4 cursor-pointer">
+        {{ campo }}
+        <span>
+          <span class="block font-medium">{{ campo.label }}</span>
+          <span class="block text-sm text-slate-600">{{ campo.help_text }}</span>
+        </span>
+      </label>
+    {% endfor %}
+    <button type="submit" class="btn">Salvar apoios</button>
+  </form>
+</div>
+{% endblock %}

@@ -7,10 +7,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.contas.decorators import papel_requerido
+from apps.perfis.models import Perfil, nomes_da_mascara
 from apps.turmas.models import Aluno, Turma
+from ia.gerar_versao import ErroGeracao, gerar_versao
 
-from .forms import AulaForm, QuestaoFormSet
-from .models import Aula, Resposta
+from .forms import AulaForm, QuestaoFormSet, VersaoForm
+from .models import Aula, Resposta, VersaoAdaptada
 from .versoes import versao_para_aluno
 
 # ---------------------------------------------------------------------------
@@ -62,8 +64,10 @@ def editar_aula(request, pk):
     formset = QuestaoFormSet(request.POST or None, instance=aula)
     if request.method == "POST" and form.is_valid() and formset.is_valid():
         _salvar_aula(form, formset)
-        # Fatia 2: ao editar, apagar as VersaoAdaptada desta aula (o texto original mudou).
-        messages.success(request, "Aula atualizada.")
+        # O texto original mudou: as versões adaptadas antigas não valem mais.
+        apagadas, _ = aula.versoes.all().delete()
+        aviso = " As versões adaptadas foram apagadas; gere de novo." if apagadas else ""
+        messages.success(request, "Aula atualizada." + aviso)
         return redirect("aulas:detalhe_professor", pk=aula.pk)
     return render(request, "aulas/form_aula.html", {"turma": aula.turma, "form": form, "formset": formset, "aula": aula})
 
@@ -72,13 +76,65 @@ def editar_aula(request, pk):
 def detalhe_professor(request, pk):
     aula = get_object_or_404(Aula.objects.select_related("turma"), pk=pk, turma__professor=request.user)
     alunos_que_responderam = Aluno.objects.filter(respostas__questao__aula=aula).distinct().count()
+
+    # Uma linha por combinação de apoios que existe na turma (a 000 é a própria aula original).
+    alunos_por_mascara = {}
+    for perfil in Perfil.objects.filter(aluno__turma=aula.turma):
+        if perfil.mascara:
+            alunos_por_mascara[perfil.mascara] = alunos_por_mascara.get(perfil.mascara, 0) + 1
+    versoes = {versao.mascara: versao for versao in aula.versoes.all()}
+    linhas_versoes = [
+        {
+            "mascara": mascara,
+            "apoios": nomes_da_mascara(mascara),
+            "num_alunos": num_alunos,
+            "versao": versoes.get(mascara),
+        }
+        for mascara, num_alunos in sorted(alunos_por_mascara.items())
+    ]
+
     contexto = {
         "aula": aula,
         "questoes": aula.questoes.all(),
         "alunos_que_responderam": alunos_que_responderam,
         "total_alunos": aula.turma.alunos.count(),
+        "linhas_versoes": linhas_versoes,
+        "faltam_aprovar": any(not (linha["versao"] and linha["versao"].aprovada) for linha in linhas_versoes),
     }
     return render(request, "aulas/detalhe_professor.html", contexto)
+
+
+@require_POST
+@papel_requerido("professor")
+def gerar(request, pk, mascara):
+    """Gera com a IA a versão da aula para uma combinação de apoios (ou gera de novo, com forcar=1)."""
+    aula = get_object_or_404(Aula, pk=pk, turma__professor=request.user)
+    if not 1 <= mascara <= 7:
+        raise Http404
+    try:
+        gerar_versao(aula, mascara, forcar=request.POST.get("forcar") == "1")
+    except ErroGeracao as erro:
+        messages.error(request, str(erro))
+        return redirect("aulas:detalhe_professor", pk=aula.pk)
+    return redirect("aulas:revisar_versao", pk=aula.pk, mascara=mascara)
+
+
+@papel_requerido("professor")
+def revisar_versao(request, pk, mascara):
+    """Mostra a versão gerada para o professor corrigir, se quiser, e aprovar."""
+    aula = get_object_or_404(Aula, pk=pk, turma__professor=request.user)
+    versao = get_object_or_404(VersaoAdaptada, aula=aula, mascara=mascara)
+    questoes = list(aula.questoes.all())
+    form = VersaoForm(request.POST or None, versao=versao, questoes=questoes)
+    if request.method == "POST" and form.is_valid():
+        versao.conteudo = form.cleaned_data["conteudo"].strip()
+        versao.enunciados = form.enunciados()
+        versao.aprovada = True
+        versao.save()
+        messages.success(request, "Versão aprovada: os alunos com esses apoios já veem esta versão.")
+        return redirect("aulas:detalhe_professor", pk=aula.pk)
+    contexto = {"aula": aula, "versao": versao, "apoios": nomes_da_mascara(mascara), "form": form}
+    return render(request, "aulas/revisar_versao.html", contexto)
 
 
 @require_POST

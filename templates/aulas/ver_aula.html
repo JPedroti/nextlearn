@@ -33,7 +33,7 @@
     {% csrf_token %}
     {% for item in itens %}
       <fieldset class="cartao mb-4">
-        <legend class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</legend>
+        <legend class="float-left w-full font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</legend>
         {% for alternativa in item.questao.alternativas %}
           <label class="flex items-start gap-2 rounded px-2 py-1 hover:bg-slate-50">
             <input type="radio" name="questao_{{ item.questao.pk }}" value="{{ forloop.counter0 }}" required class="mt-1.5">

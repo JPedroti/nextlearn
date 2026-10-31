@@ -26,7 +26,7 @@
 
   {% for qform in formset %}
     <fieldset class="cartao mb-4">
-      <legend class="font-medium px-1">Questão {{ forloop.counter }}</legend>
+      <legend class="float-left w-full font-medium mb-2">Questão {{ forloop.counter }}</legend>
       {{ qform.id }}
       {% if qform.non_field_errors %}<div class="mb-3">{{ qform.non_field_errors }}</div>{% endif %}
       {% include "_campo.html" with campo=qform.enunciado %}

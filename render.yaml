@@ -6,7 +6,8 @@ services:
     runtime: python
     plan: free
     buildCommand: bash build.sh
-    startCommand: gunicorn config.wsgi:application
+    # Timeout de 120 s: gerar uma versão com a IA pode passar dos 30 s padrão do gunicorn.
+    startCommand: gunicorn config.wsgi:application --timeout 120
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8

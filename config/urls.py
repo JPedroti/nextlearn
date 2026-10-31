@@ -6,6 +6,7 @@ urlpatterns = [
     path("", include("apps.contas.urls")),
     path("professor/", include("apps.painel.urls")),
     path("professor/turmas/", include("apps.turmas.urls")),
-    path("familia/", include("apps.perfis.urls")),
-    path("", include("apps.aulas.urls")),  # rotas do professor (/professor/aulas/...) e do aluno (/aluno/...)
+    # Os apps abaixo têm rotas do professor (/professor/...) e da família ou do aluno.
+    path("", include("apps.perfis.urls")),
+    path("", include("apps.aulas.urls")),
 ]

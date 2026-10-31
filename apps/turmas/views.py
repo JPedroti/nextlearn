@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.contas.decorators import papel_requerido
 from apps.contas.models import Usuario
+from apps.perfis.models import Perfil
 
 from .forms import NovoAlunoForm, TurmaForm
 from .models import Aluno, Turma
@@ -27,7 +28,7 @@ def detalhe(request, pk):
     turma = get_object_or_404(Turma, pk=pk, professor=request.user)
     contexto = {
         "turma": turma,
-        "alunos": turma.alunos.select_related("usuario"),
+        "alunos": turma.alunos.select_related("usuario", "perfil"),
         "aulas": turma.aulas.all(),
     }
     return render(request, "turmas/detalhe.html", contexto)
@@ -42,7 +43,8 @@ def novo_aluno(request, pk):
             usuario = form.save(commit=False)
             usuario.papel = Usuario.Papel.ALUNO
             usuario.save()
-            Aluno.objects.create(usuario=usuario, turma=turma)
+            aluno = Aluno.objects.create(usuario=usuario, turma=turma)
+            Perfil.objects.create(aluno=aluno)  # começa sem apoios: vê a aula original
         messages.success(
             request, f"{usuario} foi cadastrado(a). Passe o usuário “{usuario.username}” e a senha para o primeiro acesso."
         )

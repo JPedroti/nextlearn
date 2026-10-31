@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block titulo %}Revisar versão · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'aulas:detalhe_professor' aula.pk %}" class="voltar">← {{ aula.titulo }}</a>
+
+<div class="flex flex-wrap items-start justify-between gap-4 mt-3 mb-6">
+  <div>
+    <h1 class="text-2xl font-semibold">Versão: {{ apoios|join:" + " }}</h1>
+    <p class="text-sm text-slate-600">
+      {% if versao.aprovada %}Aprovada. Os alunos com esses apoios veem esta versão.{% else %}Gerada pela IA e ainda não aprovada.{% endif %}
+      Você pode corrigir o texto antes de aprovar.
+    </p>
+  </div>
+  <form method="post" action="{% url 'aulas:gerar_versao' aula.pk versao.mascara %}" data-gerar>
+    {% csrf_token %}
+    <input type="hidden" name="forcar" value="1">
+    <button type="submit" class="btn-sec">Gerar de novo</button>
+  </form>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="cartao mb-6">
+    {% include "_campo.html" with campo=form.conteudo %}
+    <details class="text-sm">
+      <summary class="cursor-pointer text-indigo-700">Comparar com a versão original</summary>
+      <div class="mt-3 rounded bg-slate-50 p-4 space-y-3">{{ aula.conteudo|linebreaks }}</div>
+    </details>
+  </div>
+
+  <h2 class="text-xl font-semibold mb-1">Questões</h2>
+  <p class="text-sm text-slate-600 mb-4">A IA só reescreve o enunciado. As alternativas e a resposta correta são as suas e não mudam.</p>
+  {% for campo, questao in form.itens %}
+    <div class="cartao mb-4">
+      {% include "_campo.html" %}
+      <p class="text-xs text-slate-500 mb-2">Original: {{ questao.enunciado }}</p>
+      <ul class="text-sm space-y-1">
+        {% for alternativa in questao.alternativas %}
+          <li class="{% if forloop.counter0 == questao.indice_correto %}font-medium text-green-800{% endif %}">
+            {{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}{% if forloop.counter0 == questao.indice_correto %} · correta{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endfor %}
+
+  <button type="submit" class="btn">{% if versao.aprovada %}Salvar alterações{% else %}Aprovar versão{% endif %}</button>
+</form>
+{% endblock %}

@@ -78,3 +78,27 @@ QuestaoFormSet = forms.inlineformset_factory(
     validate_min=True,
     can_delete=True,
 )
+
+
+class VersaoForm(forms.Form):
+    """O professor revisa (e pode corrigir) o texto e os enunciados gerados pela IA antes de aprovar."""
+
+    conteudo = forms.CharField(label="Texto da aula adaptado", widget=forms.Textarea(attrs={"rows": 14}))
+
+    def __init__(self, *args, versao, questoes, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["conteudo"].initial = versao.conteudo
+        self.questoes = questoes
+        for i, (questao, enunciado) in enumerate(zip(questoes, versao.enunciados)):
+            self.fields[f"enunciado_{i}"] = forms.CharField(
+                label=f"Enunciado da questão {questao.ordem}",
+                initial=enunciado,
+                widget=forms.Textarea(attrs={"rows": 3}),
+            )
+
+    def itens(self):
+        """Pares (campo do enunciado, questão) para mostrar as alternativas do professor ao lado."""
+        return [(self[f"enunciado_{i}"], questao) for i, questao in enumerate(self.questoes)]
+
+    def enunciados(self):
+        return [self.cleaned_data[f"enunciado_{i}"].strip() for i in range(len(self.questoes))]

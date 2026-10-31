@@ -5,5 +5,8 @@ from . import views
 app_name = "perfis"
 
 urlpatterns = [
-    path("", views.inicio, name="inicio"),
+    # Família
+    path("familia/", views.inicio, name="inicio"),
+    # Professor
+    path("professor/alunos/<int:aluno_pk>/apoios/", views.editar_apoios, name="editar_apoios"),
 ]

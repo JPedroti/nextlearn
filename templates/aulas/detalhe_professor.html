@@ -24,6 +24,49 @@
   </div>
 </div>
 
+<section class="mb-8">
+  <h2 class="text-xl font-semibold mb-1">Versões adaptadas</h2>
+  <p class="text-sm text-slate-600 mb-3">
+    Uma versão para cada combinação de apoios presente na turma, gerada pela IA a partir do texto abaixo.
+    Os alunos só veem uma versão depois que você aprova; até lá, veem a original.
+  </p>
+  {% if linhas_versoes %}
+    <ul class="cartao divide-y divide-slate-100 p-0">
+      {% for linha in linhas_versoes %}
+        <li class="px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+          <span>
+            <span class="block font-medium">{{ linha.apoios|join:" + " }}</span>
+            <span class="block text-sm text-slate-500">{{ linha.num_alunos }} aluno{{ linha.num_alunos|pluralize }}</span>
+          </span>
+          <span class="flex items-center gap-3">
+            {% if not linha.versao %}
+              <span class="text-xs rounded-full bg-slate-100 text-slate-700 px-2 py-1">Não gerada</span>
+              <form method="post" action="{% url 'aulas:gerar_versao' aula.pk linha.mascara %}" data-gerar>
+                {% csrf_token %}
+                <button type="submit" class="btn">Gerar com IA</button>
+              </form>
+            {% elif linha.versao.aprovada %}
+              <span class="text-xs rounded-full bg-green-100 text-green-800 px-2 py-1">Aprovada</span>
+              <a href="{% url 'aulas:revisar_versao' aula.pk linha.mascara %}" class="btn-sec">Ver</a>
+            {% else %}
+              <span class="text-xs rounded-full bg-amber-100 text-amber-900 px-2 py-1">Aguardando sua revisão</span>
+              <a href="{% url 'aulas:revisar_versao' aula.pk linha.mascara %}" class="btn">Revisar</a>
+            {% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+    {% if aula.publicada and faltam_aprovar %}
+      <p class="mt-2 text-sm text-amber-800">Enquanto uma versão não é aprovada, os alunos com esses apoios veem a aula original.</p>
+    {% endif %}
+  {% else %}
+    <p class="cartao text-slate-600">
+      Nenhum aluno da turma tem apoios marcados, então todos veem a aula original.
+      Marque os apoios em <a href="{% url 'turmas:detalhe' aula.turma.pk %}" class="text-indigo-700 hover:underline">Alunos → Ajustar apoios</a>.
+    </p>
+  {% endif %}
+</section>
+
 <article class="cartao mb-6">
   <h2 class="text-sm font-medium text-slate-500 mb-2">Versão original</h2>
   <div class="leading-relaxed space-y-3">{{ aula.conteudo|linebreaks }}</div>

@@ -45,5 +45,16 @@
     {% endif %}
     {% block conteudo %}{% endblock %}
   </main>
+
+  <script>
+    // Formulários que chamam a IA: evita clique duplo e avisa que pode demorar.
+    document.querySelectorAll("form[data-gerar]").forEach(function (form) {
+      form.addEventListener("submit", function () {
+        var botao = form.querySelector("button");
+        botao.disabled = true;
+        botao.textContent = "Gerando… (pode levar até 1 minuto)";
+      });
+    });
+  </script>
 </body>
 </html>

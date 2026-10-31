@@ -39,9 +39,19 @@
   {% if alunos %}
     <ul class="cartao divide-y divide-slate-100 p-0">
       {% for aluno in alunos %}
-        <li class="px-6 py-3 flex justify-between">
-          <span>{{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</span>
-          <span class="text-sm text-slate-500">usuário: {{ aluno.usuario.username }}</span>
+        <li class="px-6 py-3 flex flex-wrap items-center justify-between gap-2">
+          <span>
+            <span class="block">{{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</span>
+            <span class="block text-sm text-slate-500">usuário: {{ aluno.usuario.username }}</span>
+          </span>
+          <span class="flex flex-wrap items-center gap-2 text-xs">
+            {% for apoio in aluno.perfil.nomes_apoios %}
+              <span class="rounded-full bg-amber-100 text-amber-900 px-2 py-1">{{ apoio }}</span>
+            {% empty %}
+              <span class="rounded-full bg-slate-100 text-slate-700 px-2 py-1">Aula original</span>
+            {% endfor %}
+            <a href="{% url 'perfis:editar_apoios' aluno.pk %}" class="text-sm text-indigo-700 hover:underline ml-2">Ajustar apoios</a>
+          </span>
         </li>
       {% endfor %}
     </ul>
