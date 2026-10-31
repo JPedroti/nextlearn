@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block titulo %}Dashboard — {{ aluno.usuario.get_full_name|default:aluno.usuario.username }} · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'turmas:detalhe' aluno.turma.pk %}" class="voltar">← {{ aluno.turma.nome }}</a>
+
+<h1 class="text-2xl font-semibold mt-3 mb-1">{{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</h1>
+<div class="flex flex-wrap items-center gap-3 mb-6">
+  <span class="text-sm text-slate-500">Turma: {{ aluno.turma.nome }}</span>
+  <a href="{% url 'perfis:editar_apoios' aluno.pk %}" class="text-sm text-indigo-700 hover:underline">Ajustar apoios</a>
+</div>
+
+{% if total_questoes == 0 %}
+  <div class="cartao max-w-xl">
+    <p class="text-slate-600">Nenhuma atividade ainda. Os dados aparecem aqui assim que o aluno responder a primeira aula.</p>
+  </div>
+{% else %}
+  <!-- Cards de resumo -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="cartao text-center">
+      <p class="text-3xl font-bold text-indigo-700">{{ pct_total }}%</p>
+      <p class="text-xs text-slate-500">acertos ({{ acertos }}/{{ total_questoes }})</p>
+    </div>
+    <div class="cartao text-center">
+      <p class="text-3xl font-bold text-indigo-700">{{ aulas_respondidas }}</p>
+      <p class="text-xs text-slate-500">aula{{ aulas_respondidas|pluralize:"s" }} completada{{ aulas_respondidas|pluralize:"s" }}</p>
+    </div>
+    <div class="cartao text-center">
+      <p class="text-3xl font-bold text-indigo-700">{{ tempo_total_min }}min</p>
+      <p class="text-xs text-slate-500">tempo total de uso</p>
+    </div>
+    <div class="cartao text-center">
+      <p class="text-3xl font-bold text-indigo-700">{{ num_adaptada }}</p>
+      <p class="text-xs text-slate-500">questões na versão adaptada</p>
+    </div>
+  </div>
+
+  <!-- Original vs Adaptada -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div class="cartao">
+      <h2 class="font-semibold mb-3">Aula original vs. adaptada</h2>
+      {% if pct_original is not None and pct_adaptada is not None %}
+        <div class="flex gap-6">
+          <div class="flex-1 text-center">
+            <p class="text-sm text-slate-500">Original</p>
+            <p class="text-2xl font-bold {% if pct_original >= 70 %}text-green-700{% elif pct_original >= 50 %}text-amber-700{% else %}text-red-700{% endif %}">
+              {{ pct_original }}%
+            </p>
+            <p class="text-xs text-slate-400">{{ num_original }} questões</p>
+          </div>
+          <div class="flex-1 text-center">
+            <p class="text-sm text-slate-500">Adaptada</p>
+            <p class="text-2xl font-bold {% if pct_adaptada >= 70 %}text-green-700{% elif pct_adaptada >= 50 %}text-amber-700{% else %}text-red-700{% endif %}">
+              {{ pct_adaptada }}%
+            </p>
+            <p class="text-xs text-slate-400">{{ num_adaptada }} questões</p>
+          </div>
+        </div>
+        {% if pct_adaptada and pct_original and pct_adaptada > pct_original %}
+          <p class="mt-3 text-sm text-green-700">As adaptações estão ajudando!</p>
+        {% endif %}
+      {% else %}
+        <p class="text-sm text-slate-400">Dados insuficientes para comparar.</p>
+      {% endif %}
+    </div>
+
+    <div class="cartao">
+      <h2 class="font-semibold mb-3">Apoios</h2>
+      <p class="text-sm text-slate-600 mb-2">
+        Ativos:
+        {% for apoio in perfil.nomes_apoios %}
+          <span class="etiqueta bg-amber-100 text-amber-900">{{ apoio }}</span>
+        {% empty %}
+          <span class="etiqueta bg-slate-100 text-slate-700">Aula original</span>
+        {% endfor %}
+      </p>
+      {% if usos %}
+        <p class="text-sm text-slate-600 mb-2">Apoios de leitura usados:</p>
+        <ul class="text-sm space-y-1">
+          {% for uso in usos %}
+            <li class="flex justify-between">
+              <span>{{ uso.rotulo }}</span>
+              <span class="font-medium">{{ uso.vezes }}×</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      {% if perfil.contexto_familia %}
+        <p class="mt-3 text-xs text-slate-400 italic">"{{ perfil.contexto_familia|truncatechars:120 }}"</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Evolução -->
+  {% if evolucao %}
+  <div class="cartao mb-6">
+    <h2 class="font-semibold mb-3">Progresso por aula</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-slate-500 border-b">
+            <th class="pb-2">Aula</th>
+            <th class="pb-2">Data</th>
+            <th class="pb-2">Acertos</th>
+            <th class="pb-2">%</th>
+            <th class="pb-2">Versão</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in evolucao %}
+            <tr class="border-b last:border-0">
+              <td class="py-2">{{ e.aula }}</td>
+              <td class="py-2 text-slate-500">{{ e.data|date:"d/m H:i" }}</td>
+              <td class="py-2">{{ e.acertos }}/{{ e.total }}</td>
+              <td class="py-2">
+                <span class="{% if e.pct >= 70 %}text-green-700{% elif e.pct >= 50 %}text-amber-700{% else %}text-red-700{% endif %} font-medium">
+                  {{ e.pct }}%
+                </span>
+              </td>
+              <td class="py-2 text-slate-500">{% if e.mascara %}adaptada{% else %}original{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Sugestões pendentes -->
+  {% if sugestoes %}
+    <div class="cartao mb-6">
+      <h2 class="font-semibold mb-1">Sugestões pendentes</h2>
+      {% include "perfis/_sugestoes.html" %}
+    </div>
+  {% endif %}
+{% endif %}
+{% endblock %}
