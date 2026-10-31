@@ -4,63 +4,74 @@
 
 {% block conteudo %}
 <a href="{% url 'turmas:detalhe' turma.pk %}" class="voltar">← {{ turma.nome }}</a>
-<h1 class="text-2xl font-semibold mt-3 mb-1">Painel: {{ turma.nome }}</h1>
-<p class="text-sm text-slate-600 mb-6">
-  Números calculados na hora a partir das respostas e do uso dos alunos.
-  Com poucas respostas, as porcentagens mudam muito: olhe também as quantidades.
+
+<h1 class="text-2xl font-bold tracking-tight mt-3 mb-1" style="color: var(--color-text);">Painel: {{ turma.nome }}</h1>
+<p class="text-meta mb-8">
+  Métricas calculadas a partir das respostas reais dos alunos.
 </p>
 
-<section class="cartao mb-8">
-  <h2 class="text-xl font-semibold mb-1">Sugestões de ajuste de perfil</h2>
-  {% if sugestoes %}
-    <p class="text-sm text-slate-600">Vêm do questionário da família e do uso da plataforma. Nada muda sem você aceitar.</p>
+<!-- Sugestões -->
+{% if sugestoes %}
+  <div class="card-highlight mb-8">
+    <h2 class="text-lg font-semibold mb-1" style="color: var(--color-primary);">Sugestões de ajuste</h2>
+    <p class="text-meta mb-3">Do questionário da família, do uso da plataforma e de padrões de erro. Nada muda sem você aceitar.</p>
     {% include "perfis/_sugestoes.html" with mostrar_aluno=True %}
-  {% else %}
-    <p class="text-sm text-slate-600">Nenhuma sugestão pendente.</p>
-  {% endif %}
-</section>
+  </div>
+{% endif %}
 
-<section class="mb-8">
-  <h2 class="text-xl font-semibold mb-3">Por aluno</h2>
+<!-- Por aluno -->
+<section class="mb-10">
+  <h2 class="text-lg font-semibold mb-4" style="color: var(--color-text);">Por aluno</h2>
   {% if linhas_alunos %}
-    <div class="cartao p-0 overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="text-left text-slate-600 border-b border-slate-200">
+    <div class="card-elevated" style="padding: 0; overflow-x: auto;">
+      <table>
+        <thead>
           <tr>
-            <th class="px-4 py-3 font-medium">Aluno</th>
-            <th class="px-4 py-3 font-medium">Apoios no conteúdo</th>
-            <th class="px-4 py-3 font-medium">Aulas respondidas</th>
-            <th class="px-4 py-3 font-medium">Acertos</th>
-            <th class="px-4 py-3 font-medium">Apoios de leitura ligados</th>
+            <th>Aluno</th>
+            <th>Apoios</th>
+            <th>Aulas</th>
+            <th class="text-right">Acertos</th>
+            <th>Leitura</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-100">
+        <tbody>
           {% for linha in linhas_alunos %}
             <tr>
-              <td class="px-4 py-3">
-                <a href="{% url 'perfis:editar_apoios' linha.aluno.pk %}" class="text-indigo-700 hover:underline">
+              <td>
+                <a href="{% url 'perfis:editar_apoios' linha.aluno.pk %}"
+                   class="font-medium" style="color: var(--color-primary);">
                   {{ linha.aluno.usuario.get_full_name|default:linha.aluno.usuario.username }}
                 </a>
               </td>
-              <td class="px-4 py-3">{{ linha.apoios|join:", "|default:"Aula original" }}</td>
-              <td class="px-4 py-3">
-                {{ linha.aulas_respondidas }} de {{ total_aulas }}
-                {% if linha.aulas_com_versao_adaptada %}
-                  <span class="block text-xs text-slate-500">{{ linha.aulas_com_versao_adaptada }} na versão adaptada</span>
-                {% endif %}
-              </td>
-              <td class="px-4 py-3">
-                {% if linha.placar.total %}
-                  {{ linha.placar.pct }}% <span class="text-slate-500">({{ linha.placar.acertos }} de {{ linha.placar.total }})</span>
-                {% else %}
-                  <span class="text-slate-500">sem respostas</span>
-                {% endif %}
-              </td>
-              <td class="px-4 py-3">
-                {% for uso in linha.usos %}
-                  <span class="block">{{ uso.rotulo }}: {{ uso.vezes }}×</span>
+              <td>
+                {% for apoio in linha.apoios %}
+                  <span class="tag tag-amber">{{ apoio }}</span>
                 {% empty %}
-                  <span class="text-slate-500">nenhum</span>
+                  <span class="tag tag-slate">Aula original</span>
+                {% endfor %}
+              </td>
+              <td>
+                <span class="text-small">{{ linha.aulas_respondidas }} de {{ total_aulas }}</span>
+                {% if linha.aulas_com_versao_adaptada %}
+                  <span class="block text-meta">{{ linha.aulas_com_versao_adaptada }} adaptada{{ linha.aulas_com_versao_adaptada|pluralize:"s" }}</span>
+                {% endif %}
+              </td>
+              <td class="text-right">
+                {% if linha.placar.total %}
+                  <span class="text-small font-medium
+                    {% if linha.placar.pct >= 70 %}tag-green{% elif linha.placar.pct >= 50 %}tag-amber{% else %}tag-slate{% endif %}"
+                    style="display: inline-block;">
+                    {{ linha.placar.pct }}%
+                  </span>
+                {% else %}
+                  <span class="text-meta">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% for uso in linha.usos %}
+                  <span class="block text-small">{{ uso.rotulo }} <span class="font-medium">{{ uso.vezes }}×</span></span>
+                {% empty %}
+                  <span class="text-meta">—</span>
                 {% endfor %}
               </td>
             </tr>
@@ -69,57 +80,75 @@
       </table>
     </div>
   {% else %}
-    <p class="cartao text-slate-600">Nenhum aluno cadastrado.</p>
+    <div class="card text-center py-6">
+      <p class="text-meta">Nenhum aluno cadastrado.</p>
+    </div>
   {% endif %}
 </section>
 
+<!-- Por aula -->
 <section>
-  <h2 class="text-xl font-semibold mb-3">Por aula publicada</h2>
-  {% for linha in linhas_aulas %}
-    <div class="cartao mb-4">
-      <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
-        <h3 class="text-lg font-semibold">
-          <a href="{% url 'aulas:detalhe_professor' linha.aula.pk %}" class="hover:underline">{{ linha.aula.titulo }}</a>
-        </h3>
-        <span class="text-sm text-slate-600">{{ linha.alunos_responderam }} de {{ total_alunos }} aluno{{ total_alunos|pluralize }} responderam</span>
-      </div>
+  <h2 class="text-lg font-semibold mb-4" style="color: var(--color-text);">Por aula publicada</h2>
+  {% if linhas_aulas %}
+    <div class="grid gap-4">
+      {% for linha in linhas_aulas %}
+        <div class="card-elevated">
+          <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+            <h3 class="text-base font-semibold" style="color: var(--color-text);">
+              <a href="{% url 'aulas:detalhe_professor' linha.aula.pk %}"
+                 style="color: inherit; text-decoration: none;">
+                {{ linha.aula.titulo }}
+              </a>
+            </h3>
+            <span class="text-meta">{{ linha.alunos_responderam }} de {{ total_alunos }} respondeu</span>
+          </div>
 
-      {% if linha.placar.total %}
-        <p class="mb-1">
-          <span class="font-medium">Acertos: {{ linha.placar.pct }}%</span>
-          <span class="text-sm text-slate-500">({{ linha.placar.acertos }} de {{ linha.placar.total }} respostas)</span>
-        </p>
-        <p class="text-sm text-slate-600 mb-4">
-          Na aula original:
-          {% if linha.placar_original.total %}{{ linha.placar_original.pct }}% ({{ linha.placar_original.acertos }} de {{ linha.placar_original.total }}){% else %}sem respostas{% endif %}
-          · nas versões adaptadas:
-          {% if linha.placar_adaptada.total %}{{ linha.placar_adaptada.pct }}% ({{ linha.placar_adaptada.acertos }} de {{ linha.placar_adaptada.total }}){% else %}sem respostas{% endif %}
-        </p>
+          {% if linha.placar.total %}
+            <div class="flex flex-wrap items-center gap-6 mb-4">
+              <div>
+                <span class="text-meta block">Geral</span>
+                <span class="text-lg font-bold" style="color: var(--color-text);">{{ linha.placar.pct }}%</span>
+              </div>
+              <div>
+                <span class="text-meta block">Original</span>
+                <span class="font-medium" style="color: var(--color-text);">
+                  {% if linha.placar_original.total %}{{ linha.placar_original.pct }}%{% else %}—{% endif %}
+                </span>
+              </div>
+              <div>
+                <span class="text-meta block">Adaptada</span>
+                <span class="font-medium" style="color: var(--color-text);">
+                  {% if linha.placar_adaptada.total %}{{ linha.placar_adaptada.pct }}%{% else %}—{% endif %}
+                </span>
+              </div>
+            </div>
 
-        <h4 class="text-sm font-medium text-slate-600 mb-2">Acertos por questão</h4>
-        <ul class="space-y-3">
-          {% for item in linha.questoes %}
-            <li>
-              <p class="text-sm">{{ item.questao.ordem }}. {{ item.questao.enunciado|truncatechars:90 }}</p>
-              {% if item.placar.total %}
+            <div class="space-y-2">
+              {% for item in linha.questoes %}
                 <div class="flex items-center gap-3">
-                  <div class="h-2 flex-1 rounded bg-slate-200" aria-hidden="true">
-                    <div class="h-2 rounded bg-indigo-600" style="width: {{ item.placar.pct }}%"></div>
-                  </div>
-                  <span class="text-sm w-32 text-right">{{ item.placar.pct }}% ({{ item.placar.acertos }} de {{ item.placar.total }})</span>
+                  <span class="text-small shrink-0 w-6 text-right" style="color: var(--color-text-muted);">{{ item.questao.ordem }}</span>
+                  <span class="text-small truncate flex-1">{{ item.questao.enunciado|truncatechars:80 }}</span>
+                  {% if item.placar.total %}
+                    <div class="h-1.5 flex-1 max-w-[120px] rounded-full" style="background: #e2e8f0;" aria-hidden="true">
+                      <div class="h-1.5 rounded-full transition-all" style="width: {{ item.placar.pct }}%; background: var(--color-primary);"></div>
+                    </div>
+                    <span class="text-meta w-10 text-right">{{ item.placar.pct }}%</span>
+                  {% else %}
+                    <span class="text-meta w-10 text-right">—</span>
+                  {% endif %}
                 </div>
-              {% else %}
-                <p class="text-sm text-slate-500">sem respostas</p>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p class="text-sm text-slate-600">Ainda sem respostas.</p>
-      {% endif %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-meta">Sem respostas ainda.</p>
+          {% endif %}
+        </div>
+      {% endfor %}
     </div>
-  {% empty %}
-    <p class="cartao text-slate-600">Nenhuma aula publicada ainda.</p>
-  {% endfor %}
+  {% else %}
+    <div class="card text-center py-6">
+      <p class="text-meta">Nenhuma aula publicada.</p>
+    </div>
+  {% endif %}
 </section>
 {% endblock %}

@@ -3,30 +3,51 @@
 {% block titulo %}Entrar · NextLearn{% endblock %}
 
 {% block conteudo %}
-<div class="max-w-sm mx-auto bg-white rounded-lg shadow p-6">
-  <h1 class="text-2xl font-semibold mb-1">Entrar</h1>
-  <p class="text-sm text-slate-600 mb-6">A mesma aula, no jeito de cada aluno aprender.</p>
+<div class="min-h-[80vh] flex flex-col items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+    <!-- Hero: o que é NextLearn -->
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-bold tracking-tight mb-3" style="color: var(--color-text);">NextLearn</h1>
+      <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary); max-width: 20rem; margin: 0 auto;">
+        A mesma aula, no jeito de cada aluno aprender.
+      </p>
+    </div>
 
-  {% if form.non_field_errors %}
-    <div class="mb-4 rounded bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
-      {% for erro in form.non_field_errors %}{{ erro }}{% endfor %}
-    </div>
-  {% endif %}
+    <!-- Formulário -->
+    <div class="card-elevated">
+      {% if form.non_field_errors %}
+        <div class="mensagem mensagem-error mb-4">
+          {% for erro in form.non_field_errors %}{{ erro }}{% endfor %}
+        </div>
+      {% endif %}
 
-  <form method="post" class="space-y-4">
-    {% csrf_token %}
-    <div>
-      <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium mb-1">Usuário</label>
-      <input type="text" name="username" id="{{ form.username.id_for_label }}" value="{{ form.username.value|default:'' }}"
-             autocomplete="username" required autofocus class="w-full rounded border border-slate-300 px-3 py-2">
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-4">
+          <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Usuário</label>
+          <input type="text" name="username" id="{{ form.username.id_for_label }}"
+                 value="{{ form.username.value|default:'' }}"
+                 autocomplete="username" required autofocus
+                 class="w-full rounded-lg border px-3 py-2.5 text-sm"
+                 style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"
+                 placeholder="prof, daniel ou talita">
+        </div>
+        <div class="mb-6">
+          <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium mb-1.5" style="color: var(--color-text);">Senha</label>
+          <input type="password" name="password" id="{{ form.password.id_for_label }}"
+                 autocomplete="current-password" required
+                 class="w-full rounded-lg border px-3 py-2.5 text-sm"
+                 style="border-color: var(--color-border); background: var(--color-surface); color: var(--color-text);"
+                 placeholder="senha123">
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <button type="submit" class="btn w-full">Entrar</button>
+      </form>
     </div>
-    <div>
-      <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium mb-1">Senha</label>
-      <input type="password" name="password" id="{{ form.password.id_for_label }}"
-             autocomplete="current-password" required class="w-full rounded border border-slate-300 px-3 py-2">
-    </div>
-    <input type="hidden" name="next" value="{{ next }}">
-    <button type="submit" class="w-full rounded bg-indigo-700 text-white py-2 font-medium hover:bg-indigo-800">Entrar</button>
-  </form>
+
+    <p class="text-center mt-6 text-meta" style="color: var(--color-text-muted);">
+      Hackathon LEPV × FGV · Desafio Teachy
+    </p>
+  </div>
 </div>
 {% endblock %}
