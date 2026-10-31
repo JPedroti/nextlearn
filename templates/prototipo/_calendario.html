@@ -1,0 +1,28 @@
+<!-- Calendário do aluno: abre "em zoom" a partir de onde foi chamado. Usado no painel e no treino. -->
+<dialog class="calendario" data-calendario aria-labelledby="cal-titulo">
+  <div class="cal-caixa">
+    <header class="cal-topo">
+      <button type="button" class="cal-nav" data-cal-anterior aria-label="Mês anterior">‹</button>
+      <h2 id="cal-titulo" data-cal-titulo>Calendário</h2>
+      <button type="button" class="cal-nav" data-cal-proximo aria-label="Próximo mês">›</button>
+      <button type="button" class="cal-fechar" data-cal-fechar aria-label="Fechar calendário">×</button>
+    </header>
+    <div class="cal-corpo">
+      <div>
+        <div class="cal-grade" role="grid" aria-labelledby="cal-titulo" data-cal-grade></div>
+        <ul class="cal-legenda">
+          <li><span class="leg leg-feita">✓</span> Aula feita</li>
+          <li><span class="leg leg-prazo"></span> Prazo de tarefa</li>
+          <li><span class="leg leg-estudo"></span> Dia com estudo</li>
+          <li><span class="leg-meta">Meta ✓</span> Semana com a meta cumprida</li>
+        </ul>
+      </div>
+      <section class="cal-dia" aria-live="polite">
+        <h3 data-cal-dia-titulo>Hoje</h3>
+        <ul class="cal-eventos" data-cal-eventos></ul>
+        <h3 class="cal-prox-titulo" data-cal-proximos-titulo>Próximos prazos</h3>
+        <ul class="cal-proximos" data-cal-proximos></ul>
+      </section>
+    </div>
+  </div>
+</dialog>

@@ -21,11 +21,17 @@
 
 ## Painel do aluno no protótipo (`/prototipo/aluno/inicio/`)
 O login do aluno pelo `/prototipo/login/` cai aqui. Lê os dados reais do banco (no teste local, o Davi fictício).
-- **Hoje é só uma coisa:** a próxima tarefa em destaque, um botão só (apoio de foco: uma ação por vez).
+- **Missão de hoje:** a próxima tarefa em destaque, um botão só (apoio de foco: uma ação por vez), com o prazo.
+  À direita, o dia do mês em destaque: ao clicar, o **calendário** abre em zoom (aulas feitas, prazos, dias com estudo,
+  semanas com a meta, próximos prazos; setas do teclado mudam o dia). Também abre pelo botão "Calendário" do topo,
+  pela ofensiva semanal, pelo ícone de cada tarefa e pela página de treino (`#calendario`).
+- **Prazo:** o backend ainda não tem prazo; o protótipo usa publicação + 7 dias (valor de produto, a calibrar).
 - **Minha média:** comparada com o próprio aluno no mês anterior. Sem ranking.
 - **Ofensiva semanal:** semanas seguidas com a meta mínima (2 aulas); semana parada só pausa, não zera.
 - **Tempo de estudo:** minutos na semana e hoje, ao lado do limite diário combinado com a família (ECA Digital).
-- **Minhas notas:** média por matéria, evolução das últimas 6 aulas, assuntos dominados e para revisar.
+- **Painéis interativos (blocos temáticos):** notas filtradas por matéria (barra clicável mostra a aula), tempo de estudo
+  por semana ou 4 semanas com a linha do limite da família, tarefas para fazer/feitas. O tema é só um marcador de cor
+  pequeno (Okabe-Ito em forma, nunca em texto); animações só com a preferência "Animações suaves" (desligada com foco).
 - **Minhas tarefas:** com foco, só a atual aparece; as outras ficam recolhidas.
 - **Treinar:** revisar o que errei, treino rápido (3 questões) e revisão de 7 dias; uma questão por tela, confirmar antes
   de ver a resposta, certo/errado com texto e ícone; treino não vale nota.

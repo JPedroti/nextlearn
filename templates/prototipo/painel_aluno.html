@@ -13,6 +13,8 @@
     <a href="{% url 'prototipo:painel_aluno' %}" class="marca">NextLearn</a>
     <div class="topo-direita">
       <span class="quem">{{ aluno.usuario.first_name|default:aluno.usuario.username }} · {{ aluno.turma.nome }}</span>
+      {% if not sem_turma %}<button type="button" class="btn-contorno" data-abrir-calendario>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendário</button>{% endif %}
       <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form>
     </div>
   </header>
@@ -22,39 +24,44 @@
   {% else %}
   <main class="pagina">
 
-    <!-- 1. Uma ação principal (apoio de foco: só uma coisa por vez) -->
+    <!-- 1. Missão do dia + dia do mês (abre o calendário) -->
     <section class="hoje cartao" aria-labelledby="hoje-titulo">
       <div class="hoje-next" aria-hidden="true" data-pose="livro">{% include "prototipo/_next.html" %}</div>
       <div class="hoje-texto">
-        <p class="rotulo">Oi, {{ aluno.usuario.first_name|default:"tudo bem" }}!</p>
+        <p class="rotulo">Missão de hoje</p>
         {% if proxima %}
-          <h1 id="hoje-titulo">Hoje é só uma coisa: <span class="destaque">{{ proxima.assunto }}</span></h1>
-          <p class="suave">{{ proxima.materia }} · {{ proxima.n_questoes }} questões{% if foco %} · em passos curtos, um de cada vez{% endif %}</p>
+          <h1 id="hoje-titulo">Oi, {{ aluno.usuario.first_name }}! Hoje é só uma coisa: <span class="destaque">{{ proxima.assunto }}</span></h1>
+          <p class="suave">{{ proxima.materia }} · {{ proxima.n_questoes }} questões{% if foco %} · em passos curtos, um de cada vez{% endif %}
+            · prazo {% if proxima.dias_para_prazo == 0 %}hoje{% elif proxima.dias_para_prazo == 1 %}amanhã{% else %}em {{ proxima.dias_para_prazo }} dias{% endif %}</p>
           <a class="btn-principal" href="{% url 'aulas:ver' proxima.aula.pk %}">Começar</a>
         {% else %}
-          <h1 id="hoje-titulo">Você está em dia. Que tal um treino rápido?</h1>
+          <h1 id="hoje-titulo">Oi, {{ aluno.usuario.first_name }}! Você está em dia.</h1>
           <a class="btn-principal" href="{% url 'prototipo:treino' 'rapido' %}">Treinar 3 minutos</a>
         {% endif %}
       </div>
+      <button type="button" class="dia-grande" data-abrir-calendario data-dia-hoje aria-label="Hoje, {{ hoje|date:'l, j \d\e F' }}. Abrir meu calendário">
+        <span class="dg-semana">{{ hoje|date:"l"|cut:"-feira" }}</span>
+        <span class="dg-numero">{{ hoje|date:"j" }}</span>
+        <span class="dg-mes">{{ hoje|date:"F" }}</span>
+        <span class="dg-dica">Ver calendário</span>
+      </button>
     </section>
 
-    <!-- 2. Números do aluno (só comparado com ele mesmo) -->
+    <!-- 2. Números (só comparado com ele mesmo) -->
     <section class="numeros" aria-label="Meus números">
-      <article class="cartao numero">
+      <article class="cartao numero tema-notas">
         <p class="rotulo">Minha média</p>
         <p class="valor">{{ media_geral|default:"–" }}<span class="de"> /10</span></p>
-        {% if delta is not None %}
-          <p class="suave">{% if delta > 0 %}▲ subiu {{ delta }} desde o mês passado{% elif delta < 0 %}▼ caiu {{ delta_abs }} desde o mês passado. Vamos revisar?{% else %}igual ao mês passado{% endif %}</p>
-        {% endif %}
+        {% if delta is not None %}<p class="suave">{% if delta > 0 %}▲ subiu {{ delta }} desde o mês passado{% elif delta < 0 %}▼ caiu {{ delta_abs }} desde o mês passado{% else %}igual ao mês passado{% endif %}</p>{% endif %}
       </article>
-      <article class="cartao numero">
+      <article class="cartao numero tema-ritmo">
         <p class="rotulo">Ofensiva semanal</p>
         <p class="valor">{{ ofensiva }}<span class="de"> semana{{ ofensiva|pluralize }}</span></p>
         <p class="suave">Esta semana: {{ feitas_semana }} de {{ meta_semanal }} aulas
           <span class="bolinhas" aria-hidden="true">{% for b in meta_bolinhas %}<i class="{% if b %}cheia{% endif %}"></i>{% endfor %}</span></p>
-        <p class="mini">Semana parada não zera: só pausa.</p>
+        <button type="button" class="btn-link mini-link" data-abrir-calendario>Ver semanas no calendário</button>
       </article>
-      <article class="cartao numero">
+      <article class="cartao numero tema-tempo">
         <p class="rotulo">Tempo de estudo</p>
         <p class="valor">{{ min_semana }}<span class="de"> min na semana</span></p>
         <div class="barra" role="img" aria-label="Hoje: {{ min_hoje }} de {{ limite_diario }} minutos"><span style="width: {{ pct_hoje }}%"></span></div>
@@ -64,59 +71,65 @@
 
     <div class="colunas">
       <div class="principal">
-        <!-- 3. Notas -->
-        <section class="cartao" aria-labelledby="notas-titulo">
-          <h2 id="notas-titulo">Minhas notas</h2>
-          <ul class="materias">
-            {% for m in por_materia %}
-              <li>
-                <span class="m-nome">{{ m.nome }}</span>
-                <span class="m-barra" role="img" aria-label="{{ m.nome }}: média {{ m.media }} de 10"><span style="width: {{ m.pct }}%"></span></span>
-                <span class="m-valor">{{ m.media }}</span>
-              </li>
-            {% endfor %}
-          </ul>
-          {% if evolucao %}
-            <h3>Minhas últimas {{ evolucao|length }} aulas</h3>
-            <div class="evolucao" role="img" aria-label="Notas das últimas aulas: {% for e in evolucao %}{{ e.rotulo }} {{ e.nota }}{% if not forloop.last %}, {% endif %}{% endfor %}">
-              {% for e in evolucao %}
-                <div class="ev"><span class="ev-area"><span class="ev-nota">{{ e.nota }}</span><span class="ev-barra" style="height: {{ e.altura }}px"></span></span><span class="ev-rot">{{ e.rotulo|truncatechars:14 }}</span></div>
-              {% endfor %}
+        <!-- 3. Painel de notas (interativo) -->
+        <section class="cartao bloco tema-notas" aria-labelledby="notas-titulo">
+          <header class="bloco-topo">
+            <h2 id="notas-titulo"><span class="marcador" aria-hidden="true"></span>Minhas notas</h2>
+            <div class="abas" role="tablist" aria-label="Filtrar por matéria" data-filtro-notas>
+              <button type="button" role="tab" aria-selected="true" data-materia="">Todas</button>
+              {% for m in materias %}<button type="button" role="tab" aria-selected="false" data-materia="{{ m }}">{{ m }}</button>{% endfor %}
             </div>
-          {% endif %}
-          <p class="habilidades"><strong>{{ dominadas|length }}</strong> assuntos dominados · <strong>{{ revisar|length }}</strong> para revisar</p>
+          </header>
+          <div class="notas-resumo">
+            <p><span class="valor-medio" data-media-filtro>{{ media_geral }}</span><span class="de"> média</span></p>
+            <p class="suave" data-texto-filtro>{{ dominadas|length }} assuntos dominados · {{ revisar|length }} para revisar</p>
+          </div>
+          <div class="grafico" data-grafico-notas role="img" aria-label="Notas por aula"></div>
+          <p class="mini" data-detalhe-nota>Toque numa barra para ver a aula.</p>
         </section>
 
-        <!-- 4. Tarefas -->
-        <section class="cartao" aria-labelledby="tarefas-titulo">
-          <h2 id="tarefas-titulo">Minhas tarefas</h2>
-          {% if foco %}
-            {% if proxima %}<p class="tarefa-agora">Agora: <strong>{{ proxima.assunto }}</strong> ({{ proxima.materia }})</p>{% endif %}
-            <details>
-              <summary>Ver as outras tarefas ({{ pendentes|length|add:"-1" }} para fazer, {{ feitas|length }} feitas)</summary>
-              {% include "prototipo/_lista_tarefas.html" %}
-            </details>
-          {% else %}
-            {% include "prototipo/_lista_tarefas.html" %}
-          {% endif %}
+        <!-- 4. Tempo de estudo (interativo) -->
+        <section class="cartao bloco tema-tempo" aria-labelledby="tempo-titulo">
+          <header class="bloco-topo">
+            <h2 id="tempo-titulo"><span class="marcador" aria-hidden="true"></span>Meu tempo de estudo</h2>
+            <div class="abas" role="tablist" aria-label="Período" data-filtro-tempo>
+              <button type="button" role="tab" aria-selected="true" data-periodo="semana">Esta semana</button>
+              <button type="button" role="tab" aria-selected="false" data-periodo="mes">4 semanas</button>
+            </div>
+          </header>
+          <div class="grafico grafico-tempo" data-grafico-tempo role="img" aria-label="Minutos de estudo"></div>
+          <p class="mini">A linha tracejada é o limite diário combinado com a família ({{ limite_diario }} min). Estudar mais não dá ponto extra.</p>
         </section>
 
-        <!-- 5. Treinar -->
-        <section aria-labelledby="treinar-titulo">
-          <h2 id="treinar-titulo" class="titulo-solto">Treinar</h2>
+        <!-- 5. Tarefas (interativo) -->
+        <section class="cartao bloco tema-tarefas" aria-labelledby="tarefas-titulo">
+          <header class="bloco-topo">
+            <h2 id="tarefas-titulo"><span class="marcador" aria-hidden="true"></span>Minhas tarefas</h2>
+            <div class="abas" role="tablist" aria-label="Tarefas" data-filtro-tarefas>
+              <button type="button" role="tab" aria-selected="true" data-lista="pendentes">Para fazer ({{ pendentes|length }})</button>
+              <button type="button" role="tab" aria-selected="false" data-lista="feitas">Feitas ({{ feitas|length }})</button>
+            </div>
+          </header>
+          <ul class="tarefas" data-lista-tarefas></ul>
+          {% if foco %}<button type="button" class="btn-link" data-mostrar-todas hidden>Mostrar todas</button>{% endif %}
+        </section>
+
+        <!-- 6. Treinar -->
+        <section class="bloco-solto tema-treino" aria-labelledby="treinar-titulo">
+          <h2 id="treinar-titulo" class="titulo-solto"><span class="marcador" aria-hidden="true"></span>Treinar</h2>
           <div class="treinos">
             <a class="cartao treino" href="{% url 'prototipo:treino' 'erros' %}">
-              <span class="t-icone" aria-hidden="true">↺</span>
+              <svg class="t-icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4"/></svg>
               <span class="t-nome">Revisar o que errei</span>
               <span class="suave">{{ n_erradas }} quest{{ n_erradas|pluralize:"ão,ões" }}, uma de cada vez</span>
             </a>
             <a class="cartao treino" href="{% url 'prototipo:treino' 'rapido' %}">
-              <span class="t-icone" aria-hidden="true">⏱</span>
+              <svg class="t-icone" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M10 3h4"/></svg>
               <span class="t-nome">Treino rápido</span>
               <span class="suave">3 questões, uns 3 minutos</span>
             </a>
             <a class="cartao treino" href="{% url 'prototipo:treino' 'revisao' %}">
-              <span class="t-icone" aria-hidden="true">◷</span>
+              <svg class="t-icone" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 14h3"/></svg>
               <span class="t-nome">Revisão da semana passada</span>
               <span class="suave">Para não esquecer ({{ n_revisao }} assunto{{ n_revisao|pluralize }})</span>
             </a>
@@ -140,44 +153,26 @@
             <button type="button" class="interruptor" data-pref="letras" aria-pressed="false">Letras espaçadas</button>
             <button type="button" class="interruptor" data-pref="voz" aria-pressed="{% if perfil.leitura_voz %}true{% else %}false{% endif %}">Botões de ouvir</button>
             <button type="button" class="interruptor" data-pref="limpo" aria-pressed="{% if perfil.modo_limpo %}true{% else %}false{% endif %}">Modo limpo</button>
+            <button type="button" class="interruptor" data-pref="movimento" aria-pressed="{% if foco %}false{% else %}true{% endif %}">Animações suaves</button>
           </div>
         </section>
 
         <section class="cartao" aria-labelledby="como-titulo">
           <h2 id="como-titulo">Como foi hoje?</h2>
           <div class="humor" role="group" aria-label="Como foi hoje">
-            <button type="button" data-humor="bem" aria-pressed="false"><span aria-hidden="true">🙂</span> Bem</button>
-            <button type="button" data-humor="mais-ou-menos" aria-pressed="false"><span aria-hidden="true">😐</span> Mais ou menos</button>
-            <button type="button" data-humor="dificil" aria-pressed="false"><span aria-hidden="true">🙁</span> Difícil</button>
+            <button type="button" data-humor="bem" aria-pressed="false">Bem</button>
+            <button type="button" data-humor="mais-ou-menos" aria-pressed="false">Mais ou menos</button>
+            <button type="button" data-humor="dificil" aria-pressed="false">Difícil</button>
           </div>
           <p class="mini" data-humor-msg>Opcional. Ajuda o seu professor a ajustar as aulas.</p>
         </section>
       </aside>
     </div>
   </main>
-  {% endif %}
 
-  <script>
-  (function () {
-    var b = document.body;
-    function ler(k) { try { return localStorage.getItem("nl-" + k); } catch (e) { return null; } }
-    function gravar(k, v) { try { localStorage.setItem("nl-" + k, v); } catch (e) {} }
-    var classes = { letras: "letras-espacadas", voz: "com-voz", limpo: "modo-limpo" };
-    document.querySelectorAll("[data-pref]").forEach(function (bt) {
-      var k = bt.dataset.pref, salvo = ler(k);
-      var ligado = salvo === null ? bt.getAttribute("aria-pressed") === "true" : salvo === "1";
-      function aplicar() { bt.setAttribute("aria-pressed", ligado ? "true" : "false"); b.classList.toggle(classes[k], ligado); }
-      aplicar();
-      bt.addEventListener("click", function () { ligado = !ligado; gravar(k, ligado ? "1" : "0"); aplicar(); });
-    });
-    var msg = document.querySelector("[data-humor-msg]");
-    document.querySelectorAll("[data-humor]").forEach(function (bt) {
-      bt.addEventListener("click", function () {
-        document.querySelectorAll("[data-humor]").forEach(function (o) { o.setAttribute("aria-pressed", o === bt ? "true" : "false"); });
-        msg.textContent = bt.dataset.humor === "dificil" ? "Obrigado por contar. Amanhã a gente vai com calma." : "Obrigado por contar!";
-      });
-    });
-  })();
-  </script>
+  {% include "prototipo/_calendario.html" %}
+  <script id="dados-painel" type="application/json">{{ dados_json|safe }}</script>
+  {% endif %}
+  <script src="{% static 'prototipo/aluno_painel.js' %}"></script>
 </body>
 </html>

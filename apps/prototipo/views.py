@@ -160,6 +160,7 @@ class Login(LoginView):
 # - treino curto, uma questão por tela, com confirmação antes de enviar.
 
 META_SEMANAL = 2          # aulas por semana (combinada com professor e família)
+PRAZO_DIAS = 7            # valor de produto, a calibrar: o backend ainda não tem prazo; usamos publicação + 7 dias
 LIMITE_DIARIO_MIN = 40    # minutos por dia combinados com a família
 
 
@@ -263,13 +264,48 @@ from apps.contas.decorators import papel_requerido  # noqa: E402
 
 @papel_requerido("aluno")
 def painel_aluno(request):
+    import json
+    from datetime import timedelta
+
+    from django.urls import reverse
+    from django.utils import timezone
+
     aluno = _aluno_logado(request)
     if not aluno:
         return render(request, "prototipo/painel_aluno.html", {"sem_turma": True})
     perfil = getattr(aluno, "perfil", None)
     contexto = _dados_aluno(aluno)
+    hoje = timezone.localtime()
+
+    # Dados dos painéis interativos e do calendário (o JS monta os gráficos a partir daqui)
+    def prazo(item):
+        return (timezone.localtime(item["aula"].criada_em) + timedelta(days=PRAZO_DIAS)).date()
+
+    eventos, minutos = [], {}
+    for i in contexto["pendentes"]:
+        p = prazo(i)
+        i["prazo"] = p
+        i["dias_para_prazo"] = (p - hoje.date()).days
+        eventos.append({"data": p.isoformat(), "tipo": "prazo", "titulo": i["assunto"], "materia": i["materia"],
+                        "detalhe": "Prazo da tarefa", "url": reverse("aulas:ver", args=[i["aula"].pk])})
+    for i in contexto["feitas"]:
+        d = i["quando"].date().isoformat()
+        eventos.append({"data": d, "tipo": "feita", "titulo": i["assunto"], "materia": i["materia"],
+                        "detalhe": f"{i['acertos']} de {i['total']} certas", "url": reverse("aulas:ver", args=[i["aula"].pk])})
+        minutos[d] = minutos.get(d, 0) + i["ms"] // 60000
+    notas = [{"materia": i["materia"], "assunto": i["assunto"], "nota": i["nota"], "data": i["quando"].date().isoformat()}
+             for i in reversed(contexto["feitas"])]
+    pendentes_js = [{"titulo": i["assunto"], "materia": i["materia"], "prazo": i["prazo"].isoformat(),
+                     "url": reverse("aulas:ver", args=[i["aula"].pk])} for i in contexto["pendentes"]]
+    feitas_js = [{"titulo": i["assunto"], "materia": i["materia"], "data": i["quando"].date().isoformat(),
+                  "detalhe": f"{i['acertos']} de {i['total']} certas", "url": reverse("aulas:ver", args=[i["aula"].pk])}
+                 for i in contexto["feitas"]]
+    dados = {"hoje": hoje.date().isoformat(), "eventos": eventos, "minutos": minutos, "notas": notas,
+             "pendentes": pendentes_js, "feitas": feitas_js, "limite": LIMITE_DIARIO_MIN, "meta": META_SEMANAL}
+
     contexto.update(aluno=aluno, perfil=perfil, apoios=perfil.nomes_apoios() if perfil else [],
-                    foco=bool(perfil and perfil.foco))
+                    foco=bool(perfil and perfil.foco), hoje=hoje, materias=sorted({n["materia"] for n in notas}),
+                    dados_json=json.dumps(dados, ensure_ascii=False))
     return render(request, "prototipo/painel_aluno.html", contexto)
 
 

@@ -11,7 +11,10 @@
 <body class="{% if foco %}apoio-foco{% endif %}">
   <header class="topo">
     <a href="{% url 'prototipo:painel_aluno' %}" class="marca">NextLearn</a>
-    <a href="{% url 'prototipo:painel_aluno' %}" class="btn-link">Voltar para minha área</a>
+    <div class="topo-direita">
+      <a href="{% url 'prototipo:painel_aluno' %}#calendario" class="btn-contorno"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendário</a>
+      <a href="{% url 'prototipo:painel_aluno' %}" class="btn-link">Voltar para minha área</a>
+    </div>
   </header>
   <main class="pagina treino-pagina">
     <p class="rotulo">{{ titulo }}</p>

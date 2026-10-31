@@ -249,3 +249,9 @@ Registro cronológico e literal dos prompts que Thiago enviou à IA durante o ha
 > ta dando o erro de improrpoly confinger
 
 **Resumo da resposta da IA:** O `ImproperlyConfigured` vinha do `DATABASE_URL=` vazio: uma janela do servidor aberta antes da correção do `.env` continuava com o valor vazio na memória. Ajustou o `settings.py` para tratar `DATABASE_URL` vazio como "usar SQLite" (vale também para quem copiar o `.env.example`) e pediu para fechar a janela antiga e rodar o `.bat` de novo.
+
+## Prompt 31 — 31/10/2026, 07:50 (BRT) — autor: Thiago — ferramenta: Claude
+
+> Dentro dessa pagina de login, quero que ali no começo onde está a missao diária, tenho bem grande na direita, no mesmo quadro, o numero de dia do mes e ao clicar nele isso "abra um zoom" do calendário do aluno. Além disso, a opcao de ver o calendário do aluno deve estar disponivel em outros lugares também. Quero gerar dashboards iterativos para que fique mais fácil. Isso já entra a skill /design-neuro . Os blocos devem ser temáticos, mas devem respeitar uma estética minimalista.
+
+**Resumo da resposta da IA:** No quadro da missão de hoje entrou o dia do mês em destaque à direita; ao clicar, o calendário do aluno abre "em zoom" a partir do ponto clicado (aulas feitas, prazos, dias com estudo, semanas com a meta, próximos prazos, navegação por teclado). O calendário também abre pelo topo, pela ofensiva semanal, por cada tarefa e pela página de treino. Os blocos viraram painéis interativos e temáticos (notas filtradas por matéria, tempo por semana/4 semanas com o limite da família, tarefas para fazer/feitas), seguindo a skill design-neuro: marcador de cor só em forma, um destaque por tela e animação só com a preferência "Animações suaves" (desligada por padrão com o apoio de foco).

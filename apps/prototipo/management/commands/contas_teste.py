@@ -130,8 +130,13 @@ class Command(BaseCommand):
                 VersaoAdaptada.objects.create(aula=aula, mascara=perfil.mascara, conteudo=VERSAO_RETA[0],
                                               enunciados=VERSAO_RETA[1], aprovada=True)
             if acertos is None:
+                # tarefas novas: publicadas há 1 a 3 dias (o prazo do protótipo é publicação + 7 dias)
+                n_pend = sum(1 for a in AULAS if a[3] is None)
+                ordem = [a[0] for a in AULAS if a[3] is None].index(titulo)
+                Aula.objects.filter(pk=aula.pk).update(criada_em=agora - timedelta(days=n_pend - ordem + 1))
                 continue
             quando = agora - timedelta(days=dias, hours=3)
+            Aula.objects.filter(pk=aula.pk).update(criada_em=quando - timedelta(days=2))
             for i, q in enumerate(objs):
                 certa = i < acertos
                 escolha = q.indice_correto if certa else (q.indice_correto + 1) % len(q.alternativas)
