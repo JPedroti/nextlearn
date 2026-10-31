@@ -61,6 +61,12 @@ class Perfil(models.Model):
         "Modo limpo", default=False, help_text="Tela com menos cores e enfeites, e letra maior."
     )
 
+    contexto_familia = models.TextField(
+        "Contexto compartilhado pela família",
+        blank=True,
+        help_text="Informações que a família compartilhou sobre como o aluno aprende. O professor revisa e edita. "
+        "Quando preenchido, é incluído como contexto adicional na geração das aulas adaptadas.",
+    )
     revisado_pelo_professor = models.BooleanField(default=False)
     atualizado_em = models.DateTimeField(auto_now=True)
 
@@ -83,6 +89,17 @@ class RespostaQuestionario(models.Model):
 
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name="questionarios")
     respostas = models.JSONField(help_text="{id da pergunta: 0 = quase nunca, 1 = às vezes, 2 = com frequência}")
+    nome_aluno = models.CharField(
+        "Nome do aluno",
+        max_length=120,
+        blank=True,
+        help_text="Como a família chama o aluno (apelido ou nome de casa).",
+    )
+    observacoes = models.TextField(
+        "O que mais o professor deve saber?",
+        blank=True,
+        help_text="Informações que a família quer compartilhar sobre como o aluno aprende melhor.",
+    )
     preenchido_por = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="questionarios_preenchidos"
     )

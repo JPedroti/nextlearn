@@ -76,14 +76,32 @@ def questionario(request, aluno_pk):
     """A família responde as perguntas sobre o dia a dia; as respostas viram sugestões para o professor."""
     aluno = get_object_or_404(Aluno.objects.select_related("usuario"), pk=aluno_pk, responsavel=request.user)
     anterior = aluno.questionarios.first()
-    form = QuestionarioForm(request.POST or None, initial=anterior.respostas if anterior else None)
+
+    initial = {}
+    if anterior:
+        initial = anterior.respostas.copy()
+        initial["nome_aluno"] = anterior.nome_aluno
+        initial["observacoes"] = anterior.observacoes
+
+    form = QuestionarioForm(request.POST or None, initial=initial if anterior else None)
     if request.method == "POST" and form.is_valid():
+        dados = form.dados_questionario()
         with transaction.atomic():
             resposta = RespostaQuestionario.objects.create(
-                aluno=aluno, respostas=form.cleaned_data, preenchido_por=request.user
+                aluno=aluno,
+                respostas=dados["respostas"],
+                nome_aluno=dados["nome_aluno"],
+                observacoes=dados["observacoes"],
+                preenchido_por=request.user,
             )
             criar_sugestoes(resposta)
-        messages.success(request, "Obrigado! As respostas foram para o professor, que decide os apoios.")
+            # Levar as observações para o perfil, para o professor revisar
+            if dados["observacoes"].strip():
+                perfil, _ = Perfil.objects.get_or_create(aluno=aluno)
+                if not perfil.revisado_pelo_professor:
+                    perfil.contexto_familia = dados["observacoes"].strip()
+                    perfil.save(update_fields=["contexto_familia"])
+        messages.success(request, "Obrigado! Suas respostas foram enviadas para o professor, que vai decidir os melhores apoios para o aluno.")
         return redirect("perfis:inicio")
     return render(request, "perfis/questionario.html", {"aluno": aluno, "form": form, "anterior": anterior})
 

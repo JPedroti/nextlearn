@@ -1,50 +1,72 @@
-"""Questionário da família: perguntas sobre o dia a dia que viram sugestões de apoio para o professor.
+"""Questionário da família — perguntas sobre o dia a dia do aluno que viram sugestões de apoio para o professor.
 
-Não há laudo nem diagnóstico: as perguntas descrevem situações, e quem decide os apoios é o professor.
+A família responde com base no que observa em casa. Não há laudo nem diagnóstico: as perguntas
+descrevem situações cotidianas, e quem decide quais apoios ativar é o professor.
 """
 
 from .models import APOIOS, Perfil, SugestaoPerfil
 
-# PROVISÓRIO: aguardando as 6 perguntas do Cauã. Para trocar, mude só o "texto" (e o "apoio", se precisar).
+# Cada apoio tem 3 perguntas. As respostas vão de 0 (quase nunca) a 2 (com frequência).
+# A soma das 3 respostas de um apoio determina se ele é sugerido ao professor.
 PERGUNTAS = [
+    # --- Atenção e foco (F) ---
     {
         "id": "foco_tarefas_longas",
         "apoio": "foco",
-        "texto": "Perde a concentração quando a tarefa é longa ou tem muitas etapas?",
+        "texto": "Quando a tarefa é longa ou tem várias etapas, ele para no meio ou desiste antes de terminar?",
     },
     {
         "id": "foco_distracoes",
         "apoio": "foco",
-        "texto": "Distrai-se com facilidade com barulhos, imagens ou outras coisas ao redor?",
+        "texto": "Barulhos, imagens na tela ou movimento ao redor tiram a atenção dele com facilidade?",
     },
+    {
+        "id": "foco_organizacao",
+        "apoio": "foco",
+        "texto": "Ele se perde quando precisa organizar várias informações ao mesmo tempo, como datas, nomes ou instruções?",
+    },
+    # --- Acessibilidade textual (S) ---
     {
         "id": "textual_textos_longos",
         "apoio": "textual",
-        "texto": "Se perde ou se cansa ao ler textos longos?",
+        "texto": "Ler um texto comprido deixa ele cansado ou confuso antes de chegar ao final?",
     },
     {
         "id": "textual_sentido_literal",
         "apoio": "textual",
-        "texto": "Tem dificuldade com frases de duplo sentido, ironia ou expressões como “cair a ficha”?",
+        "texto": "Expressões como \"cair a ficha\", \"quebrar a cabeça\" ou \"viajar na maionese\" confundem ele?",
     },
+    {
+        "id": "textual_palavras_dificeis",
+        "apoio": "textual",
+        "texto": "Palavras difíceis ou termos técnicos atrapalham: ele trava e não consegue continuar?",
+    },
+    # --- Interativo e concreto (C) ---
     {
         "id": "concreto_ideias_abstratas",
         "apoio": "concreto",
-        "texto": "Tem dificuldade com ideias que não dá para ver ou tocar, como frações ou regras gerais?",
+        "texto": "Conceitos que não dá para ver ou tocar, como frações, átomos ou regras gerais, são mais difíceis para ele?",
     },
     {
         "id": "concreto_exemplos",
         "apoio": "concreto",
-        "texto": "Só entende uma explicação depois de ver um exemplo do dia a dia ou de fazer na prática?",
+        "texto": "Ele só entende uma explicação quando você mostra um exemplo do dia a dia?",
+    },
+    {
+        "id": "concreto_visualizacao",
+        "apoio": "concreto",
+        "texto": "Desenhar, montar ou imaginar a cena ajuda ele a entender melhor do que só ouvir ou ler?",
     },
 ]
 
 OPCOES = [(0, "Quase nunca"), (1, "Às vezes"), (2, "Com frequência")]
 NOME_OPCAO = dict(OPCOES)
 
-# Soma das respostas de um apoio a partir da qual ele é sugerido:
-# uma resposta "com frequência", ou duas "às vezes".
-LIMIAR = 2
+# Soma das 3 respostas de um apoio a partir da qual ele é sugerido ao professor.
+# Com 3 perguntas por apoio (0–2 cada), a soma máxima é 6.
+# Sugerir com soma >= 3: "com frequência" em 1 pergunta + "às vezes" em outra,
+# ou "às vezes" nas 3, ou "com frequência" em 2.
+LIMIAR = 3
 
 
 def respostas_legiveis(respostas):
@@ -82,7 +104,7 @@ def criar_sugestoes(resposta_questionario):
         if getattr(perfil, campo) == valor:
             continue
         detalhes = "; ".join(
-            f"“{p['texto']}” {NOME_OPCAO[respostas[p['id']]].lower()}"
+            f"\"{p['texto']}\" {NOME_OPCAO[respostas[p['id']]].lower()}"
             for p in PERGUNTAS
             if p["apoio"] == campo and p["id"] in respostas
         )

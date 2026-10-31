@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 01:44 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 03:15 (BRT), por Cauã (Qwen)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -66,10 +66,10 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ### Cauã (Conteúdo: aula de exemplo, questionário, blocos pedagógicos, roteiro e narração do vídeo)
 
-- ❔ Blocos pedagógicos dos prompts (`ia/blocos/*.md`), com prazo às 02h. Por enquanto os arquivos têm um texto provisório
-- ❔ Aula de exemplo para a demo
-- ❔ 6 perguntas do questionário da família. A Fatia 4 já funciona com 6 perguntas provisórias em `apps/perfis/questionario.py`; basta trocar o texto
-- ❔ Roteiro e narração do vídeo
+- ✅ Blocos pedagógicos dos prompts (`ia/blocos/*.md`) — texto definitivo, baseado em DUA, sem marcadores provisórios
+- ✅ 9 perguntas do questionário da família (3 por apoio: foco, textual, concreto), com tom humano e cordial, + campo de nome do aluno + campo de observações (texto livre que alimenta o `contexto_familia` do perfil)
+- ⏳ Aula de exemplo para a demo
+- ⏳ Roteiro e narração do vídeo
 
 ### Gabriel (Negócio: plano de negócio, edição do vídeo)
 
@@ -78,6 +78,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 03:15 — Cauã: Blocos pedagógicos reescritos com base no DUA (5 arquivos, sem texto provisório). Questionário expandido para 9 perguntas (3 por apoio) com tom humano + campos de nome do aluno e observações. Modelo `RespostaQuestionario` com `nome_aluno` e `observacoes`; `Perfil` com `contexto_familia` (alimenta o system prompt). Integração no `prompt_builder.py` e `gerar_versao.py`. Migração criada e aplicada. 80 testes passando.
 - 31/10, 01:44 — Documentação final escrita (arquitetura com diagramas, decisões, contexto com dados conferidos no Inep). Todas as fatias do app concluídas no código; faltam deploy, provedor de IA e textos do Cauã.
 - 31/10, 01:39 — Fatia 5 concluída no código (painel da turma e sugestões a partir do uso); 80 testes passando. Material do Thiago (repositório learnext) juntado à `main`, com as marcas de conflito resolvidas.
 - 31/10, 01:33 — Fatia 3 concluída no código (barra de apoios de leitura, OpenDyslexic, voz, modo limpo, EventoUso); 70 testes passando.
