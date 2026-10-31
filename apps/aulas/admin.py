@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Aula, Questao, Resposta
+from .models import Aula, Questao, Resposta, VersaoAdaptada
 
 
 class QuestaoInline(admin.StackedInline):
@@ -19,3 +19,9 @@ class AulaAdmin(admin.ModelAdmin):
 class RespostaAdmin(admin.ModelAdmin):
     list_display = ("aluno", "questao", "indice_escolhido", "correta", "criado_em")
     list_filter = ("correta", "questao__aula")
+
+
+@admin.register(VersaoAdaptada)
+class VersaoAdaptadaAdmin(admin.ModelAdmin):
+    list_display = ("aula", "mascara", "aprovada", "gerada_em")
+    list_filter = ("aprovada", "mascara")

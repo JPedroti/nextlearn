@@ -37,6 +37,28 @@ class Questao(models.Model):
         return f"{self.aula} — questão {self.ordem}"
 
 
+class VersaoAdaptada(models.Model):
+    """Texto e enunciados reescritos pela IA para uma máscara de apoios (1–7).
+
+    A restrição única (aula, mascara) é o cache: cada combinação é gerada uma vez por aula.
+    Alternativas e gabarito não ficam aqui; continuam sempre os de `Questao`.
+    """
+
+    aula = models.ForeignKey(Aula, on_delete=models.CASCADE, related_name="versoes")
+    mascara = models.PositiveSmallIntegerField()
+    conteudo = models.TextField()
+    enunciados = models.JSONField(help_text="Um enunciado por questão, na mesma ordem das questões.")
+    aprovada = models.BooleanField(default=False, help_text="Só versões aprovadas pelo professor chegam aos alunos.")
+    gerada_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["mascara"]
+        constraints = [models.UniqueConstraint(fields=["aula", "mascara"], name="uma_versao_por_mascara")]
+
+    def __str__(self):
+        return f"{self.aula} — máscara {self.mascara:03b}"
+
+
 class Resposta(models.Model):
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name="respostas")
     questao = models.ForeignKey(Questao, on_delete=models.CASCADE, related_name="respostas")
