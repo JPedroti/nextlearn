@@ -637,3 +637,11 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** voltou a `main` ao estado de 10h52 com um commit de reversão (sem reescrever o histórico), mantendo o histórico de prompts e a proteção do `contas_locais.txt`; 120 testes passando. Na branch `thiago/prototipo-neuro`, trocou o texto "Chamilion" do topo pela logo Chamaleon e pôs os camaleões professor e família nas áreas do professor e da família (74 testes da branch passando; páginas conferidas num banco temporário). Avisou que a `main` voltou a ter o comando do aluno fictício, que é risco de cartão vermelho.
 
 ---
+
+## Prompt 52 — 31/10/2026, 11:25 (BRT) — autor: João — ferramenta: Claude Code
+
+> De uma olhada no site inteiro, quero que você use sua skill de design para melhor a aparencia da aba de familiares e professores. Verifique se todas as mudancas recentes estao fazendo o site funcionar e verifique se o guia de roteiro está coerente. Alem disso aponte os dois principais problemas que poderemos ter ao usar a nossa solucao
+
+**Resumo da resposta da IA:** na branch `thiago/prototipo-neuro`, abriu todas as páginas como visitante, professor, família e aluno (todas respondem; os testes da branch passam) e olhou as áreas do professor e da família no navegador. Corrigiu o camaleão gigante (a branch não usa Tailwind), o nome do aluno quebrando na tabela e um emoji usado como ícone. Conferiu o roteiro do Chamilion com o site: as telas existem (inclusive os 9 critérios da análise), mas a conta "familia.teste" vem de um comando com aluno fictício e a criação de questões precisa de chave de IA. Apontou os dois principais riscos da solução. Registrado às 11:28.
+
+---
