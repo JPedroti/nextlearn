@@ -32,7 +32,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 | 0. Esqueleto (login com 3 papéis, deploy) | 23h–00h | João | ✅ código · ⚠️ deploy | Criar o serviço no Render e testar no ar |
 | 1. Aula base (turma, aluno, aula, aluno responde a versão 000) | 00h–02h | João | ✅ (adiantada) | Testar no ar |
 | 2. Motor de IA (apoios, geração com cache, aprovação, aluno vê a sua versão) | 02h–04h | Thiago (feita pelo João com Claude Code) | ✅ código (adiantada) · ⚠️ | Decidir o provedor de IA (ver Entregas) e testar a geração real; trocar os blocos provisórios de `ia/blocos/` pelo texto do Cauã |
-| 3. Interface (OpenDyslexic, leitura em voz alta, modo limpo, registro de EventoUso) | 04h–06h | Thiago | ⏳ | Tudo. O João pediu à IA para fazer, se o Thiago não tiver começado (sem commits dele às 01h18) |
+| 3. Interface (OpenDyslexic, leitura em voz alta, modo limpo, registro de EventoUso) | 04h–06h | Thiago | 🔄 | Thiago começou às 01h40 (plano em `docs/mapeamento_pesquisa_app.md`, seção 4). Combinar com o João para não duplicar |
 | 4. Família (questionário → apoios sugeridos → revisão do professor) | 08h–09h15 | João | ✅ código (adiantada) | Trocar as 6 perguntas provisórias (`apps/perfis/questionario.py`) pelas do Cauã; testar no ar |
 | 5. Painel (acertos, adaptações usadas, sugestões de ajuste de perfil) | 09h15–10h30 | João | ⏳ | Tudo. Na fila, depois das Fatias 4 e 3 |
 | Docs finais | até 10h30 | João | ⏳ | Link do deploy no README; `docs/arquitetura.md`, `docs/decisoes.md` e `docs/contexto.md` |
