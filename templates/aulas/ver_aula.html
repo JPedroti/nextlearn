@@ -1,55 +1,228 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block titulo %}{{ aula.titulo }} · NextLearn{% endblock %}
 
 {% block conteudo %}
 <a href="{% url 'aulas:inicio' %}" class="voltar">← Minhas aulas</a>
+
 <div class="flex flex-wrap items-center justify-between gap-3 mt-3 mb-4">
   <h1 id="titulo-aula" class="text-2xl font-semibold">{{ aula.titulo }}</h1>
-  <button type="button" class="botao-ouvir" data-ouvir="titulo-aula texto-aula">Ouvir o texto</button>
+  <div class="flex items-center gap-2">
+    <button type="button" class="botao-ouvir" data-ouvir="titulo-aula texto-aula">Ouvir o texto</button>
+    <button type="button" id="btn-tela-cheia" class="btn-sec text-sm" title="Modo concentração — uma questão por vez, sem distrações">
+      ⛰️ Modo concentração
+    </button>
+  </div>
 </div>
 
-<article id="texto-aula" class="cartao mb-8 text-lg leading-relaxed space-y-4">{{ conteudo|linebreaks }}</article>
-
-<h2 class="text-xl font-semibold mb-3">Questões</h2>
+<article id="texto-aula" class="cartao mb-6 text-lg leading-relaxed space-y-4">{{ conteudo|linebreaks }}</article>
 
 {% if respondida %}
-  <p class="mb-4 font-medium">Você acertou {{ acertos }} de {{ itens|length }}.</p>
-  {% for item in itens %}
-    <div class="cartao mb-4">
-      <p id="questao-{{ forloop.counter }}-enunciado" class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</p>
-      <ul id="questao-{{ forloop.counter }}-alternativas" class="space-y-1">
-        {% for alternativa in item.questao.alternativas %}
-          {% with escolhida=item.resposta.indice_escolhido correta=item.questao.indice_correto %}
-            <li class="rounded px-2 py-1 {% if forloop.counter0 == correta %}bg-green-50 text-green-900{% elif forloop.counter0 == escolhida %}bg-red-50 text-red-900{% endif %}">
-              {{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}
-              {% if forloop.counter0 == escolhida %}· sua resposta{% endif %}
-              {% if forloop.counter0 == correta %}· correta{% endif %}
-            </li>
-          {% endwith %}
-        {% endfor %}
-      </ul>
-      <button type="button" class="botao-ouvir mt-3" data-ouvir="questao-{{ forloop.counter }}-enunciado questao-{{ forloop.counter }}-alternativas">Ouvir a questão</button>
+  {# --- Já respondida: mostra gabarito com navegação entre questões --- #}
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xl font-semibold">Questões</h2>
+    <span class="text-sm text-slate-500">{{ acertos }} de {{ itens|length }} acertos</span>
+  </div>
+
+  <div class="barra-progresso mb-4">
+    <div class="flex justify-between text-xs text-slate-500 mb-1">
+      <span>Questão <span id="questao-atual-gabarito">1</span> de {{ itens|length }}</span>
     </div>
-  {% endfor %}
-{% else %}
-  <form method="post">
-    {% csrf_token %}
+    <div class="h-2 bg-slate-200 rounded-full">
+      <div id="barra-preenchida-gabarito" class="h-2 bg-indigo-500 rounded-full transition-all" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <div id="container-questoes-gabarito">
     {% for item in itens %}
-      <fieldset class="cartao mb-4">
-        <legend id="questao-{{ forloop.counter }}-enunciado" class="float-left w-full font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</legend>
-        <div id="questao-{{ forloop.counter }}-alternativas" class="clear-both">
+      <div class="cartao mb-4 questao-gabarito" data-questao="{{ forloop.counter }}" {% if not forloop.first %}hidden{% endif %}>
+        <p id="questao-{{ forloop.counter }}-enunciado" class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</p>
+        <ul id="questao-{{ forloop.counter }}-alternativas" class="space-y-1">
           {% for alternativa in item.questao.alternativas %}
-            <label class="flex items-start gap-2 rounded px-2 py-1 hover:bg-slate-50">
-              <input type="radio" name="questao_{{ item.questao.pk }}" value="{{ forloop.counter0 }}" required class="mt-1.5">
-              <span>{{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}</span>
-            </label>
+            {% with escolhida=item.resposta.indice_escolhido correta=item.questao.indice_correto %}
+              <li class="rounded px-2 py-1 {% if forloop.counter0 == correta %}bg-green-50 text-green-900{% elif forloop.counter0 == escolhida %}bg-red-50 text-red-900{% endif %}">
+                {{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}
+                {% if forloop.counter0 == escolhida %}· sua resposta{% endif %}
+                {% if forloop.counter0 == correta %}· correta{% endif %}
+              </li>
+            {% endwith %}
           {% endfor %}
-        </div>
+        </ul>
         <button type="button" class="botao-ouvir mt-3" data-ouvir="questao-{{ forloop.counter }}-enunciado questao-{{ forloop.counter }}-alternativas">Ouvir a questão</button>
-      </fieldset>
+      </div>
     {% endfor %}
-    <button type="submit" class="btn">Enviar respostas</button>
+  </div>
+
+  <div class="flex justify-between mt-4">
+    <button type="button" id="btn-anterior-gabarito" class="btn-sec" disabled>← Anterior</button>
+    <span id="indicador-gabarito" class="text-sm text-slate-500 self-center">1 / {{ itens|length }}</span>
+    <button type="button" id="btn-proximo-gabarito" class="btn-sec">Próxima →</button>
+  </div>
+
+{% else %}
+  {# --- Não respondida: modo concentração com uma questão por vez --- #}
+  <form method="post" id="form-respostas">
+    {% csrf_token %}
+
+    <div class="barra-progresso mb-4">
+      <div class="flex justify-between text-xs text-slate-500 mb-1">
+        <span>Questão <span id="questao-atual">1</span> de {{ itens|length }}</span>
+        <span id="respondidas-count" class="text-slate-400">0 respondidas</span>
+      </div>
+      <div class="h-2 bg-slate-200 rounded-full">
+        <div id="barra-preenchida" class="h-2 bg-indigo-500 rounded-full transition-all" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <div id="container-questoes">
+      {% for item in itens %}
+        <div class="cartao mb-4 questao-slide" data-questao="{{ forloop.counter }}" {% if not forloop.first %}hidden{% endif %}>
+          <p id="questao-{{ forloop.counter }}-enunciado" class="font-medium mb-3">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</p>
+          <div id="questao-{{ forloop.counter }}-alternativas">
+            {% for alternativa in item.questao.alternativas %}
+              <label class="flex items-start gap-3 rounded px-3 py-3 hover:bg-slate-50 cursor-pointer transition-colors border border-transparent hover:border-indigo-200">
+                <input type="radio" name="questao_{{ item.questao.pk }}" value="{{ forloop.counter0 }}" class="mt-0.5 h-5 w-5 text-indigo-600">
+                <span class="text-lg">{{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <button type="button" class="botao-ouvir mt-4" data-ouvir="questao-{{ forloop.counter }}-enunciado questao-{{ forloop.counter }}-alternativas">Ouvir a questão</button>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="flex justify-between mt-4">
+      <button type="button" id="btn-anterior" class="btn-sec" disabled>← Anterior</button>
+      <span id="indicador" class="text-sm text-slate-500 self-center">1 / {{ itens|length }}</span>
+      <button type="button" id="btn-proximo" class="btn-sec">Próxima →</button>
+    </div>
+
+    <div class="text-center mt-6">
+      <button type="submit" id="btn-enviar" class="btn text-lg px-10 py-3" disabled>Enviar respostas</button>
+      <p id="msg-faltam" class="text-sm text-amber-700 mt-2 hidden">Responda todas as questões antes de enviar.</p>
+    </div>
   </form>
 {% endif %}
+{% endblock %}
+
+{% block scripts_extra %}
+<script>
+  (function () {
+    var respondida = {{ respondida|yesno:"true,false" }};
+    var totalQuestoes = {{ itens|length }};
+    if (totalQuestoes <= 1) return;
+
+    if (respondida) {
+      // Navegação no gabarito
+      var atualG = 1;
+      var btnAntG = document.getElementById("btn-anterior-gabarito");
+      var btnProxG = document.getElementById("btn-proximo-gabarito");
+      var indicadorG = document.getElementById("indicador-gabarito");
+      var barraG = document.getElementById("barra-preenchida-gabarito");
+      var qAtualG = document.getElementById("questao-atual-gabarito");
+
+      function mostrarGabarito(n) {
+        document.querySelectorAll(".questao-gabarito").forEach(function (el) {
+          el.hidden = el.dataset.questao != n;
+        });
+        qAtualG.textContent = n;
+        indicadorG.textContent = n + " / " + totalQuestoes;
+        barraG.style.width = (n / totalQuestoes * 100) + "%";
+        btnAntG.disabled = n === 1;
+        btnProxG.disabled = n === totalQuestoes;
+        if (btnProxG.disabled) {
+          btnProxG.textContent = "Fim ✓";
+        } else {
+          btnProxG.textContent = "Próxima →";
+        }
+      }
+
+      btnAntG.addEventListener("click", function () { if (atualG > 1) { atualG--; mostrarGabarito(atualG); } });
+      btnProxG.addEventListener("click", function () { if (atualG < totalQuestoes) { atualG++; mostrarGabarito(atualG); } });
+      mostrarGabarito(1);
+    } else {
+      // Navegação no modo de resposta
+      var atual = 1;
+      var btnAnt = document.getElementById("btn-anterior");
+      var btnProx = document.getElementById("btn-proximo");
+      var indicador = document.getElementById("indicador");
+      var barra = document.getElementById("barra-preenchida");
+      var qAtual = document.getElementById("questao-atual");
+      var respondidasCount = document.getElementById("respondidas-count");
+      var btnEnviar = document.getElementById("btn-enviar");
+      var msgFaltam = document.getElementById("msg-faltam");
+
+      function contarRespondidas() {
+        var count = 0;
+        document.querySelectorAll("#container-questoes .questao-slide").forEach(function (slide) {
+          if (slide.querySelector("input[type=radio]:checked")) count++;
+        });
+        return count;
+      }
+
+      function atualizarBarra() {
+        var n = contarRespondidas();
+        respondidasCount.textContent = n + " respondida" + (n !== 1 ? "s" : "");
+        barra.style.width = (n / totalQuestoes * 100) + "%";
+        btnEnviar.disabled = n < totalQuestoes;
+        if (n < totalQuestoes) {
+          msgFaltam.classList.remove("hidden");
+        } else {
+          msgFaltam.classList.add("hidden");
+        }
+      }
+
+      function mostrarQuestao(n) {
+        document.querySelectorAll(".questao-slide").forEach(function (el) {
+          el.hidden = el.dataset.questao != n;
+        });
+        qAtual.textContent = n;
+        indicador.textContent = n + " / " + totalQuestoes;
+        btnAnt.disabled = n === 1;
+        btnProx.disabled = n === totalQuestoes;
+        if (btnProx.disabled) {
+          btnProx.textContent = "Revisar ✓";
+        } else {
+          btnProx.textContent = "Próxima →";
+        }
+        atualizarBarra();
+        // Scroll suave para o topo da questão
+        document.querySelector(".questao-slide:not([hidden])").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      btnAnt.addEventListener("click", function () { if (atual > 1) { atual--; mostrarQuestao(atual); } });
+      btnProx.addEventListener("click", function () { if (atual < totalQuestoes) { atual++; mostrarQuestao(atual); } });
+
+      // Atualiza barra ao selecionar qualquer rádio
+      document.querySelectorAll("#container-questoes input[type=radio]").forEach(function (radio) {
+        radio.addEventListener("change", atualizarBarra);
+      });
+
+      // Scrolla a questão ativa para o topo ao carregar
+      mostrarQuestao(1);
+    }
+
+    // Modo concentração: tela cheia
+    var btnTelaCheia = document.getElementById("btn-tela-cheia");
+    if (btnTelaCheia && document.fullscreenEnabled) {
+      btnTelaCheia.addEventListener("click", function () {
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+          btnTelaCheia.textContent = "⛰️ Modo concentração";
+        } else {
+          document.documentElement.requestFullscreen();
+          btnTelaCheia.textContent = "⛰️ Sair do modo concentração";
+        }
+      });
+      document.addEventListener("fullscreenchange", function () {
+        if (!document.fullscreenElement) {
+          btnTelaCheia.textContent = "⛰️ Modo concentração";
+        }
+      });
+    } else if (btnTelaCheia) {
+      btnTelaCheia.style.display = "none";
+    }
+  })();
+</script>
 {% endblock %}

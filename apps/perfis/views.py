@@ -181,3 +181,100 @@ def responder_sugestao(request, pk, aceitar):
         sugestao.recusar()
         messages.success(request, f"Sugestão recusada para {sugestao.aluno}.")
     return _redirecionar_para_next(request, "perfis:editar_apoios", aluno_pk=sugestao.aluno_id)
+
+
+@papel_requerido("professor")
+def dashboard(request, aluno_pk):
+    """Dashboard individual do aluno: métricas de uso, progresso, acertos e apoios."""
+    aluno = get_object_or_404(
+        Aluno.objects.select_related("usuario", "turma", "perfil"),
+        pk=aluno_pk,
+        turma__professor=request.user,
+    )
+    perfil = _perfil(aluno) if hasattr(aluno, "perfil") else None
+
+    respostas = list(
+        Resposta.objects.filter(aluno=aluno)
+        .select_related("questao__aula")
+        .order_by("-criado_em")
+    )
+    total_questoes = len(respostas)
+    acertos = sum(1 for r in respostas if r.correta)
+
+    # Tempo total de uso (ms → minutos)
+    tempos = [r.tempo_ms for r in respostas if r.tempo_ms]
+    tempo_total_min = round(sum(tempos) / 60000, 1) if tempos else 0
+
+    # Aulas distintas respondidas
+    aulas_ids = list(dict.fromkeys(r.questao.aula_id for r in respostas))
+    aulas_respondidas = len(aulas_ids)
+
+    # Comparação original vs adaptada
+    originais = [r for r in respostas if r.versao_mascara == 0]
+    adaptadas = [r for r in respostas if r.versao_mascara != 0]
+    pct_original = round(100 * sum(1 for r in originais if r.correta) / len(originais)) if originais else None
+    pct_adaptada = round(100 * sum(1 for r in adaptadas if r.correta) / len(adaptadas)) if adaptadas else None
+
+    # Evolução: agrupa respostas por aula
+    from collections import defaultdict
+    evolucao = []
+    for aula_id in aulas_ids:
+        suas = [r for r in respostas if r.questao.aula_id == aula_id]
+        if suas:
+            aula_nome = suas[0].questao.aula.titulo
+            data = suas[0].criado_em
+            evolucao.append({
+                "aula": aula_nome,
+                "data": data,
+                "acertos": sum(1 for r in suas if r.correta),
+                "total": len(suas),
+                "pct": round(100 * sum(1 for r in suas if r.correta) / len(suas)),
+                "mascara": suas[0].versao_mascara,
+            })
+    evolucao.sort(key=lambda e: e["data"])
+
+    # Eventos de uso
+    from apps.aulas.models import EventoUso
+    usos = (
+        EventoUso.objects.filter(aluno=aluno)
+        .values("tipo")
+        .annotate(vezes=Count("id"))
+        .order_by("-vezes")
+    )
+    rotulos_uso = {
+        "ativou_fonte_dislexia": "Fonte para dislexia",
+        "ativou_leitura_voz": "Leitura em voz alta",
+        "ativou_modo_limpo": "Modo limpo",
+    }
+
+    # Sugestões pendentes
+    sugestoes = aluno.sugestoes.filter(status=SugestaoPerfil.Status.PENDENTE)
+
+    # Último questionário
+    ultimo_q = aluno.questionarios.first()
+
+    contexto = {
+        "aluno": aluno,
+        "perfil": perfil,
+        "total_questoes": total_questoes,
+        "acertos": acertos,
+        "pct_total": round(100 * acertos / total_questoes) if total_questoes else None,
+        "tempo_total_min": tempo_total_min,
+        "aulas_respondidas": aulas_respondidas,
+        "pct_original": pct_original,
+        "pct_adaptada": pct_adaptada,
+        "num_original": len(originais),
+        "num_adaptada": len(adaptadas),
+        "evolucao": evolucao,
+        "usos": [{"rotulo": rotulos_uso.get(u["tipo"], u["tipo"]), "vezes": u["vezes"]} for u in usos],
+        "sugestoes": sugestoes,
+        "ultimo_questionario": ultimo_q,
+    }
+    return render(request, "perfis/dashboard.html", contexto)
+
+
+def _perfil(aluno):
+    try:
+        return aluno.perfil
+    except Perfil.DoesNotExist:
+        return None

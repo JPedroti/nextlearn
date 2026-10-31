@@ -22,8 +22,8 @@ body.fonte-dislexia main input,
 body.fonte-dislexia main textarea,
 body.fonte-dislexia main button {
   font-family: "OpenDyslexic", Verdana, sans-serif;
-  letter-spacing: 0.03em;
-  word-spacing: 0.15em;
+  letter-spacing: 0.12em;
+  word-spacing: 0.16em;
   line-height: 1.8;
 }
 
@@ -55,4 +55,18 @@ body.modo-limpo .etiqueta {
   background: transparent;
   color: #334155;
   border: 1px solid #cbd5e1;
+}
+
+/* WCAG 2.2: alvos de toque com no mínimo 44 px (critério 2.5.5).
+   Vale para todos os alunos, independente das preferências ativas. */
+button, .btn, .btn-sec, a.btn, a.btn-sec,
+input[type="radio"] + label, input[type="checkbox"] + label,
+select, input[type="text"], input[type="email"], input[type="password"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+/* Rádio e checkbox em si não precisam ser 44 px, só o label clicável que os envolve */
+input[type="radio"], input[type="checkbox"] {
+  min-height: auto;
+  min-width: auto;
 }

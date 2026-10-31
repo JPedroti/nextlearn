@@ -140,7 +140,7 @@ class AlunoTests(Fatia1Base):
         self.assertTrue(Resposta.objects.get(aluno=self.aluno, questao=q1).correta)
         self.assertFalse(Resposta.objects.get(aluno=self.aluno, questao=q2).correta)
         self.assertIsNotNone(Resposta.objects.get(aluno=self.aluno, questao=q1).tempo_ms)
-        self.assertContains(self.client.get(url), "Você acertou 1 de 2.")
+        self.assertContains(self.client.get(url), "1 de 2 acertos")
 
     def test_nao_responde_duas_vezes(self):
         aula = self.criar_aula()

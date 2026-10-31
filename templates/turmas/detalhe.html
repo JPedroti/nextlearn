@@ -70,6 +70,7 @@
             {% if aluno.sugestoes_pendentes %}
               <span class="rounded-full bg-indigo-600 text-white px-2 py-1">{{ aluno.sugestoes_pendentes }} sugest{{ aluno.sugestoes_pendentes|pluralize:"ão,ões" }}</span>
             {% endif %}
+            <a href="{% url 'perfis:dashboard' aluno.pk %}" class="text-sm text-indigo-700 hover:underline ml-2">Dashboard</a>
             <a href="{% url 'perfis:editar_apoios' aluno.pk %}" class="text-sm text-indigo-700 hover:underline ml-2">Ajustar apoios</a>
           </span>
         </li>
