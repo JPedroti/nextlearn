@@ -10,6 +10,7 @@ urlpatterns = [
     # Família
     path("familia/", views.inicio, name="inicio"),
     path("familia/alunos/<int:aluno_pk>/questionario/", views.questionario, name="questionario"),
+    path("familia/alunos/<int:aluno_pk>/relatorio/", views.relatorio, name="relatorio"),
     # Professor
     path("professor/alunos/<int:aluno_pk>/apoios/", views.editar_apoios, name="editar_apoios"),
     path("professor/sugestoes/<int:pk>/aceitar/", views.responder_sugestao, {"aceitar": True}, name="aceitar_sugestao"),

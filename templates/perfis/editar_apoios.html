@@ -35,7 +35,16 @@
         </span>
       </label>
     {% endfor %}
-    <button type="submit" class="btn">Salvar apoios</button>
+
+    <h2 class="font-semibold mt-6">Contexto compartilhado pela família</h2>
+    <p class="text-sm text-slate-600 mb-4">
+      Informações que a família compartilhou sobre como o aluno aprende.
+      Você pode editar. Quando preenchido, ajuda a IA a personalizar o tom e os exemplos das aulas adaptadas.
+    </p>
+    {{ form.contexto_familia }}
+    {{ form.contexto_familia.errors }}
+
+    <button type="submit" class="btn mt-4">Salvar apoios</button>
   </form>
 </div>
 
@@ -50,11 +59,12 @@
 <section class="cartao max-w-xl mt-6">
   <h2 class="text-xl font-semibold mb-1">Questionário da família</h2>
   {% if ultimo_questionario %}
-    <p class="text-sm text-slate-600 mb-3">
+    <p class="text-sm text-slate-600 mb-1">
       Respondido por {{ ultimo_questionario.preenchido_por.get_full_name|default:ultimo_questionario.preenchido_por.username }}
       em {{ ultimo_questionario.criado_em|date:"d/m/Y, H:i" }}.
+      {% if ultimo_questionario.nome_aluno %}A família chama o aluno de "{{ ultimo_questionario.nome_aluno }}".{% endif %}
     </p>
-    <dl class="space-y-2 text-sm">
+    <dl class="space-y-2 text-sm mt-3">
       {% for pergunta, resposta in respostas_questionario %}
         <div>
           <dt class="text-slate-600">{{ pergunta }}</dt>
@@ -62,6 +72,12 @@
         </div>
       {% endfor %}
     </dl>
+    {% if ultimo_questionario.observacoes %}
+      <div class="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+        <p class="text-sm font-medium text-amber-900 mb-1">Observações da família:</p>
+        <p class="text-sm text-amber-800">{{ ultimo_questionario.observacoes|linebreaksbr }}</p>
+      </div>
+    {% endif %}
   {% elif aluno.responsavel %}
     <p class="text-sm text-slate-600">A família ainda não respondeu.</p>
   {% else %}

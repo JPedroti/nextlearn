@@ -9,8 +9,8 @@ from apps.turmas.models import Aluno, Turma
 SENHA = "senha-de-teste-123"
 
 
-def respostas(foco=(0, 0), textual=(0, 0), concreto=(0, 0)):
-    """Monta {id da pergunta: valor} na ordem das perguntas de cada apoio."""
+def respostas(foco=(0, 0, 0), textual=(0, 0, 0), concreto=(0, 0, 0)):
+    """Monta {id da pergunta: valor} na ordem das perguntas de cada apoio (3 por apoio)."""
     valores = {"foco": list(foco), "textual": list(textual), "concreto": list(concreto)}
     return {p["id"]: valores[p["apoio"]].pop(0) for p in PERGUNTAS}
 
@@ -20,11 +20,14 @@ class ApoiosSugeridosTests(TestCase):
         self.assertEqual(apoios_sugeridos(respostas()), {"foco": False, "textual": False, "concreto": False})
 
     def test_um_com_frequencia_basta(self):
-        self.assertTrue(apoios_sugeridos(respostas(foco=(2, 0)))["foco"])
+        # Com 3 perguntas por apoio, um "com frequência" (2) + dois "quase nunca" (0,0) soma 2 — ainda < 3.
+        # Precisa de pelo menos 3: (2,1,0) ou (1,1,1) ou (2,2,0) etc.
+        self.assertTrue(apoios_sugeridos(respostas(foco=(2, 1, 0)))["foco"])
 
-    def test_dois_as_vezes_bastam_e_um_so_nao(self):
-        self.assertTrue(apoios_sugeridos(respostas(textual=(1, 1)))["textual"])
-        self.assertFalse(apoios_sugeridos(respostas(concreto=(1, 0)))["concreto"])
+    def test_tres_as_vezes_sugerem_e_dois_nao(self):
+        # 1+1+1 = 3 → sugere. 1+1+0 = 2 → não sugere.
+        self.assertTrue(apoios_sugeridos(respostas(textual=(1, 1, 1)))["textual"])
+        self.assertFalse(apoios_sugeridos(respostas(concreto=(1, 1, 0)))["concreto"])
 
 
 class Fatia4Base(TestCase):
@@ -77,20 +80,20 @@ class QuestionarioTests(Fatia4Base):
     def test_respostas_viram_sugestoes_so_onde_mudam_algo(self):
         self.perfil.concreto = True  # o professor já tinha ligado
         self.perfil.save()
-        self.client.post(self.url, self.dados_questionario(foco=(2, 1), concreto=(2, 2)))
+        self.client.post(self.url, self.dados_questionario(foco=(2, 1, 0), concreto=(2, 2, 2)))
 
         questionario = RespostaQuestionario.objects.get(aluno=self.aluno)
         self.assertEqual(questionario.preenchido_por, self.familia)
         sugestoes = SugestaoPerfil.objects.filter(aluno=self.aluno)
         self.assertEqual([(s.campo, s.valor_sugerido) for s in sugestoes], [("foco", True)])
-        self.assertIn("Perde a concentração", sugestoes[0].motivo)
+        self.assertIn("Quando a tarefa é longa", sugestoes[0].motivo)
         # As respostas não mudam o perfil sozinhas: o professor decide.
         self.perfil.refresh_from_db()
         self.assertFalse(self.perfil.foco)
 
     def test_responder_de_novo_substitui_as_sugestoes_pendentes(self):
-        self.client.post(self.url, self.dados_questionario(foco=(2, 2)))
-        self.client.post(self.url, self.dados_questionario(textual=(2, 2)))
+        self.client.post(self.url, self.dados_questionario(foco=(2, 2, 2)))
+        self.client.post(self.url, self.dados_questionario(textual=(2, 2, 2)))
         pendentes = SugestaoPerfil.objects.filter(aluno=self.aluno, status="pendente")
         self.assertEqual([s.campo for s in pendentes], ["textual"])
         self.assertEqual(RespostaQuestionario.objects.filter(aluno=self.aluno).count(), 2)
@@ -99,7 +102,7 @@ class QuestionarioTests(Fatia4Base):
         dados = self.dados_questionario()
         dados.pop(PERGUNTAS[0]["id"])
         resposta = self.client.post(self.url, dados)
-        self.assertContains(resposta, "Escolha uma resposta.")
+        self.assertContains(resposta, "Por favor, escolha uma resposta")
         self.assertFalse(RespostaQuestionario.objects.exists())
 
     def test_familia_nao_responde_por_aluno_de_outra_familia(self):
@@ -153,7 +156,7 @@ class RevisaoProfessorTests(Fatia4Base):
 
     def test_pagina_de_apoios_mostra_sugestoes_e_questionario(self):
         familia = self.criar_familia()
-        RespostaQuestionario.objects.create(aluno=self.aluno, respostas=respostas(foco=(2, 0)), preenchido_por=familia)
+        RespostaQuestionario.objects.create(aluno=self.aluno, respostas=respostas(foco=(2, 0, 0)), preenchido_por=familia)
         resposta = self.client.get(reverse("perfis:editar_apoios", args=[self.aluno.pk]))
         self.assertContains(resposta, "Ligar “Acessibilidade textual”")
         self.assertContains(resposta, "Com frequência")

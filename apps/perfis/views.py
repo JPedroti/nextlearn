@@ -1,12 +1,12 @@
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Max
+from django.db.models import Count, Max
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
-from apps.aulas.models import Aula, EventoUso
+from apps.aulas.models import Aula, EventoUso, Resposta
 from apps.contas.decorators import papel_requerido
 from apps.turmas.models import Aluno
 
@@ -76,16 +76,94 @@ def questionario(request, aluno_pk):
     """A família responde as perguntas sobre o dia a dia; as respostas viram sugestões para o professor."""
     aluno = get_object_or_404(Aluno.objects.select_related("usuario"), pk=aluno_pk, responsavel=request.user)
     anterior = aluno.questionarios.first()
-    form = QuestionarioForm(request.POST or None, initial=anterior.respostas if anterior else None)
+
+    initial = {}
+    if anterior:
+        initial = anterior.respostas.copy()
+        initial["nome_aluno"] = anterior.nome_aluno
+        initial["observacoes"] = anterior.observacoes
+
+    form = QuestionarioForm(request.POST or None, initial=initial if anterior else None)
     if request.method == "POST" and form.is_valid():
+        dados = form.dados_questionario()
         with transaction.atomic():
             resposta = RespostaQuestionario.objects.create(
-                aluno=aluno, respostas=form.cleaned_data, preenchido_por=request.user
+                aluno=aluno,
+                respostas=dados["respostas"],
+                nome_aluno=dados["nome_aluno"],
+                observacoes=dados["observacoes"],
+                preenchido_por=request.user,
             )
             criar_sugestoes(resposta)
-        messages.success(request, "Obrigado! As respostas foram para o professor, que decide os apoios.")
+            # Levar as observações para o perfil, para o professor revisar
+            if dados["observacoes"].strip():
+                perfil, _ = Perfil.objects.get_or_create(aluno=aluno)
+                if not perfil.revisado_pelo_professor:
+                    perfil.contexto_familia = dados["observacoes"].strip()
+                    perfil.save(update_fields=["contexto_familia"])
+        messages.success(request, "Obrigado! Suas respostas foram enviadas para o professor, que vai decidir os melhores apoios para o aluno.")
         return redirect("perfis:inicio")
     return render(request, "perfis/questionario.html", {"aluno": aluno, "form": form, "anterior": anterior})
+
+
+@papel_requerido("familia")
+def relatorio(request, aluno_pk):
+    """Relatório detalhado de performance do aluno para a família."""
+    aluno = get_object_or_404(
+        Aluno.objects.select_related("usuario", "turma", "perfil"),
+        pk=aluno_pk,
+        responsavel=request.user,
+    )
+    perfil = aluno.perfil if hasattr(aluno, "perfil") else None
+
+    # Respostas do aluno
+    respostas = list(
+        Resposta.objects.filter(aluno=aluno)
+        .select_related("questao__aula")
+        .order_by("-criado_em")
+    )
+    total_respostas = len(respostas)
+    acertos = sum(1 for r in respostas if r.correta)
+
+    # Aulas respondidas
+    aulas_ids = list(dict.fromkeys(r.questao.aula_id for r in respostas))
+    aulas_respondidas = len(aulas_ids)
+
+    # Comparação: original vs adaptada
+    originais = [r for r in respostas if r.versao_mascara == 0]
+    adaptadas = [r for r in respostas if r.versao_mascara != 0]
+
+    pct_original = round(100 * sum(1 for r in originais if r.correta) / len(originais)) if originais else None
+    pct_adaptada = round(100 * sum(1 for r in adaptadas if r.correta) / len(adaptadas)) if adaptadas else None
+
+    # Preferências mais usadas
+    from apps.aulas.models import EventoUso
+    usos = (
+        EventoUso.objects.filter(aluno=aluno)
+        .values("tipo")
+        .annotate(vezes=Count("id"))
+        .order_by("-vezes")
+    )
+    rotulos_uso = {
+        "ativou_fonte_dislexia": "Fonte para dislexia",
+        "ativou_leitura_voz": "Leitura em voz alta",
+        "ativou_modo_limpo": "Modo limpo",
+    }
+
+    contexto = {
+        "aluno": aluno,
+        "perfil": perfil,
+        "total_respostas": total_respostas,
+        "acertos": acertos,
+        "pct_total": round(100 * acertos / total_respostas) if total_respostas else None,
+        "aulas_respondidas": aulas_respondidas,
+        "pct_original": pct_original,
+        "pct_adaptada": pct_adaptada,
+        "num_original": len(originais),
+        "num_adaptada": len(adaptadas),
+        "usos": [{"rotulo": rotulos_uso.get(u["tipo"], u["tipo"]), "vezes": u["vezes"]} for u in usos],
+    }
+    return render(request, "perfis/relatorio.html", contexto)
 
 
 # ---------------------------------------------------------------------------
