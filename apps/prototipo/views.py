@@ -417,6 +417,8 @@ def _trilha(contexto, aluno, apoios, intensidade, ambiente_forcado=""):
     mundos.sort(key=lambda m: (not m["atual"], m["concluido"], m["materia"], m["numero"]))
     for m in mundos:
         m["aberta"] = m["atual"] or not foco
+    if mundos and not any(m["aberta"] for m in mundos):  # sem fase atual (tudo feito): abre o primeiro mundo, para a trilha nunca sumir
+        mundos[0]["aberta"] = True
     return mundos
 
 
