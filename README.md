@@ -139,12 +139,17 @@ tests/         testes automatizados
 docs/          cronograma, histórico de prompts e documentação
 ```
 
-Material trazido do repositório `learnext`, em que o Thiago trabalhou antes de juntar com este (não é usado pelo app):
+## Pesquisa e documentação de apoio
 
-```
-prompts/       prompts do Thiago naquele repositório, um arquivo por prompt
-docs/*.md      pesquisas: evidências sobre neurodivergência, métricas, riscos legais, tese de produto
-db/            esboço de banco em SQL (o app usa os modelos do Django em apps/*/models.py)
-design/        mockup da tela inicial do aluno
-scripts/       testar_chave.py: testa uma chave de API em endpoint compatível com OpenAI
-```
+Material de pesquisa produzido durante o hackathon (base científica, perfis, métricas e riscos legais):
+
+| Arquivo | Conteúdo |
+|---|---|
+| [docs/PERFIS_E_METRICAS.md](docs/PERFIS_E_METRICAS.md) | Perfis funcionais por barreira (P1–P8) e verificação da base científica |
+| [docs/METRICAS_ENSINO.md](docs/METRICAS_ENSINO.md) | Métricas de ensino em 6 camadas, inspiradas no Duolingo |
+| [docs/RISCOS_LEGAIS.md](docs/RISCOS_LEGAIS.md) | Leis e normas que afetam a plataforma (CNE, LGPD, ECA Digital, Decreto 12.686) |
+| [docs/NEURODIVERGENCIA_EVIDENCIAS.md](docs/NEURODIVERGENCIA_EVIDENCIAS.md) | Tipos de neurodivergência, prevalência e evidências |
+| [docs/pesquisa/](docs/pesquisa/) | Revisão sistemática (entrega 1) |
+| [db/schema.sql](db/schema.sql) | Esboço de modelo de dados (referência; o app usa os models do Django) |
+| [design/](design/) | Mockup da tela inicial do aluno |
+| [prompts/](prompts/) | Prompts usados pelo Thiago, um arquivo por prompt |

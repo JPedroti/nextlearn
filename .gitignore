@@ -1,7 +1,5 @@
 # Segredos
 .env
-.env.*
-!.env.example
 
 # Python
 venv/
@@ -13,10 +11,12 @@ __pycache__/
 db.sqlite3
 staticfiles/
 
-# Editores
-.vscode/
-.idea/
-
 # Material de referência (PDFs do evento; o deck da Teachy é confidencial)
 referencias/
 *.pdf
+
+# Extras (pasta local do Thiago)
+.env.*
+!.env.example
+.vscode/
+.idea/
