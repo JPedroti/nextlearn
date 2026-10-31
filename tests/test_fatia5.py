@@ -104,7 +104,7 @@ class PainelTests(Fatia5Base):
         self.assertEqual(linhas["ana"]["placar"], {"acertos": 2, "total": 2, "pct": 100})
         self.assertEqual(linhas["ana"]["aulas_com_versao_adaptada"], 1)
         self.assertEqual(linhas["bia"]["placar"]["pct"], 50)
-        self.assertEqual(linhas["bia"]["usos"], [{"rotulo": "Fonte para dislexia", "vezes": 1}])
+        self.assertEqual(linhas["bia"]["usos"], [{"rotulo": "Letras espaçadas", "vezes": 1}])
         self.assertEqual(linhas["caio"]["placar"]["total"], 0)
 
     def test_numeros_por_aula_e_por_questao(self):

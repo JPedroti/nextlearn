@@ -8,8 +8,10 @@
     var anterior = bloco.querySelector("[data-anterior]");
     var proximo = bloco.querySelector("[data-proximo]");
     var contador = bloco.querySelector("[data-contador]");
+    var barraPassos = bloco.querySelector("[data-barra-passos]");
     var nome = bloco.dataset.paginas;
     var atual = 0;
+    if (barraPassos) barraPassos.parentElement.hidden = false;
 
     function mostrar(indice, rolar) {
       atual = indice;
@@ -22,6 +24,7 @@
         contador.hidden = false;
         contador.textContent = nome + " " + (indice + 1) + " de " + paginas.length;
       }
+      if (barraPassos) barraPassos.style.width = (100 * (indice + 1) / paginas.length) + "%";
       if (rolar) bloco.scrollIntoView({ block: "start" });
     }
 

@@ -214,7 +214,10 @@ def inicio(request):
         for aula in aluno.turma.aulas.filter(publicada=True):
             aula.respondida = aula.pk in respondidas
             aulas.append(aula)
-    return render(request, "aulas/inicio_aluno.html", {"aluno": aluno, "aulas": aulas})
+    # Com o apoio de foco, a tela destaca só a próxima aula a fazer e recolhe as outras (skill design-neuro).
+    proxima = next((aula for aula in aulas if not aula.respondida), None)
+    contexto = {"aluno": aluno, "aulas": aulas, "proxima": proxima, "outras": [a for a in aulas if a != proxima]}
+    return render(request, "aulas/inicio_aluno.html", contexto)
 
 
 @papel_requerido("aluno")

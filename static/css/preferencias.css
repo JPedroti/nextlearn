@@ -16,7 +16,8 @@
   font-display: swap;
 }
 
-/* Fonte para dislexia: fonte própria, mais espaço entre letras, palavras e linhas */
+/* Letras espaçadas: mais espaço entre letras (0,12 em; Zorzi et al., 2012), palavras e linhas, na fonte OpenDyslexic.
+   O nome na tela não promete ganho da fonte em si: a evidência é para o espaçamento (skill design-neuro). */
 body.fonte-dislexia main,
 body.fonte-dislexia main input,
 body.fonte-dislexia main textarea,
@@ -35,7 +36,8 @@ body.leitura-voz .botao-ouvir {
   display: inline-flex;
 }
 
-/* Modo limpo: fundo branco, sem sombras nem destaques coloridos, letra maior e coluna mais estreita */
+/* Modo limpo: fundo branco, sem sombras nem destaques coloridos, letra maior e coluna mais estreita
+   (tamanhos: valor de produto, a calibrar). As cores do modo limpo estão em temas.css. */
 body.modo-limpo {
   background: #ffffff;
 }

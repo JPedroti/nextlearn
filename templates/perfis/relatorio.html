@@ -74,6 +74,19 @@
   {% endif %}
 {% endif %}
 
+{% if dicas %}
+  <section class="cartao max-w-xl mt-6" aria-labelledby="dicas-titulo">
+    <h2 id="dicas-titulo" class="font-semibold mb-1">Como ajudar em casa</h2>
+    <p class="text-sm mb-3" style="color: var(--texto-suave);">Ideias simples para os apoios que o professor escolheu.</p>
+    {% for nome, lista in dicas %}
+      <h3 class="font-medium mt-3">{{ nome }}</h3>
+      <ul class="list-disc pl-5 mt-1 space-y-1">
+        {% for dica in lista %}<li>{{ dica }}</li>{% endfor %}
+      </ul>
+    {% endfor %}
+  </section>
+{% endif %}
+
 <div class="mt-6">
   <a href="{% url 'perfis:questionario' aluno.pk %}" class="btn-sec">Responder o questionário de novo</a>
 </div>

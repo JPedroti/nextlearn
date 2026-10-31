@@ -42,7 +42,7 @@ O que guia o produto:
 - **Correção confiável.** A IA reescreve só o texto da aula e os enunciados. Alternativas e gabarito são sempre os do
   professor.
 - **Privacidade de criança.** Nenhum dado pessoal do aluno vai para a IA: ela recebe só os apoios ligados e a aula.
-- **Funciona para qualquer aluno.** Fonte para dislexia, leitura em voz alta e modo limpo ficam numa barra que
+- **Funciona para qualquer aluno.** Letras espaçadas, leitura em voz alta e modo limpo ficam numa barra que
   qualquer aluno pode ligar, sem precisar de rótulo. Quando alguém usa sempre um apoio, o professor recebe a
   sugestão de deixá-lo ligado.
 

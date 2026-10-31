@@ -1,0 +1,107 @@
+/* Paleta e regras de tela por apoio (skill design-neuro, do Thiago: .claude/skills/design-neuro/SKILL.md).
+
+   O <body> recebe a classe do tema: tema-base (professor, família e aluno sem apoio no conteúdo) ou o apoio mais
+   restritivo do aluno: tema-foco > tema-textual > tema-concreto. O modo limpo, quando o aluno liga, vale por cima de
+   todos. O tema só muda a tela do próprio aluno; nada identifica o aluno para a turma.
+   O contraste de cada par de texto é conferido por tests/test_contraste.py (mínimo 4,5:1, WCAG 2.2). */
+
+body.tema-base {
+  --fundo: #F7F8FA;
+  --superficie: #FFFFFF;
+  --texto: #1F2933;
+  --texto-suave: #52606D;
+  --destaque: #2B59C3;
+  --destaque-suave: #E6EDFB;
+  --borda: #E1E5EA;
+}
+
+/* Foco (calma): baixa saturação e um só destaque, para menos estímulo. */
+body.tema-foco {
+  --fundo: #F4F6F8;
+  --superficie: #FFFFFF;
+  --texto: #1E293B;
+  --texto-suave: #475569;
+  --destaque: #35557F;
+  --destaque-suave: #E5EBF2;
+  --borda: #DDE3EA;
+}
+
+/* Textual (leitura): fundo levemente tingido e texto cinza-escuro, com menos brilho. */
+body.tema-textual {
+  --fundo: #FBF8F1;
+  --superficie: #FFFDF8;
+  --texto: #2B2B2B;
+  --texto-suave: #555049;
+  --destaque: #1F5A96;
+  --destaque-suave: #E7EEF7;
+  --borda: #E8E1D3;
+}
+
+/* Concreto (visual). */
+body.tema-concreto {
+  --fundo: #F7F9FB;
+  --superficie: #FFFFFF;
+  --texto: #1F2933;
+  --texto-suave: #52606D;
+  --destaque: #0B6BA8;
+  --destaque-suave: #E3F0F8;
+  --borda: #E1E5EA;
+}
+
+/* Modo limpo: vem depois dos outros temas para valer por cima deles. */
+body.modo-limpo {
+  --fundo: #FFFFFF;
+  --superficie: #FFFFFF;
+  --texto: #111827;
+  --texto-suave: #374151;
+  --destaque: #1D4ED8;
+  --destaque-suave: #EEF2FF;
+  --borda: #D1D5DB;
+}
+
+/* As variáveis do visual do app (definidas em base.html) passam a seguir o tema da tela.
+   "body[class]" e "body :focus-visible" ganham do CSS gerado pelo Tailwind em base.html, que pode vir depois. */
+body[class] {
+  --color-primary: var(--destaque);
+  --color-primary-hover: color-mix(in srgb, var(--destaque) 80%, #000000);
+  --color-primary-light: var(--destaque-suave);
+  --color-bg: var(--fundo);
+  --color-surface: var(--superficie);
+  --color-border: var(--borda);
+  --color-text: var(--texto);
+  --color-text-secondary: var(--texto-suave);
+  --color-text-muted: var(--texto-suave);
+  color: var(--texto);
+}
+
+/* Foco visível em todas as telas: contorno de 3 px na cor de destaque. */
+body :focus-visible {
+  outline: 3px solid var(--destaque);
+  outline-offset: 2px;
+}
+
+/* Apoio de foco: nenhuma animação nem movimento na tela. */
+body.apoio-foco *,
+body.apoio-foco *::before,
+body.apoio-foco *::after {
+  transition: none !important;
+  animation: none !important;
+}
+body.apoio-foco .btn:active,
+body.apoio-foco .btn-secondary:active {
+  transform: none;
+}
+
+/* Apoio textual: texto da aula e das questões com pelo menos 19 px, linha de até 65 caracteres e entrelinha 1,75
+   (valores da skill design-neuro; valor de produto, a calibrar). O botão "Ouvir" aparece mesmo sem a leitura em voz
+   alta ligada na barra. */
+body.apoio-textual #texto-aula,
+body.apoio-textual [data-pagina] legend,
+body.apoio-textual [data-pagina] > p[id] {
+  font-size: 1.1875rem;
+  line-height: 1.75;
+  max-width: 65ch;
+}
+body.apoio-textual .botao-ouvir {
+  display: inline-flex;
+}
