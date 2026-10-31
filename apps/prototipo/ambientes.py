@@ -16,9 +16,9 @@ FASES_POR_AMBIENTE = 10
 # ---------------------------------------------------------------------------
 ELEMENTOS = {
     # Deserto
-    "piramide": '<path d="M50 18 L92 100 H8Z" fill="{a}"/><path d="M50 18 L92 100 H58Z" fill="{b}"/><path d="M30 70 h40 M22 85 h56" stroke="{c}" stroke-width="2" opacity=".5"/>',
+    "piramide": '<path d="M50 18 L92 100 H8Z" fill="#E8BE78"/><path d="M50 18 L92 100 H58Z" fill="#C9934D"/><path d="M30 70 h40 M22 85 h56" stroke="{c}" stroke-width="2" opacity=".5"/>',
     "oasis": '<ellipse cx="50" cy="94" rx="44" ry="8" fill="{c}"/><path d="M40 92 C42 70 44 55 50 40" stroke="#8B5A2B" stroke-width="5" fill="none"/><path d="M50 40 C38 30 26 32 18 40 M50 40 C60 28 74 28 82 36 M50 40 C48 26 54 18 62 14 M50 40 C40 38 30 48 28 58" stroke="{a}" stroke-width="7" fill="none" stroke-linecap="round"/>',
-    "camelo": '<path d="M18 62 C18 46 30 40 38 48 C42 36 54 36 58 48 C62 44 70 44 72 52 L80 40 C84 34 92 36 90 44 L82 60 C80 66 74 68 68 66 L66 98 M60 66 L58 98 M30 66 L28 98 M22 64 L20 98" fill="{a}" stroke="{a}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="86" cy="40" r="1.8" fill="#222"/>',
+    "camelo": '<path d="M18 62 C18 46 30 40 38 48 C42 36 54 36 58 48 C62 44 70 44 72 52 L80 40 C84 34 92 36 90 44 L82 60 C80 66 74 68 68 66 L66 98 M60 66 L58 98 M30 66 L28 98 M22 64 L20 98" fill="#C68A4E" stroke="#C68A4E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="86" cy="40" r="1.8" fill="#222"/>',
     "cacto": '<path d="M50 100 V30 a8 8 0 0 1 16 0 V100Z M50 64 H38 V44 a6 6 0 0 1 12 0 M66 56 H76 V40 a6 6 0 0 1 12 0 V62 H66" fill="{a}"/><path d="M58 34 V96" stroke="{b}" stroke-width="2" opacity=".5"/>',
     "duna": '<path d="M0 100 C20 70 40 62 60 72 C76 80 88 76 100 70 V100Z" fill="{b}"/>',
     # Floresta
@@ -148,3 +148,243 @@ def cenario(ambiente_id, semente, altura, intensidade):
                           "espelhar": rnd.random() < .5, "svg": svg})
     return {"id": amb["id"], "nome": amb["nome"], "cor": cor, "elementos": elementos,
             "escuro": ambiente_id in ("espaco", "caverna")}
+
+
+# ===========================================================================
+# MAPA (v2): cenário de jogo de verdade — céu, horizonte em camadas, chão em faixas, estrada
+# sinuosa ligando as fases, elementos com sombra e profundidade, detalhes no chão.
+# Inspirado nos mapas de fases de jogos (Candy Crush, Super Mario World, Duolingo).
+# ===========================================================================
+LARGURA = 560
+
+CENA = {  # horizonte, cores das camadas, chão, estrada, detalhes miúdos e astro
+    "deserto": {"ceu": ("#FFE2A8", "#FBC77A"), "horizonte": ("dunas", "piramides_longe"), "longe": "#E9B97A", "meio": "#DDA35E",
+                "chao": ("#EFC786", "#E5B470"), "estrada": ("#F8E3B5", "#C99A5B"), "detalhe": "ondinha", "astro": "sol"},
+    "floresta": {"ceu": ("#CFEFFF", "#E9F8E8"), "horizonte": ("copas", "montanhas"), "longe": "#8CC09A", "meio": "#5E9E6E",
+                 "chao": ("#8CCB72", "#7ABD61"), "estrada": ("#E8D3A3", "#A9875A"), "detalhe": "tufo", "astro": "sol"},
+    "mar": {"ceu": ("#7FD3E8", "#3FA7C9"), "horizonte": ("recife", "ondas"), "longe": "#3A93B5", "meio": "#2C7FA2",
+            "chao": ("#F1DDAE", "#E6CC94"), "estrada": ("#FFF4D6", "#C9A86A"), "detalhe": "bolha", "astro": "raios"},
+    "gelo": {"ceu": ("#D7EEFF", "#F3FAFF"), "horizonte": ("picos", "montanhas"), "longe": "#B7D7EE", "meio": "#9CC6E3",
+             "chao": ("#F4FAFF", "#E3F0FA"), "estrada": ("#CFE5F5", "#8FB6D3"), "detalhe": "floco", "astro": "sol"},
+    "espaco": {"ceu": ("#0F1535", "#2A1F5C"), "horizonte": ("crateras", "crateras"), "longe": "#3B2F6B", "meio": "#4A3B80",
+               "chao": ("#5B4A92", "#514285"), "estrada": ("#8C7BD1", "#3A2E6B"), "detalhe": "estrelinha", "astro": "planeta"},
+    "vulcao": {"ceu": ("#FFD3B5", "#F7A97B"), "horizonte": ("vulcoes", "montanhas"), "longe": "#9A6A58", "meio": "#7C4A3A",
+               "chao": ("#A9806A", "#98705B"), "estrada": ("#D9B79F", "#6B4334"), "detalhe": "pedrinha", "astro": "sol"},
+    "savana": {"ceu": ("#FFE9B3", "#FFD27A"), "horizonte": ("planalto", "acacias_longe"), "longe": "#C9A65A", "meio": "#B08E45",
+               "chao": ("#DCC57E", "#D0B76C"), "estrada": ("#F2E2B3", "#A88B4A"), "detalhe": "tufo", "astro": "sol"},
+    "cidade": {"ceu": ("#CFE3F7", "#EEF4FA"), "horizonte": ("predios", "predios"), "longe": "#9AAAC4", "meio": "#7387A6",
+               "chao": ("#B9D9A0", "#A9CC8F"), "estrada": ("#9AA3B2", "#5F6878"), "detalhe": "tufo", "astro": "sol"},
+    "praia": {"ceu": ("#9FE0F7", "#D9F4FC"), "horizonte": ("ondas", "ilhas"), "longe": "#3FA9CF", "meio": "#2F95BD",
+              "chao": ("#F6E2B0", "#EED39A"), "estrada": ("#FFF6DD", "#D2B27A"), "detalhe": "concha_mini", "astro": "sol"},
+    "caverna": {"ceu": ("#1C1633", "#33285A"), "horizonte": ("cristais", "estalactites"), "longe": "#46386E", "meio": "#5A4890",
+                "chao": ("#4D3F7A", "#43366C"), "estrada": ("#8B7CC8", "#2E2550"), "detalhe": "brilho", "astro": "nenhum"},
+    "selva": {"ceu": ("#BDECC5", "#E3F7DA"), "horizonte": ("copas", "copas"), "longe": "#4F9E63", "meio": "#2F7D4F",
+              "chao": ("#6FB863", "#62AA56"), "estrada": ("#D9C08A", "#8C6A3A"), "detalhe": "folhinha", "astro": "sol"},
+    "campo": {"ceu": ("#CDE6FF", "#EEF6FF"), "horizonte": ("montanhas", "colinas"), "longe": "#93A9CC", "meio": "#7FB06A",
+              "chao": ("#A8D88A", "#97CB78"), "estrada": ("#EAD9AE", "#A68A57"), "detalhe": "florzinha", "astro": "sol"},
+}
+
+
+def _silhueta(tipo, base, alt, rnd, cor):
+    """Faixa do horizonte que vai de ponta a ponta (path fechado embaixo)."""
+    W = LARGURA
+    pts = []
+    if tipo in ("dunas", "colinas", "ondas", "planalto"):
+        n = {"dunas": 4, "colinas": 5, "ondas": 9, "planalto": 3}[tipo]
+        a = alt * (0.35 if tipo == "ondas" else 1)
+        d = f"M0 {base}"
+        for i in range(n):
+            x1 = W * (i + .5) / n
+            x2 = W * (i + 1) / n
+            d += f" Q{x1:.0f} {base - a * rnd.uniform(.6, 1.1):.0f} {x2:.0f} {base - a * rnd.uniform(0, .25):.0f}"
+        return f'<path d="{d} V{base + 400} H0Z" fill="{cor}"/>'
+    if tipo in ("montanhas", "picos", "vulcoes", "cristais"):
+        n = {"montanhas": 5, "picos": 7, "vulcoes": 3, "cristais": 9}[tipo]
+        d, x = f"M0 {base}", 0
+        for i in range(n):
+            larg = W / n * rnd.uniform(.8, 1.2)
+            topo = base - alt * rnd.uniform(.6, 1.15) * (1.3 if tipo == "picos" else 1)
+            if tipo == "vulcoes":
+                d += f" L{x + larg * .38:.0f} {topo:.0f} L{x + larg * .62:.0f} {topo:.0f} L{x + larg:.0f} {base:.0f}"
+            else:
+                d += f" L{x + larg / 2:.0f} {topo:.0f} L{x + larg:.0f} {base - alt * rnd.uniform(0, .2):.0f}"
+            x += larg
+        neve = ""
+        if tipo in ("montanhas", "picos"):
+            neve = ""
+        return f'<path d="{d} L{W} {base} V{base + 400} H0Z" fill="{cor}"/>{neve}'
+    if tipo == "copas" or tipo == "acacias_longe" or tipo == "recife":
+        s = f'<rect x="0" y="{base}" width="{W}" height="400" fill="{cor}"/>'
+        x = -10
+        while x < W + 20:
+            r = rnd.uniform(alt * .35, alt * .7)
+            if tipo == "acacias_longe":
+                s += f'<ellipse cx="{x:.0f}" cy="{base - alt * .5:.0f}" rx="{r * 1.4:.0f}" ry="{r * .35:.0f}" fill="{cor}"/><rect x="{x - 2:.0f}" y="{base - alt * .5:.0f}" width="4" height="{alt * .5:.0f}" fill="{cor}"/>'
+                x += r * 3.5
+            else:
+                s += f'<circle cx="{x:.0f}" cy="{base:.0f}" r="{r:.0f}" fill="{cor}"/>'
+                x += r * 1.2
+        return s
+    if tipo == "predios":
+        s, x = f'<rect x="0" y="{base}" width="{W}" height="400" fill="{cor}"/>', 0
+        while x < W:
+            larg, h = rnd.uniform(28, 60), alt * rnd.uniform(.5, 1.4)
+            s += f'<rect x="{x:.0f}" y="{base - h:.0f}" width="{larg:.0f}" height="{h + 2:.0f}" fill="{cor}"/>'
+            for jy in range(int(base - h + 8), int(base - 6), 14):
+                for jx in range(int(x + 6), int(x + larg - 8), 12):
+                    if rnd.random() < .5:
+                        s += f'<rect x="{jx}" y="{jy}" width="5" height="6" fill="#FFF3C4" opacity=".7"/>'
+            x += larg + rnd.uniform(2, 8)
+        return s
+    if tipo == "piramides_longe":
+        s = f'<rect x="0" y="{base}" width="{W}" height="400" fill="{cor}"/>'
+        for _ in range(3):
+            cx, h = rnd.uniform(40, W - 40), alt * rnd.uniform(.6, 1.1)
+            s += f'<path d="M{cx - h:.0f} {base} L{cx:.0f} {base - h:.0f} L{cx + h:.0f} {base}Z" fill="{cor}"/>'
+        return s
+    if tipo == "ilhas":
+        s = f'<rect x="0" y="{base}" width="{W}" height="400" fill="{cor}"/>'
+        for _ in range(2):
+            cx = rnd.uniform(60, W - 60)
+            s += f'<ellipse cx="{cx:.0f}" cy="{base:.0f}" rx="60" ry="18" fill="{cor}"/><path d="M{cx:.0f} {base - 14} q4 -26 14 -36" stroke="{cor}" stroke-width="4" fill="none"/>'
+        return s
+    if tipo == "estalactites":
+        s = f'<rect x="0" y="{base}" width="{W}" height="400" fill="{cor}"/>'
+        for i in range(14):
+            x = W * i / 13
+            s += f'<path d="M{x - 14:.0f} 0 L{x:.0f} {rnd.uniform(30, 90):.0f} L{x + 14:.0f} 0Z" fill="{cor}" opacity=".8"/>'
+        return s
+    # crateras
+    s = f'<path d="M0 {base} Q{W / 2} {base - alt * .3} {W} {base} V{base + 400} H0Z" fill="{cor}"/>'
+    for _ in range(4):
+        s += f'<ellipse cx="{rnd.uniform(30, W - 30):.0f}" cy="{base + rnd.uniform(4, 20):.0f}" rx="{rnd.uniform(14, 30):.0f}" ry="5" fill="#000" opacity=".15"/>'
+    return s
+
+
+DETALHES = {
+    "ondinha": '<path d="M-8 0 q4 -3 8 0 t8 0" stroke="{c}" stroke-width="1.6" fill="none" opacity=".55"/>',
+    "tufo": '<path d="M-5 0 L-3 -7 M0 0 V-9 M5 0 L3 -7" stroke="{c}" stroke-width="2" stroke-linecap="round" opacity=".7"/>',
+    "bolha": '<circle r="3" fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".7"/>',
+    "floco": '<path d="M0 -4 V4 M-3.5 -2 L3.5 2 M-3.5 2 L3.5 -2" stroke="#FFFFFF" stroke-width="1.4"/>',
+    "estrelinha": '<circle r="1.6" fill="#FFF7C2"/>',
+    "pedrinha": '<ellipse rx="4" ry="2.5" fill="{c}" opacity=".7"/>',
+    "concha_mini": '<path d="M-4 0 a4 4 0 0 1 8 0Z" fill="#F7B9A8"/>',
+    "brilho": '<path d="M0 -4 L1 -1 L4 0 L1 1 L0 4 L-1 1 L-4 0 L-1 -1Z" fill="#F0ABFC" opacity=".8"/>',
+    "folhinha": '<path d="M0 0 q-6 -6 0 -10 q6 4 0 10Z" fill="{c}" opacity=".7"/>',
+    "florzinha": '<circle r="2.4" fill="#FFFFFF"/><circle r="1" fill="#F2C94C"/>',
+}
+
+
+def mapa(ambiente_id, semente, nos, intensidade):
+    """Monta o mapa de um mundo. `nos` = lista de fases (só as visíveis). Devolve SVG do fundo, a estrada e
+    a posição (x, y) de cada fase, no sistema de 560 px de largura."""
+    amb, cena = POR_ID[ambiente_id], CENA[ambiente_id]
+    rnd = random.Random(semente)
+    sat, luz = intensidade["saturacao"], intensidade["luz"]
+    densidade = intensidade["densidade"]
+    matiz = rnd.uniform(-10, 10)
+    aj = lambda c: _ajustar(c, sat, luz, matiz)  # noqa: E731
+    W, topo, passo = LARGURA, 250, 132
+    zigue = [0, 95, 140, 95, 0, -95, -140, -95]
+    inicio = rnd.randint(0, len(zigue) - 1)
+    pos = [(W / 2 + zigue[(inicio + i) % len(zigue)], topo + 40 + i * passo) for i in range(len(nos))]
+    H = (pos[-1][1] if pos else topo) + 150
+
+    # Céu + astro + nuvens
+    c1, c2 = aj(cena["ceu"][0]), aj(cena["ceu"][1])
+    s = [f'<defs><linearGradient id="ceu-{semente_id(semente)}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{c1}"/><stop offset="1" stop-color="{c2}"/></linearGradient></defs>',
+         f'<rect width="{W}" height="{topo + 40}" fill="url(#ceu-{semente_id(semente)})"/>']
+    ax = rnd.uniform(70, W - 70)
+    if cena["astro"] == "sol":
+        s.append(f'<circle cx="{ax:.0f}" cy="70" r="46" fill="#FFF3B0" opacity=".45"/><circle cx="{ax:.0f}" cy="70" r="30" fill="#FFD95A"/>')
+    elif cena["astro"] == "planeta":
+        s.append(f'<circle cx="{ax:.0f}" cy="80" r="34" fill="#F472B6"/><ellipse cx="{ax:.0f}" cy="82" rx="58" ry="12" fill="none" stroke="#FDE68A" stroke-width="5"/>')
+        s += [f'<circle cx="{rnd.uniform(0, W):.0f}" cy="{rnd.uniform(10, topo):.0f}" r="{rnd.uniform(.8, 2):.1f}" fill="#FFFFFF"/>' for _ in range(40)]
+    elif cena["astro"] == "raios":
+        s += [f'<path d="M{x:.0f} 0 L{x + 40:.0f} 0 L{x - 30:.0f} {topo + 40} L{x - 70:.0f} {topo + 40}Z" fill="#FFFFFF" opacity=".12"/>' for x in (120, 300, 470)]
+    if cena["astro"] in ("sol",) and densidade > .4:
+        for _ in range(2 + int(densidade * 2)):
+            nx, ny, k = rnd.uniform(0, W), rnd.uniform(20, 140), rnd.uniform(.7, 1.3)
+            s.append(f'<g class="nuvem-mov" transform="translate({nx:.0f} {ny:.0f}) scale({k:.2f})"><path d="M0 20 a14 14 0 0 1 12-22 a20 20 0 0 1 36-4 a14 14 0 0 1 14 26Z" fill="#FFFFFF" opacity=".9"/></g>')
+
+    # Horizonte em duas camadas (longe mais claro, meio mais escuro): dá profundidade
+    s.append(_silhueta(cena["horizonte"][1], topo - 10, 90, rnd, aj(cena["longe"])))
+    s.append(_silhueta(cena["horizonte"][0], topo + 20, 60, rnd, aj(cena["meio"])))
+
+    # Chão em faixas onduladas alternadas
+    g1, g2 = aj(cena["chao"][0]), aj(cena["chao"][1])
+    s.append(f'<rect y="{topo + 36}" width="{W}" height="{H}" fill="{g1}"/>')
+    y = topo + 36
+    k = 0
+    while y < H:
+        d = f"M0 {y:.0f}"
+        for i in range(4):
+            d += f" Q{W * (i + .5) / 4:.0f} {y + rnd.uniform(-26, 26):.0f} {W * (i + 1) / 4:.0f} {y + rnd.uniform(-8, 8):.0f}"
+        s.append(f'<path d="{d} V{H} H0Z" fill="{g2 if k % 2 == 0 else g1}"/>')
+        y += rnd.uniform(170, 240)
+        k += 1
+
+    # Detalhes miúdos no chão (longe da estrada)
+    det = DETALHES[cena["detalhe"]].replace("{c}", _ajustar(g2, 1.0, -0.18))
+    def longe_da_estrada(x, y, margem):
+        return all(abs(x - px) > margem or abs(y - py) > 70 for px, py in pos) and abs(x - _x_estrada(pos, y)) > margem
+    for _ in range(int(60 * densidade)):
+        x, yy = rnd.uniform(10, W - 10), rnd.uniform(topo + 50, H - 10)
+        if longe_da_estrada(x, yy, 40):
+            s.append(f'<g transform="translate({x:.0f} {yy:.0f})">{det}</g>')
+
+    # Estrada sinuosa ligando as fases (borda + miolo + tracejado)
+    if pos:
+        d = f"M{W / 2:.0f} {topo + 10}"
+        ant = (W / 2, topo + 10)
+        for px, py in pos:
+            d += f" C{ant[0]:.0f} {ant[1] + 60:.0f} {px:.0f} {py - 60:.0f} {px:.0f} {py:.0f}"
+            ant = (px, py)
+        d += f" C{ant[0]:.0f} {ant[1] + 60:.0f} {W / 2:.0f} {H - 60:.0f} {W / 2:.0f} {H}"
+        e1, e2 = aj(cena["estrada"][0]), aj(cena["estrada"][1])
+        s.append(f'<path d="{d}" stroke="{e2}" stroke-width="46" fill="none" stroke-linecap="round" opacity=".55"/>')
+        s.append(f'<path d="{d}" stroke="{e1}" stroke-width="34" fill="none" stroke-linecap="round"/>')
+        s.append(f'<path d="{d}" stroke="{e2}" stroke-width="3" fill="none" stroke-dasharray="2 14" stroke-linecap="round" opacity=".6"/>')
+
+    # Elementos grandes com sombra; mais para baixo = mais perto (maior)
+    tipos, pesos = zip(*amb["elementos"].items())
+    cor = {k: aj(amb[k]) for k in ("a", "b", "c")}
+    tentativas = int(26 * densidade) + 4
+    colocados = []
+    for _ in range(tentativas * 3):
+        if len(colocados) >= tentativas:
+            break
+        yy = rnd.uniform(topo + 70, H - 30)
+        x = rnd.choice([rnd.uniform(20, 150), rnd.uniform(W - 150, W - 20)])
+        prof = (yy - topo) / max(1, H - topo)
+        tam = (70 + 70 * min(1, prof * 1.4)) * rnd.uniform(.85, 1.2)
+        if not longe_da_estrada(x, yy, tam * .55 + 30) or any(abs(x - cx) < tam * .6 and abs(yy - cy) < tam * .6 for cx, cy in colocados):
+            continue
+        colocados.append((x, yy))
+        tipo = rnd.choices(tipos, weights=pesos)[0]
+        trio = [cor["a"], cor["b"], cor["c"]]
+        if rnd.random() < .3:
+            rnd.shuffle(trio)
+        esp = -1 if rnd.random() < .5 else 1
+        svg = ELEMENTOS[tipo].format(a=trio[0], b=trio[1], c=trio[2])
+        sx = tam / 100
+        s.append(f'<ellipse cx="{x:.0f}" cy="{yy:.0f}" rx="{tam * .38:.0f}" ry="{tam * .08:.0f}" fill="#000" opacity=".16"/>')
+        s.append(f'<g transform="translate({x - esp * tam / 2:.0f} {yy - tam:.0f}) scale({esp * sx:.3f} {sx:.3f})">{svg}</g>')
+    return {"largura": W, "altura": int(H), "svg": "".join(s), "pos": [(round(x), round(y)) for x, y in pos],
+            "escuro": ambiente_id in ("espaco", "caverna"), "nome": amb["nome"], "id": amb["id"]}
+
+
+def _x_estrada(pos, y):
+    if not pos:
+        return LARGURA / 2
+    pts = [(LARGURA / 2, 0)] + pos + [(LARGURA / 2, 10 ** 6)]
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        if y0 <= y <= y1:
+            t = (y - y0) / max(1, y1 - y0)
+            t = t * t * (3 - 2 * t)
+            return x0 + (x1 - x0) * t
+    return LARGURA / 2
+
+
+def semente_id(semente):
+    return "".join(ch for ch in str(semente) if ch.isalnum())[:24]

@@ -1,0 +1,66 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Meu progresso · NextLearn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
+</head>
+<body data-perfil-dev="{{ perfil_dev }}" class="tema-{{ tema }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}{% if concreto %} apoio-concreto{% endif %}{% if limpo %} modo-limpo{% endif %}{% if letras %} letras-espacadas{% endif %}">
+  {% include "prototipo/_icones.html" %}
+  <header class="topo">
+    <a href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn</a>
+    <div class="topo-direita">
+      <a class="btn-contorno" href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}">Minha trilha</a>
+    </div>
+  </header>
+  <main class="pagina progresso">
+    <section class="cartao prog-topo">
+      <div>
+        <p class="rotulo">Meu progresso</p>
+        <h1>{{ aluno.usuario.first_name }}, olha o quanto você já andou</h1>
+        <p class="suave">{{ n_sessoes }} aulas feitas · {{ n_respostas }} respostas guardadas · comparado só com você mesmo</p>
+      </div>
+      <div class="estado"><span class="rotulo">Situação</span><strong>{{ estado }}</strong>{% if dias is not None %}<span class="mini">última aula há {{ dias }} dia{{ dias|pluralize }}</span>{% endif %}</div>
+    </section>
+
+    <section class="prog-grade">
+      {% for c in cartoes %}
+        <article class="cartao prog-cartao">
+          <header><h2><span class="marcador m-{% if c.tema == 'tempo' %}tempo{% elif c.tema == 'foco' %}treino{% else %}notas{% endif %}" aria-hidden="true"></span>{{ c.titulo }}</h2>
+            <p class="prog-valor">{{ c.valor }} <span class="mini">{{ c.unid }}</span></p></header>
+          {{ c.graf|safe }}
+          <details class="porque"><summary>Por que medimos isso?</summary><p>{{ c.porque }}</p><p class="mini">Fonte: {{ c.fonte }}</p></details>
+        </article>
+      {% endfor %}
+    </section>
+
+    <section class="cartao">
+      <h2><span class="marcador m-tarefas" aria-hidden="true"></span>Ofensiva semanal (meta: 2 aulas por semana)</h2>
+      <ol class="semanas">
+        {% for r, ok, n in metas %}<li class="{% if ok %}ok{% endif %}"><span class="sem-quadro">{% if ok %}✓{% else %}{{ n }}{% endif %}</span><span class="mini">{{ r }}</span></li>{% endfor %}
+      </ol>
+      <p class="mini">✓ = meta cumprida. Semana parada não zera nada: só pausa. Sem punição (ECA Digital; METRICAS_ENSINO camada D).</p>
+    </section>
+
+    <section class="prog-grade">
+      {% for m, g in por_materia %}
+        <article class="cartao prog-cartao"><h2>{{ m }}: nota por aula</h2>{{ g|safe }}</article>
+      {% endfor %}
+    </section>
+
+    <section class="cartao">
+      <h2>Sinais para o professor ajustar o apoio</h2>
+      <ul class="sinais">
+        <li><strong>Variação do tempo entre aulas:</strong> {% if cv is not None %}{{ cv }}%{% else %}poucos dados{% endif %}. Se sobe muito, vale encurtar a aula ou pôr pausa. Não é diagnóstico (Kofler et al., 2013).</li>
+        <li><strong>3 erros seguidos na mesma matéria:</strong> aconteceu {{ alertas }} vez{{ alertas|pluralize:"es" }}. Sinal para mudar a estratégia (exemplo resolvido, pré-requisito).</li>
+        <li><strong>Retenção (revisão de 7 dias):</strong> aparece quando houver revisões registradas (próxima etapa: EventoUso).</li>
+      </ul>
+      <p class="mini">Os dados ficam guardados por aluno (cada resposta com acerto, tempo e data). Sem laudo, sem câmera, sem comparação com colegas.</p>
+    </section>
+  </main>
+  <script src="{% static 'prototipo/ao_vivo.js' %}"></script>
+</body>
+</html>

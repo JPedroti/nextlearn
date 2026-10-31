@@ -380,7 +380,7 @@ ROMANOS = ["", " II", " III", " IV", " V", " VI"]
 def _trilha(contexto, aluno, apoios, intensidade, ambiente_forcado=""):
     """Trilha estilo jogo. Cada mundo (ambiente) tem no máximo 10 fases; depois começa outro mundo,
     mesmo que a matéria seja a mesma (Matemática → Matemática II). O cenário é gerado por ambiente + semente."""
-    from .ambientes import AMBIENTES, FASES_POR_AMBIENTE, cenario
+    from .ambientes import AMBIENTES, FASES_POR_AMBIENTE, mapa
 
     foco = apoios["foco"]
     proxima = contexto["proxima"]
@@ -421,16 +421,24 @@ def _trilha(contexto, aluno, apoios, intensidade, ambiente_forcado=""):
                     if vistas > 2:
                         no["oculta"] = True
                         n_ocultas += 1
-            altura = 140 + 118 * sum(1 for n in nos if not n.get("oculta"))
             atual = any(n["estado"] == "atual" for n in nos)
             if atual and ambiente_forcado:  # ferramenta do desenvolvedor: ver o mundo atual em outro ambiente
                 amb = next((x for x in AMBIENTES if x["id"] == ambiente_forcado), amb)
+            visiveis = [n for n in nos if not n.get("oculta")]
+            m = mapa(amb["id"], f"{aluno.pk}-{materia}-{parte}", visiveis, intensidade)
+            fase = 0
+            for no, (x, y) in zip(visiveis, m["pos"]):
+                no["x"], no["y"], no["lado"] = x, y, ("esq" if x > m["largura"] / 2 else "dir")
+                if no["estado"] != "revisao":
+                    fase += 1
+                    no["fase"] = fase
             concluido = feitas_m == len(bloco)
             mundos.append({
                 "materia": materia, "nome": materia + ROMANOS[min(parte, len(ROMANOS) - 1)], "numero": n_mundo,
-                "nos": nos, "feitas": feitas_m, "total": len(bloco), "pct": int(100 * feitas_m / len(bloco)),
+                "nos": visiveis, "feitas": feitas_m, "total": len(bloco), "pct": int(100 * feitas_m / len(bloco)),
                 "atual": atual, "concluido": concluido, "icone": ICONE_MATERIA.get(materia, "estrela"), "n_ocultas": n_ocultas,
-                "cenario": cenario(amb["id"], f"{aluno.pk}-{materia}-{parte}", altura, intensidade), "altura": altura,
+                "mapa": m, "cenario": {"nome": amb["nome"], "escuro": m["escuro"]},
+                "cor_a": amb["a"], "cor_c": amb["c"],
             })
     # Ordem: o mundo atual primeiro; com foco, só ele aberto
     mundos.sort(key=lambda m: (not m["atual"], m["concluido"], m["materia"], m["numero"]))
@@ -538,3 +546,167 @@ def fala(request):
         nome=aluno.usuario.first_name,
     )
     return JsonResponse({"fala": texto, "origem": origem})
+
+
+# ---------------------------------------------------------------------------
+# Progresso do aluno ao longo do tempo (métricas de docs/METRICAS_ENSINO.md e docs/PERFIS_E_METRICAS.md)
+# Tudo sai das respostas guardadas no banco (Resposta: acerto, tempo e data de cada questão, de cada aluno).
+# ---------------------------------------------------------------------------
+def _grafico_linha(valores, rotulos, maximo=None, sufixo="", altura=150, cor="var(--destaque)"):
+    """SVG simples de linha com pontos e rótulos (sem biblioteca)."""
+    W, H, m = 520, altura, 28
+    vals = [v for v in valores if v is not None]
+    if not vals:
+        return '<p class="mini">Ainda sem dados.</p>'
+    top = maximo or max(vals) or 1
+    n = len(valores)
+    xs = [m + (W - 2 * m) * (i / max(1, n - 1)) for i in range(n)]
+    pts = [(x, H - m - (H - 2 * m) * (v / top)) for x, v in zip(xs, valores) if v is not None]
+    linha = " ".join(f"{x:.0f},{y:.0f}" for x, y in pts)
+    area = f"M{pts[0][0]:.0f},{H - m} L" + " L".join(f"{x:.0f},{y:.0f}" for x, y in pts) + f" L{pts[-1][0]:.0f},{H - m}Z"
+    s = [f'<svg class="graf" viewBox="0 0 {W} {H}" role="img" aria-label="' + ", ".join(f"{r}: {v if v is not None else '-'}{sufixo}" for r, v in zip(rotulos, valores)) + '">',
+         f'<line x1="{m}" y1="{H - m}" x2="{W - m}" y2="{H - m}" stroke="var(--borda)" stroke-width="2"/>',
+         f'<path d="{area}" fill="{cor}" opacity=".12"/><polyline points="{linha}" fill="none" stroke="{cor}" stroke-width="3" stroke-linejoin="round"/>']
+    for (x, y), v in zip(pts, vals):
+        s.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="4.5" fill="#FFFFFF" stroke="{cor}" stroke-width="3"/><text x="{x:.0f}" y="{y - 10:.0f}" text-anchor="middle" class="graf-v">{v:g}{sufixo}</text>')
+    for x, r in zip(xs, rotulos):
+        s.append(f'<text x="{x:.0f}" y="{H - 8}" text-anchor="middle" class="graf-r">{r}</text>')
+    return "".join(s) + "</svg>"
+
+
+def _grafico_barras(valores, rotulos, sufixo="", altura=150, cor="#0F9D6E", linha=None):
+    W, H, m = 520, altura, 28
+    top = max([v for v in valores] + [linha or 0, 1])
+    n = len(valores)
+    larg = (W - 2 * m) / max(1, n)
+    s = [f'<svg class="graf" viewBox="0 0 {W} {H}" role="img" aria-label="' + ", ".join(f"{r}: {v}{sufixo}" for r, v in zip(rotulos, valores)) + '">']
+    if linha:
+        y = H - m - (H - 2 * m) * linha / top
+        s.append(f'<line x1="{m}" y1="{y:.0f}" x2="{W - m}" y2="{y:.0f}" stroke="{cor}" stroke-dasharray="6 6" opacity=".6"/>')
+    for i, (v, r) in enumerate(zip(valores, rotulos)):
+        h = (H - 2 * m) * v / top
+        x = m + i * larg + larg * .18
+        s.append(f'<rect x="{x:.0f}" y="{H - m - h:.0f}" width="{larg * .64:.0f}" height="{max(2, h):.0f}" rx="5" fill="{cor}"/>')
+        s.append(f'<text x="{x + larg * .32:.0f}" y="{H - m - h - 6:.0f}" text-anchor="middle" class="graf-v">{v:g}{sufixo}</text>')
+        s.append(f'<text x="{x + larg * .32:.0f}" y="{H - 8}" text-anchor="middle" class="graf-r">{r}</text>')
+    return "".join(s) + "</svg>"
+
+
+@papel_requerido("aluno")
+def progresso(request):
+    import statistics
+    from datetime import timedelta
+
+    from django.conf import settings
+    from django.utils import timezone
+
+    from apps.aulas.models import Resposta
+
+    aluno = _aluno_logado(request)
+    if not aluno:
+        return render(request, "prototipo/painel_aluno.html", {"sem_turma": True})
+    perfil = getattr(aluno, "perfil", None)
+    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    a, tema, _ = _apoios_visuais(perfil, perfil_dev)
+    hoje = timezone.localtime()
+    resp = list(Resposta.objects.filter(aluno=aluno).select_related("questao__aula").order_by("criado_em", "questao__ordem"))
+
+    def seg(dt):
+        d = timezone.localtime(dt).date()
+        return d - timedelta(days=d.weekday())
+
+    semana_atual = hoje.date() - timedelta(days=hoje.weekday())
+    semanas = [semana_atual - timedelta(days=7 * k) for k in range(9, -1, -1)]   # últimas 10 semanas
+    rot = [s.strftime("%d/%m") for s in semanas]
+    por_sem = {s: [] for s in semanas}
+    sessoes = {}
+    for r in resp:
+        s = seg(r.criado_em)
+        if s in por_sem:
+            por_sem[s].append(r)
+        sessoes.setdefault(r.questao.aula_id, []).append(r)
+
+    acerto = [round(100 * sum(r.correta for r in por_sem[s]) / len(por_sem[s])) if por_sem[s] else None for s in semanas]
+    minutos, n_sessoes = [], []
+    for s in semanas:
+        aulas = {r.questao.aula_id: (r.tempo_ms or 0) for r in por_sem[s]}
+        minutos.append(sum(aulas.values()) // 60000)
+        n_sessoes.append(len(aulas))
+    # Métrica-norte: assuntos dominados (100%) acumulados por semana
+    dominio = {}
+    for aula_id, rs in sessoes.items():
+        if all(r.correta for r in rs):
+            dominio[aula_id] = seg(rs[0].criado_em)
+    dominadas = [sum(1 for d in dominio.values() if d <= s) for s in semanas]
+    # Ofensiva semanal (meta mínima de 2 aulas)
+    metas = [n >= META_SEMANAL for n in n_sessoes]
+    # Estado do aluno (ciclo semanal, versão escolar dos estados do Duolingo)
+    ultima = timezone.localtime(resp[-1].criado_em) if resp else None
+    dias = (hoje - ultima).days if ultima else None
+    estado = "Ativo na semana" if dias is not None and dias < 7 else ("Em risco (7+ dias sem estudar)" if dias is not None and dias < 14 else "Dormente (14+ dias)")
+    # P3: queda de acerto ao longo da sessão (acerto por posição da questão)
+    pos = {}
+    for rs in sessoes.values():
+        for r in rs:
+            pos.setdefault(r.questao.ordem, []).append(r.correta)
+    acerto_pos = [round(100 * sum(v) / len(v)) for _, v in sorted(pos.items())]
+    # P3: variabilidade do tempo entre sessões (coeficiente de variação) — só para ajustar pausas, não diagnostica
+    tempos = [rs[0].tempo_ms / 60000 for rs in sessoes.values() if rs[0].tempo_ms]
+    cv = round(100 * statistics.pstdev(tempos) / statistics.mean(tempos)) if len(tempos) > 2 else None
+    # Erros consecutivos (3 seguidos na mesma matéria → mudar a estratégia)
+    seq, alertas = {}, 0
+    for r in resp:
+        mat = _materia(r.questao.aula.titulo)
+        seq[mat] = 0 if r.correta else seq.get(mat, 0) + 1
+        if seq[mat] == 3:
+            alertas += 1
+    # Média por matéria ao longo do tempo (sessões em ordem)
+    por_materia = {}
+    for aula_id, rs in sorted(sessoes.items(), key=lambda kv: kv[1][0].criado_em):
+        mat = _materia(rs[0].questao.aula.titulo)
+        por_materia.setdefault(mat, []).append(round(10 * sum(r.correta for r in rs) / len(rs), 1))
+
+    cartoes = [
+        {"titulo": "Assuntos dominados (acumulado)", "valor": dominadas[-1], "unid": "assuntos", "tema": "notas",
+         "graf": _grafico_linha(dominadas, rot, cor="#1E7B4A"),
+         "porque": "Métrica-norte: aprendizagem que fica, não tempo de tela. Dominado = 100% de acerto no assunto (meta do estudo: domínio ≥ 0,95).",
+         "fonte": "METRICAS_ENSINO §3 · adaptado de Duolingo/HLR"},
+        {"titulo": "Acerto por semana", "valor": f"{next((v for v in reversed(acerto) if v is not None), '–')}%", "unid": "na última semana com aula", "tema": "notas",
+         "graf": _grafico_linha(acerto, rot, maximo=100, sufixo="%"),
+         "porque": "Comparar o aluno com ele mesmo. Zona-alvo de prática: acertar a maioria sem ser fácil demais.",
+         "fonte": "METRICAS_ENSINO camada C"},
+        {"titulo": "Minutos e aulas por semana", "valor": minutos[-1], "unid": "min nesta semana", "tema": "tempo",
+         "graf": _grafico_barras(minutos, rot, linha=None),
+         "porque": "Hábito, sem premiar tempo de uso. O limite diário é combinado com a família (ECA Digital).",
+         "fonte": "METRICAS_ENSINO camadas D e E"},
+        {"titulo": "Queda de acerto ao longo da aula", "valor": f"{acerto_pos[0] if acerto_pos else '–'}% → {acerto_pos[-1] if acerto_pos else '–'}%", "unid": "1ª questão → última", "tema": "foco",
+         "graf": _grafico_barras(acerto_pos, [f"{i + 1}ª" for i in range(len(acerto_pos))], sufixo="%", cor="#35557F"),
+         "porque": "Para quem tem apoio de foco: se o acerto cai no fim, a aula deve ser mais curta ou ter pausa.",
+         "fonte": "PERFIS_E_METRICAS P3 · [PRODUTO]"},
+    ]
+    contexto = {
+        "aluno": aluno, "perfil": perfil, "tema": tema, "foco": a["foco"], "textual": a["textual"], "concreto": a["concreto"],
+        "limpo": a["limpo"], "voz": a["voz"], "letras": a["letras"], "perfil_dev": perfil_dev, "dev": settings.DEBUG,
+        "cartoes": cartoes, "metas": list(zip(rot, metas, n_sessoes)), "estado": estado, "dias": dias, "cv": cv,
+        "alertas": alertas, "por_materia": [(m, _grafico_linha(v, [str(i + 1) for i in range(len(v))], maximo=10)) for m, v in sorted(por_materia.items())],
+        "n_respostas": len(resp), "n_sessoes": len(sessoes), "hoje": hoje,
+    }
+    return render(request, "prototipo/progresso.html", contexto)
+
+
+def comparar(request):
+    """Ferramenta do desenvolvedor: dois perfis lado a lado (iframes da área do aluno). Só com DEBUG."""
+    from django.conf import settings
+    from django.http import Http404
+
+    from .ambientes import AMBIENTES
+    from .perfis_dev import PERFIS_DEV
+
+    if not settings.DEBUG:
+        raise Http404
+    pagina = request.GET.get("pagina", "inicio")
+    return render(request, "prototipo/comparar.html", {
+        "a": request.GET.get("a", "tdah"), "b": request.GET.get("b", "tea"), "amb": request.GET.get("ambiente", ""),
+        "pagina": pagina if pagina in ("inicio", "progresso") else "inicio",
+        "perfis": [p for p in PERFIS_DEV if p["id"]], "ambientes": [(x["id"], x["nome"]) for x in AMBIENTES],
+    })

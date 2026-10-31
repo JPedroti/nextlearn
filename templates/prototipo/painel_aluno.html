@@ -14,7 +14,8 @@
     <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn</a>
     <div class="topo-direita">
       <span class="quem">{{ aluno.usuario.first_name|default:aluno.usuario.username }} · {{ aluno.turma.nome }}</span>
-      {% if not sem_turma %}<button type="button" class="btn-contorno" data-abrir-calendario><svg class="ico" aria-hidden="true"><use href="#i-calendario"/></svg>Calendário</button>{% endif %}
+      {% if not sem_turma %}<a class="btn-contorno" href="{% url 'prototipo:progresso' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}"><svg class="ico" aria-hidden="true"><use href="#i-estrela"/></svg>Meu progresso</a>
+      <button type="button" class="btn-contorno" data-abrir-calendario><svg class="ico" aria-hidden="true"><use href="#i-calendario"/></svg>Calendário</button>{% endif %}
       <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form>
     </div>
   </header>
@@ -49,51 +50,55 @@
 
       <div class="trilha" aria-label="Minha trilha">
         {% for u in trilha %}
-          <details class="unidade{% if u.cenario.escuro %} escuro{% endif %}" {% if u.aberta %}open{% endif %}
-                   style="--ceu: {{ u.cenario.cor.ceu }}; --chao: {{ u.cenario.cor.chao }}; --amb-a: {{ u.cenario.cor.a }}; --amb-c: {{ u.cenario.cor.c }}">
+          <details class="unidade{% if u.cenario.escuro %} escuro{% endif %}" {% if u.aberta %}open{% endif %} style="--amb-a: {{ u.cor_a }}; --amb-c: {{ u.cor_c }}">
             <summary class="unidade-faixa">
               <span class="u-icone" aria-hidden="true"><svg><use href="#i-{{ u.icone }}"/></svg></span>
               <span class="u-texto"><span class="u-num">Mundo {{ u.numero }} · {{ u.cenario.nome }}</span><strong class="mundo-nome">{{ u.nome }}</strong></span>
               <span class="u-prog" role="img" aria-label="{{ u.feitas }} de {{ u.total }} fases feitas"><span style="width: {{ u.pct }}%"></span></span>
               <span class="u-conta">{{ u.feitas }}/{{ u.total }}</span>
             </summary>
-            <div class="mundo" style="min-height: {{ u.altura|unlocalize }}px">
-              <div class="cenario" aria-hidden="true">
-                {% for e in u.cenario.elementos %}
-                  <svg class="elem elem-{{ e.tipo }}{% if e.espelhar %} espelhar{% endif %}" viewBox="0 0 100 100" style="left: {{ e.x|unlocalize }}%; top: {{ e.y|unlocalize }}px; width: {{ e.tam|unlocalize }}px; height: {{ e.tam|unlocalize }}px">{{ e.svg|safe }}</svg>
-                {% endfor %}
-              </div>
-              <ol class="caminho">
-                {% for no in u.nos %}{% if not no.oculta %}
-                  <li class="no no-{{ no.estado }}" style="--x: {{ no.deslocamento }}px">
+            <ul class="legenda-mundo" aria-label="Legenda do mapa">
+              <li><span class="lg lg-feita"><svg><use href="#i-check"/></svg></span>Fase feita (cor = nota)</li>
+              <li><span class="lg lg-atual"><svg><use href="#i-estrela"/></svg></span>Fase de agora</li>
+              <li><span class="lg lg-rev"><svg><use href="#i-revisao"/></svg></span>Revisão</li>
+              <li><span class="lg lg-bloq"><svg><use href="#i-cadeado"/></svg></span>Vem depois</li>
+              <li><span class="lg-est">★</span> 1 estrela por acerto</li>
+            </ul>
+            <div class="mapa-caixa" data-mapa>
+              <div class="mapa" style="width: {{ u.mapa.largura|unlocalize }}px; height: {{ u.mapa.altura|unlocalize }}px">
+                <svg class="mapa-fundo" viewBox="0 0 {{ u.mapa.largura|unlocalize }} {{ u.mapa.altura|unlocalize }}" width="{{ u.mapa.largura|unlocalize }}" height="{{ u.mapa.altura|unlocalize }}" aria-hidden="true">{{ u.mapa.svg|safe }}</svg>
+                <div class="placa-mundo" aria-hidden="true"><span>Mundo {{ u.numero }}</span><strong>{{ u.cenario.nome }}</strong></div>
+                {% for no in u.nos %}
+                  <div class="no no-{{ no.estado }} lado-{{ no.lado }}" style="left: {{ no.x|unlocalize }}px; top: {{ no.y|unlocalize }}px">
                     {% if no.estado == "feita" %}
-                      <a class="no-bt {{ no.faixa.classe }}" href="{{ no.url }}" aria-label="{{ no.titulo }}: {{ no.detalhe }}, {{ no.faixa.rotulo }}">
+                      <a class="no-bt {{ no.faixa.classe }}" href="{{ no.url }}" aria-label="Fase {{ no.fase }}: {{ no.titulo }}. {{ no.detalhe }}, {{ no.faixa.rotulo }}">
                         <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}check{% endif %}"/></svg>
                       </a>
                       <span class="no-estrelas" aria-hidden="true">{% for e in no.estrelas %}<i class="cheia">★</i>{% endfor %}{% for e in no.vazias %}<i>★</i>{% endfor %}</span>
-                      <span class="no-nome">{{ no.titulo }}</span>
                     {% elif no.estado == "atual" %}
+                      <a class="no-bt" href="{{ no.url }}" aria-label="Fase {{ no.fase }}, de agora: {{ no.titulo }}. Começar">
+                        <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}estrela{% endif %}"/></svg>
+                      </a>
                       <div class="next-no" aria-live="polite">
                         <p class="fala-next" data-fala-next>{% if foco %}Próxima fase: {{ no.titulo }}.{% else %}Vamos nessa? Eu vou junto!{% endif %}</p>
                         <span class="next-trilha" aria-hidden="true" data-pose="livro">{% include "prototipo/_next.html" %}</span>
                       </div>
-                      <a class="no-bt" href="{{ no.url }}" aria-label="Fase atual: {{ no.titulo }}. Começar">
-                        <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}estrela{% endif %}"/></svg>
-                      </a>
-                      <span class="no-nome forte">{{ no.titulo }}</span>
                     {% elif no.estado == "revisao" %}
                       <a class="no-bt" href="{{ no.url }}" aria-label="Revisão: treino para não esquecer"><svg aria-hidden="true"><use href="#i-revisao"/></svg></a>
-                      <span class="no-nome">Revisão</span>
                     {% else %}
-                      <span class="no-bt" role="img" aria-label="{{ no.titulo }}: fase bloqueada, vem depois"><svg aria-hidden="true"><use href="#i-cadeado"/></svg></span>
-                      <span class="no-nome">{{ no.titulo }}</span>
+                      <span class="no-bt" role="img" aria-label="Fase {{ no.fase }}: {{ no.titulo }}, vem depois"><svg aria-hidden="true"><use href="#i-cadeado"/></svg></span>
                     {% endif %}
-                  </li>
-                {% endif %}{% endfor %}
-                {% if u.n_ocultas %}<li class="no no-mais" style="--x: 0px"><span>+{{ u.n_ocultas }} fase{{ u.n_ocultas|pluralize }} depois</span></li>{% endif %}
-                {% if u.concluido %}<li class="no no-fim" style="--x: 0px"><span>Mundo concluído! Próximo mundo abaixo.</span></li>{% endif %}
-              </ol>
+                    <span class="no-legenda" aria-hidden="true">
+                      {% if no.fase %}<span class="nl-fase">Fase {{ no.fase }}</span>{% endif %}
+                      <strong>{{ no.titulo }}</strong>
+                      <span class="nl-status">{% if no.estado == "feita" %}{{ no.detalhe }} · {{ no.faixa.rotulo }}{% elif no.estado == "atual" %}Agora!{% elif no.estado == "revisao" %}Para não esquecer{% else %}Vem depois{% endif %}</span>
+                    </span>
+                  </div>
+                {% endfor %}
+              </div>
             </div>
+            {% if u.n_ocultas %}<p class="mundo-rodape">+{{ u.n_ocultas }} fase{{ u.n_ocultas|pluralize }} depois neste mundo</p>{% endif %}
+            {% if u.concluido %}<p class="mundo-rodape ok">Mundo concluído! O próximo mundo está na lista.</p>{% endif %}
           </details>
         {% endfor %}
       </div>
@@ -203,7 +208,7 @@
 
   {% if dev %}
   <aside class="dev" aria-label="Ferramenta do desenvolvedor">
-    <details>
+    <details open>
       <summary>Ferramenta do desenvolvedor · {{ tema_nome }}</summary>
       <form method="get" class="dev-form">
         <label for="perfil_dev">Simular perfil (só para o time; o aluno nunca vê estes rótulos)</label>
@@ -216,6 +221,8 @@
           <option value="">Automático</option>
           {% for id, nome in ambientes %}<option value="{{ id }}" {% if id == ambiente_dev %}selected{% endif %}>{{ nome }}</option>{% endfor %}
         </select>
+        <div class="dev-chips">{% for p in perfis_dev %}<a href="?perfil_dev={{ p.id }}{% if ambiente_dev %}&ambiente={{ ambiente_dev }}{% endif %}" {% if p.id == perfil_dev %}aria-current="page"{% endif %}>{{ p.nome|truncatechars:22 }}</a>{% endfor %}</div>
+        <p class="dev-desc"><a href="{% url 'prototipo:comparar' %}?a={{ perfil_dev|default:'tdah' }}&b=tea" target="_blank">Comparar dois perfis lado a lado ↗</a></p>
         <p class="dev-desc">Mundo atual: {{ mundo_atual.cenario.nome }} · IA das falas: {% if ia.endpoint and ia.chave %}configurada{% elif ia.chave %}chave ok, falta API_BASE_URL{% else %}sem chave{% endif %} · <span data-origem-fala>…</span></p>
       </form>
     </details>

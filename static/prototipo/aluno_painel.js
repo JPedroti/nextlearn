@@ -36,6 +36,18 @@
       .catch(function () {});
   }
 
+  // Mapa com 560 px de largura: encolhe para caber em telas menores
+  function escalarMapas() {
+    $$("[data-mapa]").forEach(function (caixa) {
+      var m = $(".mapa", caixa); if (!m) return;
+      var w = parseFloat(m.style.width), h = parseFloat(m.style.height), k = Math.min(1, caixa.clientWidth / w);
+      m.style.transform = "scale(" + k + ")"; caixa.style.height = (h * k) + "px";
+      m.style.marginLeft = Math.max(0, (caixa.clientWidth - w * k) / 2) + "px";
+    });
+  }
+  escalarMapas(); addEventListener("resize", escalarMapas);
+  $$("details.unidade").forEach(function (d) { d.addEventListener("toggle", escalarMapas); });
+
   var fonte = $("#dados-painel");
   if (!fonte) return;
   var D = JSON.parse(fonte.textContent);
