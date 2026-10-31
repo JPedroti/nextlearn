@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}NextLearn{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800">
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="{% url 'contas:inicio' %}" class="text-xl font-bold text-indigo-700">NextLearn</a>
+      {% if user.is_authenticated %}
+        <div class="flex items-center gap-4 text-sm">
+          <span>{{ user }} · {{ user.get_papel_display }}</span>
+          {% if user.is_staff %}
+            <a href="{% url 'admin:index' %}" class="text-indigo-700 hover:underline">Administração</a>
+          {% endif %}
+          <form method="post" action="{% url 'contas:sair' %}">
+            {% csrf_token %}
+            <button type="submit" class="text-slate-600 hover:text-slate-900 underline">Sair</button>
+          </form>
+        </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
+    {% if messages %}
+      {% for message in messages %}
+        <p class="mb-4 rounded bg-indigo-50 border border-indigo-200 px-4 py-2">{{ message }}</p>
+      {% endfor %}
+    {% endif %}
+    {% block conteudo %}{% endblock %}
+  </main>
+</body>
+</html>
