@@ -657,3 +657,19 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** na branch `thiago/prototipo-neuro`: trocou o nome para Chamaleon em todas as telas; caixas de questão nas cores do apoio do aluno, com faixa de destaque e o camaleão, enunciado maior e em linha curta com o apoio de foco e letra maior com o apoio textual (aula e treino); tirou a ferramenta de desenvolvedor (simular e comparar perfis). Criou só no banco do computador do João (fora do Git) um professor, uma família e 8 alunos, um por combinação de apoios, com senha 1234 e sem respostas inventadas. Não deu tempo de mudar a área da família nem de fazer enunciado longo para "hiperfoco" (não é um apoio do app). 74 testes passando.
 
 ---
+
+## Prompt 54 — 31/10/2026, 11:40 (BRT) — autor: João — ferramenta: Claude Code
+
+> estou vendo que, quando eu entro, por exemplo, em "http://127.0.0.1:8000/professor/aulas/1/", eu nao consigo voltar para "http://127.0.0.1:8000/prototipo/professor/". Parece que ocorrem várias edicoes desorganizadas entre si e nao teve comunicacao. Gaste muito tempo analisando o site e esse tipo de erro. Além disso, reforce as coisas urgentes que foram pontuadas no prompt anterior para que o projeto, de fato, fique funcional e faça sentido. Além disso, faça a logo em svg (sem perder nada do estilo) para que a resolucao se mantenha independentemente do tamanho
+
+**Resumo da resposta da IA:** na branch `thiago/prototipo-neuro`: varreu todos os links do site por papel (professor, família, aluno) e unificou a navegação. O login e a página inicial de cada papel levam às áreas novas; as telas antigas ganharam menu e link de volta ("Minha turma", "Minha trilha", "Minha área"); o logo leva sempre à área da pessoa. Apagou o código de exemplo que sobrava e corrigiu a tela do aluno sem turma. Todas as páginas respondem e têm caminho de volta; 76 testes passando. O logo em SVG não ficou pronto.
+
+---
+
+## Prompt 55 — 31/10/2026, 11:59 (BRT) — autor: João — ferramenta: Claude Code
+
+> Os tokens acabaram, então comprei mais 5 dólares em token para focar nas partes principais que devem ser mudadas. Claude, preciso que você crie um perfil COM o cadastro do aluno feito (para os pais e aluno) e um cadastro não feito para mostrar como o questionário é respondido no vídeo que vamos gravar.
+
+**Resumo da resposta da IA:** criou só no banco do computador do João (fora do Git, senha 1234) dois pares família + aluno para o vídeo. `familia.pronta` / `marcos.teste` já tem o questionário respondido pelo próprio app, com a sugestão aceita pelo professor (Atenção e foco). `familia.nova` / `julia.teste` ainda não respondeu, para gravar o preenchimento. Na branch do Thiago, corrigiu "Seis perguntas" para "Nove" e simplificou o aviso sobre laudo. 76 testes passando.
+
+---
