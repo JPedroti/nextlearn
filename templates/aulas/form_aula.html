@@ -11,7 +11,7 @@
 <h1 class="text-2xl font-semibold mt-3 mb-1">{% if aula %}Editar aula{% else %}Nova aula{% endif %}</h1>
 <p class="text-slate-600 mb-6">Turma: {{ turma.nome }}. Escreva a aula uma vez; as versões adaptadas partem deste texto.</p>
 
-<form method="post">
+<form method="post"{% if acao %} action="{{ acao }}"{% endif %}>
   {% csrf_token %}
   <div class="cartao mb-6">
     {{ form.non_field_errors }}

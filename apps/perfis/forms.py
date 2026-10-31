@@ -9,18 +9,8 @@ class ApoiosForm(forms.ModelForm):
 
     class Meta:
         model = Perfil
-        fields = ["foco", "textual", "concreto", *PREFERENCIAS, "contexto_familia"]
-        widgets = {
-            **{campo: forms.CheckboxInput(attrs={"class": "mt-1 h-5 w-5"}) for campo in ["foco", "textual", "concreto", *PREFERENCIAS]},
-            "contexto_familia": forms.Textarea(
-                attrs={
-                    "rows": 4,
-                    "class": "mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm",
-                    "placeholder": "Ex.: O aluno aprende melhor quando o conteúdo é dividido em partes menores. "
-                                   "Gosta de exemplos com esportes. Tem paciência para ler, mas precisa de silêncio.",
-                }
-            ),
-        }
+        fields = ["foco", "textual", "concreto", *PREFERENCIAS]
+        widgets = {campo: forms.CheckboxInput(attrs={"class": "mt-1 h-5 w-5"}) for campo in fields}
 
     def campos_conteudo(self):
         return [self[campo] for campo in ("foco", "textual", "concreto")]
@@ -68,8 +58,8 @@ class QuestionarioForm(forms.Form):
                                "e usar essas informações para adaptar as aulas.",
             }
         ),
-        help_text="Opcional. Tudo o que você escrever aqui será lido pelo professor. "
-                   "Nenhuma informação vai para sistemas automáticos sem que o professor revise antes.",
+        help_text="Opcional. Só o professor lê este texto; ele não é enviado para a inteligência artificial. "
+                   "Não é preciso contar diagnóstico nem laudo.",
     )
 
     def dados_questionario(self):

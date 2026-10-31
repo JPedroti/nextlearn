@@ -7,7 +7,7 @@ app_name = "aulas"
 urlpatterns = [
     # Professor
     path("professor/turmas/<int:turma_pk>/aulas/nova/", views.nova_aula, name="nova"),
-    path("professor/turmas/<int:turma_pk>/aulas/nova-via-pdf/", views.upload_pdf, name="nova_via_pdf"),
+    path("professor/turmas/<int:turma_pk>/aulas/nova-via-pdf/", views.nova_aula_via_pdf, name="nova_via_pdf"),
     path("professor/aulas/<int:pk>/", views.detalhe_professor, name="detalhe_professor"),
     path("professor/aulas/<int:pk>/editar/", views.editar_aula, name="editar"),
     path("professor/aulas/<int:pk>/publicar/", views.alternar_publicacao, name="alternar_publicacao"),

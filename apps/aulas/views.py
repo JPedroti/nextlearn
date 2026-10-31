@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db import IntegrityError, transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from apps.contas.decorators import papel_requerido
@@ -14,6 +15,7 @@ from ia.gerar_versao import ErroGeracao, gerar_versao
 
 from .forms import AulaForm, QuestaoFormSet, VersaoForm
 from .models import Aula, Resposta, VersaoAdaptada
+from .pdf import ErroPDF, extrair_texto, sugerir_titulo
 from .versoes import versao_para_aluno
 
 # ---------------------------------------------------------------------------
@@ -55,54 +57,26 @@ def nova_aula(request, turma_pk):
 
 
 @papel_requerido("professor")
-def upload_pdf(request, turma_pk):
-    """Professor faz upload de um PDF; o texto extraído pré-preenche o formulário de criação de aula."""
+def nova_aula_via_pdf(request, turma_pk):
+    """O professor envia um PDF; o texto vira o rascunho do formulário de "Nova aula", que salva a aula normalmente."""
     turma = get_object_or_404(Turma, pk=turma_pk, professor=request.user)
-    from io import BytesIO
-    from PyPDF2 import PdfReader
-
-    if request.method == "POST" and request.FILES.get("pdf"):
-        arquivo = request.FILES["pdf"]
-        if not arquivo.name.lower().endswith(".pdf"):
-            messages.error(request, "Envie um arquivo PDF.")
-            return redirect("aulas:upload_pdf", turma_pk=turma.pk)
-
-        try:
-            reader = PdfReader(BytesIO(arquivo.read()))
-            partes = []
-            for page in reader.pages:
-                texto = page.extract_text()
-                if texto:
-                    partes.append(texto.strip())
-            texto_extraido = "\n\n".join(partes)
-
-            if not texto_extraido.strip():
-                messages.error(request, "Não foi possível extrair texto deste PDF. Tente copiar e colar o conteúdo manualmente.")
-                return redirect("aulas:upload_pdf", turma_pk=turma.pk)
-
-            # Extrai título da primeira linha não vazia
-            linhas = [l.strip() for l in texto_extraido.split("\n") if l.strip()]
-            titulo_sugerido = linhas[0][:200] if linhas else "Aula via PDF"
-
-            form = AulaForm(initial={"titulo": titulo_sugerido, "conteudo": texto_extraido})
-            form.instance.turma = turma
-            formset = QuestaoFormSet(instance=form.instance)
-
-            messages.success(
-                request,
-                "Texto extraído do PDF! Agora complete as questões de múltipla escolha abaixo "
-                "e publique a aula. Depois você pode gerar as versões adaptadas.",
-            )
-            return render(request, "aulas/form_aula.html", {
-                "turma": turma,
-                "form": form,
-                "formset": formset,
-            })
-
-        except Exception as erro:
-            messages.error(request, f"Erro ao processar o PDF: {erro}")
-            return redirect("aulas:upload_pdf", turma_pk=turma.pk)
-
+    if request.method == "POST":
+        arquivo = request.FILES.get("pdf")
+        if not arquivo:
+            messages.error(request, "Escolha um arquivo PDF.")
+        else:
+            try:
+                texto = extrair_texto(arquivo)
+            except ErroPDF as erro:
+                messages.error(request, str(erro))
+            else:
+                form = AulaForm(initial={"titulo": sugerir_titulo(texto), "conteudo": texto})
+                formset = QuestaoFormSet(instance=Aula(turma=turma))
+                messages.success(
+                    request, "Texto do PDF copiado para a aula. Revise o texto, escreva as questões e salve."
+                )
+                contexto = {"turma": turma, "form": form, "formset": formset, "acao": reverse("aulas:nova", args=[turma.pk])}
+                return render(request, "aulas/form_aula.html", contexto)
     return render(request, "aulas/upload_pdf.html", {"turma": turma})
 
 
@@ -265,18 +239,7 @@ def ver_aula(request, pk):
         except IntegrityError:
             pass  # envio duplicado (ex.: dois cliques); as respostas já estão salvas
         else:
-            # Registra no histórico da IA e detecta padrões de erro
-            from apps.perfis.models import Perfil
-            from datetime import datetime
-            agora = datetime.now().strftime("%d/%m %H:%M")
-            acertos = sum(1 for indice, (questao, _) in zip(escolhas.values(), questoes) if indice == questao.indice_correto)
-            perfil, _ = Perfil.objects.get_or_create(aluno=aluno)
-            nomes = perfil.nomes_apoios() if perfil.mascara else ["aula original"]
-            perfil.acrescentar_ao_historico(
-                f"[{agora}] Respondeu aula \"{aula.titulo}\": "
-                f"{acertos}/{len(questoes)} acertos com {', '.join(nomes)}."
-            )
-            criar_sugestoes_por_padrao(aluno)
+            criar_sugestoes_por_padrao(aluno)  # muitos erros → sugestão de apoio para o professor revisar
             messages.success(request, "Respostas enviadas!")
         return redirect("aulas:ver", pk=aula.pk)
 
