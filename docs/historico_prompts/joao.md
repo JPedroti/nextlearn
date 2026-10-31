@@ -690,3 +690,11 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** conferiu que as 4 contas já existem no banco local (professor, aluno, família com questionário feito e família sem questionário) e passou a lista. Para publicar, entendeu "Cloudflare": propôs um túnel temporário (cloudflared) que mostra o servidor do computador do João num endereço público, e pediu permissão antes de baixar o programa.
 
 ---
+
+## Prompt 57 — 31/10/2026, 12:20 (BRT) — autor: João — ferramenta: Claude Code
+
+> Ache onde está a parte com o progresso, tipo duolingo, com as bolinhas, com o cenário. Não sei porque mas quando Thiago fez o merge com a parte do Cauã ele falou que você tirou isso. Volte com essa parte porque estava boa.
+
+**Resumo da resposta da IA:** achou a trilha (mundos com fases em bolinhas e cenário) intacta na branch `thiago/prototipo-neuro`; só a ferramenta de desenvolvedor tinha saído dela. Ela parecia sumida porque, com o apoio de foco e todas as fases feitas, o mundo ficava fechado; agora sempre abre um mundo, com 2 testes novos (78 passando). Explicou que, se o merge do Thiago usar a versão da `main`, o aluno cai na página antiga, sem trilha (`apps/contas/views.py` precisa ficar como na branch do Thiago).
+
+---
