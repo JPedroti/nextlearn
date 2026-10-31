@@ -159,5 +159,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # --- IA (usado a partir da Fatia 2, em ia/cliente.py) ----------------------
 
+# Provedor: "gemini" (padrão) ou "openai" (DeepSeek, Groq, OpenAI, etc.)
+IA_PROVEDOR = os.environ.get("IA_PROVEDOR", "gemini")
+
+# Gemini (Google AI Studio)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+
+# OpenAI-compatible (DeepSeek, Groq, OpenAI, etc.)
+IA_API_KEY = os.environ.get("IA_API_KEY", "")
+IA_BASE_URL = os.environ.get("IA_BASE_URL", "")
+IA_MODEL = os.environ.get("IA_MODEL", "deepseek-chat")
