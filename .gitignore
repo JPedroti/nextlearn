@@ -27,3 +27,6 @@ contas_teste_local.txt
 # Log do envio automatico para o GitHub
 envio_git.log
 servidor.log
+
+# Contas de teste criadas no computador de cada um (nunca vão para o Git)
+contas_locais.txt

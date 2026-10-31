@@ -3,7 +3,7 @@
 <head>{% include "prototipo/_cabeca.html" %}<title>Análise · {{ assunto }}</title></head>
 <body class="pg-progresso tema-base">
   <header class="topo">
-    <a href="{% url 'prototipo:prof_aulas' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"> · Professor</a>
+    <a href="{% url 'prototipo:prof_aulas' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="marca-logo"> · Professor</a>
     <nav class="topo-direita"><a class="btn-contorno" href="{% url 'prototipo:prof_aulas' %}">Todas as aulas</a><a class="btn-contorno" href="{% url 'aulas:editar' aula.pk %}">Editar aula</a><button class="btn-contorno" onclick="window.print()">Imprimir</button></nav>
   </header>
   <main class="pg">

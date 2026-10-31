@@ -27,7 +27,7 @@ USAR_IA = False          # ver DECISÃO no topo
 LIMITE_DIA = 30          # mensagens por aluno por dia (valor de produto, a calibrar)
 HISTORICO = 6            # mensagens anteriores mandadas como contexto
 
-MANUAL = """Você é o Next, um camaleão que ajuda alunos numa plataforma escolar chamada Chamilion.
+MANUAL = """Você é o Next, um camaleão que ajuda alunos numa plataforma escolar chamada Chamaleon.
 Fatos sobre a plataforma (use só estes; se não souber, diga que não sabe e sugira perguntar ao professor):
 - A trilha tem mundos (deserto, floresta, fundo do mar...). Cada mundo tem até 10 fases. Cada fase é uma aula.
 - Para começar uma fase, toque no círculo laranja com a estrela ou no botão "Começar fase".

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chamilion · A mesma aula, no jeito de cada um</title>
+  <title>Chamaleon · A mesma aula, no jeito de cada um</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/entrada.css' %}">
@@ -11,7 +11,7 @@
 <body data-cor="laranja">
 
   <header class="topo">
-    <a href="{% url 'prototipo:entrada' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"></a>
+    <a href="{% url 'prototipo:entrada' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="marca-logo"></a>
     <div class="acoes">
       <a class="btn-fantasma" href="{% url 'prototipo:como_resolvemos' %}" style="display:inline-flex;align-items:center;text-decoration:none">Como resolvemos</a>
       <button type="button" class="btn-fantasma" data-abrir="cadastro">Cadastrar</button>
@@ -79,7 +79,7 @@
       <div class="sala" aria-hidden="true">{% for i in "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" %}<span class="carteira{% if forloop.counter == 4 or forloop.counter == 17 %} g-tdah{% elif forloop.counter == 9 or forloop.counter == 23 %} g-dis{% elif forloop.counter == 28 %} g-tea{% endif %}"></span>{% endfor %}<p class="sala-legenda">Uma sala de 30 alunos</p></div>
     </div>
     <div class="gargalos">
-      <article><strong>6,4%</strong><h3>O professor não tem tempo nem formação</h3><p>Adaptar cada aula para cada aluno é inviável à mão.</p><p class="solucao">→ Ele envia o PDF que já usa; o Chamilion monta a trilha com questões e aponta o que tornar mais acessível.</p></article>
+      <article><strong>6,4%</strong><h3>O professor não tem tempo nem formação</h3><p>Adaptar cada aula para cada aluno é inviável à mão.</p><p class="solucao">→ Ele envia o PDF que já usa; o Chamaleon monta a trilha com questões e aponta o que tornar mais acessível.</p></article>
       <article><strong>Sem laudo</strong><h3>A criança espera um diagnóstico que pode demorar anos</h3><p>Enquanto isso, fica sem apoio na sala.</p><p class="solucao">→ Apoios por barreira, não por rótulo: o professor liga foco, leitura ou exemplos concretos na hora (Decreto 12.686/2025).</p></article>
       <article><strong>Em casa</strong><h3>A família não sabe como ajudar</h3><p>E o professor não sabe o que acontece em casa.</p><p class="solucao">→ A família vê os desafios do filho, recebe dicas de ambiente de estudo e manda recados ao professor.</p></article>
     </div>
@@ -155,7 +155,7 @@
           </div>
         </article>
 
-        <button type="button" class="btn-cheio btn-grande" data-abrir="entrar">Entrar no Chamilion</button>
+        <button type="button" class="btn-cheio btn-grande" data-abrir="entrar">Entrar no Chamaleon</button>
       </div>
       <div class="saiba-next" aria-hidden="true">
         <div class="nadador" data-pose="nadar">{% include "prototipo/_next.html" %}</div>

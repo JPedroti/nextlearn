@@ -1,9 +1,9 @@
 {% load static %}<!DOCTYPE html>
 <html lang="pt-br">
-<head>{% include "prototipo/_cabeca.html" %}<title>Família · Chamilion</title></head>
+<head>{% include "prototipo/_cabeca.html" %}<title>Família · Chamaleon</title></head>
 <body class="pg-progresso tema-base pg-familia">
   <header class="topo">
-    <a href="{% url 'prototipo:familia' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"> · Família</a>
+    <a href="{% url 'prototipo:familia' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="marca-logo"> · Família</a>
     <nav class="topo-direita">
       {% if filhos|length > 1 %}<form method="get">{% for f in filhos %}<button name="aluno" value="{{ f.pk }}" class="btn-contorno{% if f.pk == aluno.pk %} ativo{% endif %}">{{ f.usuario.first_name }}</button>{% endfor %}</form>{% endif %}
       <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form>

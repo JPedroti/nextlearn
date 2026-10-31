@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block titulo %}{{ aula.titulo }} · Chamilion{% endblock %}
+{% block titulo %}{{ aula.titulo }} · Chamaleon{% endblock %}
 
 {% block conteudo %}
 <a href="{% url 'aulas:inicio' %}" class="voltar">← Minhas aulas</a>
@@ -82,8 +82,23 @@
 {% endif %}
 
 {# Múltipla escolha (com gabarito do professor) #}
+<style>
+  /* Caixas de questão no jeito de cada aluno (skill design-neuro): cores do apoio, faixa de destaque e o camaleão. */
+  .questoes-tema { --destaque: var(--q-destaque); --destaque-claro: var(--q-fundo); }
+  .questoes-tema .cartao { border-left: 8px solid var(--q-destaque); background: var(--q-fundo); }
+  .questoes-base { --q-destaque: #2B59C3; --q-fundo: #F4F7FE; }
+  .questoes-foco { --q-destaque: #35557F; --q-fundo: #EEF2F6; }
+  .questoes-textual { --q-destaque: #1F5A96; --q-fundo: #FBF8F1; }
+  .questoes-concreto { --q-destaque: #0B6BA8; --q-fundo: #EAF4FA; }
+  /* Atenção e foco: enunciado maior e em linha curta, sem animação. */
+  .questoes-foco legend, .questoes-foco [data-pagina] > p[id] { font-size: 1.3rem; line-height: 1.4; max-width: 34ch; }
+  .questoes-foco * { transition: none !important; animation: none !important; }
+  /* Acessibilidade textual: letra maior e entrelinha folgada. */
+  .questoes-textual legend, .questoes-textual [data-pagina] > p[id] { font-size: 1.2rem; line-height: 1.75; max-width: 60ch; }
+</style>
+<div class="questoes-tema questoes-{{ tema_questoes }}">
 <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-  <h2 id="questoes" class="text-xl font-semibold">Questões</h2>
+  <div class="flex items-center gap-3">{% include "prototipo/_camaleao.html" with tipo="aluno" classe="w-20 h-14" %}<h2 id="questoes" class="text-xl font-semibold">Questões</h2></div>
   {% if respondida %}<span class="text-sm text-slate-600">{{ acertos }} de {{ itens_multipla|length }} acertos</span>{% endif %}
 </div>
 
@@ -155,6 +170,7 @@
     {% endif %}
   </form>
 {% endif %}
+</div>
 {% endblock %}
 
 {% block scripts_extra %}

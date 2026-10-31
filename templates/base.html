@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block titulo %}Chamilion{% endblock %}</title>
+  <title>{% block titulo %}Chamaleon{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style type="text/tailwindcss">
     /* ============================================================
-       Chamilion Design System — v2
+       Chamaleon Design System — v2
        Paleta: Indigo como ação, Slate como neutro, Emerald/Warm
        como feedback. Tipografia: system font stack nativa.
        Inspirado nos princípios de design do Anthropic:
@@ -221,7 +221,7 @@
 <body class="min-h-screen{% if preferencias.fonte_dislexia %} fonte-dislexia{% endif %}{% if preferencias.leitura_voz %} leitura-voz{% endif %}{% if preferencias.modo_limpo %} modo-limpo{% endif %}" style="background: var(--color-bg);">
   <header style="background: var(--color-surface); border-bottom: 1px solid var(--color-border);">
     <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-      <a href="{% url 'contas:inicio' %}" class="text-lg font-bold tracking-tight" style="color: var(--color-primary); text-decoration: none;">Chamilion</a>
+      <a href="{% url 'contas:inicio' %}" class="text-lg font-bold tracking-tight" style="color: var(--color-primary); text-decoration: none;">Chamaleon</a>
       {% if user.is_authenticated %}
         <div class="flex items-center gap-3">
           <span class="text-xs" style="color: var(--color-text-muted);">

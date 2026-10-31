@@ -6,7 +6,7 @@ com o apoio do aluno. Desenho em SVG, sem emoji, com descrição para leitor de 
 Uso: {% include "prototipo/_camaleao.html" with tipo="professor" %}   tipos: professor, familia, aluno, boas_vindas
 {% endcomment %}
 <svg class="camaleao {{ classe|default:'w-32 h-24 sm:w-40 sm:h-28' }} shrink-0" viewBox="0 0 220 140" role="img"
-     aria-label="{% if tipo == 'professor' %}Camaleão professor, de óculos e com um livro{% elif tipo == 'familia' %}Família de camaleões: pai, mãe e filhote{% elif tipo == 'aluno' %}Camaleão estudante, de mochila{% else %}Camaleão do Chamilion acenando{% endif %}">
+     aria-label="{% if tipo == 'professor' %}Camaleão professor, de óculos e com um livro{% elif tipo == 'familia' %}Família de camaleões: pai, mãe e filhote{% elif tipo == 'aluno' %}Camaleão estudante, de mochila{% else %}Camaleão do Chamaleon acenando{% endif %}">
   <defs>
     {# Camaleão básico olhando para a direita, ocupando mais ou menos x 10–150, y 20–120. #}
     <g id="camaleao-{{ tipo }}">

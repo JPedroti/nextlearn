@@ -28,7 +28,7 @@
   }
   var lista = document.querySelector("[data-checklist]");
   if (lista) {
-    var chave = "chamilion-" + lista.dataset.checklist, caixas = lista.querySelectorAll("input"), salvo = [];
+    var chave = "chamaleon-" + lista.dataset.checklist, caixas = lista.querySelectorAll("input"), salvo = [];
     try { salvo = JSON.parse(localStorage.getItem(chave) || "[]"); } catch (e) { salvo = []; }
     function total() {
       var n = 0; caixas.forEach(function (c) { if (c.checked) n++; });

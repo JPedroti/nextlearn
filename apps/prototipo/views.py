@@ -341,9 +341,9 @@ def painel_aluno(request):
     from .frases import status_ia
     from .perfis_dev import PERFIS_DEV
 
-    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    perfil_dev = ""  # simulação de perfil retirada (versão de entrega)
     a, tema, intensidade = _apoios_visuais(perfil, perfil_dev)
-    ambiente_dev = request.GET.get("ambiente", "") if settings.DEBUG else ""
+    ambiente_dev = ""  # ambiente fixo pelo progresso do aluno (versão de entrega)
     trilha = _trilha(contexto, aluno, a, intensidade, ambiente_dev)
     for u in trilha:
         for no in u["nos"]:
@@ -581,6 +581,9 @@ def treino(request, tipo):
     return render(request, "prototipo/treino.html", {
         "titulo": TREINOS[tipo][0], "descricao": TREINOS[tipo][1], "itens_json": json.dumps(itens, ensure_ascii=False),
         "n": len(itens), "foco": bool(perfil and perfil.foco), "aluno": aluno,
+        # Cor da caixa da questão: o apoio mais restritivo do aluno (foco > textual > concreto), como na skill design-neuro.
+        "tema": next((c for c in ("foco", "textual", "concreto") if perfil and getattr(perfil, c)), "base"),
+        "textual": bool(perfil and perfil.textual),
     })
 
 
@@ -615,7 +618,7 @@ def fala(request):
     if not aluno:
         return JsonResponse({"fala": "Oi! Eu sou o Next.", "origem": "reserva"})
     perfil = getattr(aluno, "perfil", None)
-    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    perfil_dev = ""  # simulação de perfil retirada (versão de entrega)
     a, _, _ = _apoios_visuais(perfil, perfil_dev)
     dados_aluno = _dados_aluno(aluno)
     proxima = dados_aluno["proxima"]
@@ -730,7 +733,7 @@ def progresso(request):
     if not aluno:
         return render(request, "prototipo/painel_aluno.html", {"sem_turma": True})
     perfil = getattr(aluno, "perfil", None)
-    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    perfil_dev = ""  # simulação de perfil retirada (versão de entrega)
     a, tema, _ = _apoios_visuais(perfil, perfil_dev)
     modo = modo_da_tela(a, perfil_dev) if request.user.papel == "aluno" else "padrao"
     META_SEMANAL = combinados(aluno)["meta"]  # noqa: N806 (meta combinada pela família)
@@ -873,24 +876,6 @@ def progresso(request):
     return render(request, "prototipo/progresso.html", contexto)
 
 
-def comparar(request):
-    """Ferramenta do desenvolvedor: dois perfis lado a lado (iframes da área do aluno). Só com DEBUG."""
-    from django.conf import settings
-    from django.http import Http404
-
-    from .ambientes import AMBIENTES
-    from .perfis_dev import PERFIS_DEV
-
-    if not settings.DEBUG:
-        raise Http404
-    pagina = request.GET.get("pagina", "inicio")
-    return render(request, "prototipo/comparar.html", {
-        "a": request.GET.get("a", "tdah"), "b": request.GET.get("b", "tea"), "amb": request.GET.get("ambiente", ""),
-        "pagina": pagina if pagina in ("inicio", "progresso") else "inicio",
-        "perfis": [p for p in PERFIS_DEV if p["id"]], "ambientes": [(x["id"], x["nome"]) for x in AMBIENTES],
-    })
-
-
 @papel_requerido("aluno")
 def chat(request):
     """Chat do Next (POST). Guarda só as últimas mensagens na sessão do próprio aluno."""
@@ -912,7 +897,7 @@ def chat(request):
     except ValueError:
         pergunta = ""
     perfil = getattr(aluno, "perfil", None)
-    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    perfil_dev = ""  # simulação de perfil retirada (versão de entrega)
     a, _, _ = _apoios_visuais(perfil, perfil_dev)
     d = _dados_aluno(aluno)
     contexto = {"fase_atual": d["proxima"]["assunto"] if d["proxima"] else None,
@@ -983,7 +968,7 @@ def aula_online(request, pk):
     aula = get_object_or_404(Aula, pk=pk, turma=aluno.turma, publicada=True)
     conteudo, _ = versao_para_aluno(aula, aluno)
     perfil = getattr(aluno, "perfil", None)
-    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    perfil_dev = ""  # simulação de perfil retirada (versão de entrega)
     a, tema, _ = _apoios_visuais(perfil, perfil_dev)
     trechos = _trechos(conteudo)
     return render(request, "prototipo/aula_online.html", {

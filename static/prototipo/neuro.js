@@ -1,4 +1,4 @@
-// Protótipo Chamilion: preferências (salvas no navegador), leitura em voz alta, passos e questões.
+// Protótipo Chamaleon: preferências (salvas no navegador), leitura em voz alta, passos e questões.
 (function () {
   var body = document.body;
   var aviso = document.getElementById("aviso");

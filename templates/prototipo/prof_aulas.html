@@ -3,7 +3,7 @@
 <head>{% include "prototipo/_cabeca.html" %}<title>Minhas aulas · análise</title></head>
 <body class="pg-progresso tema-base">
   <header class="topo">
-    <a href="{% url 'prototipo:prof_aulas' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"> · Professor</a>
+    <a href="{% url 'prototipo:prof_aulas' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="marca-logo"> · Professor</a>
     <nav class="topo-direita"><a class="btn-contorno" href="{% url 'painel:inicio' %}">Painel completo</a>
       <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form></nav>
   </header>

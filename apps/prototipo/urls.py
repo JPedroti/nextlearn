@@ -20,7 +20,6 @@ urlpatterns = [
     path("como-resolvemos/", views.como_resolvemos, name="como_resolvemos"),
     path("aluno/chat/", views.chat, name="chat"),
     path("aluno/progresso/", views.progresso, name="progresso"),
-    path("dev/comparar/", views.comparar, name="comparar"),
     path("aluno/treino/<str:tipo>/", views.treino, name="treino"),
     path("aluno/treino/<str:tipo>/concluido/", views.treino_concluido, name="treino_concluido"),
     path("aluno/", views.aluno, name="aluno"),

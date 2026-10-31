@@ -1,12 +1,12 @@
 {% load static %}<!DOCTYPE html>
 <html lang="pt-br">
-<head>{% include "prototipo/_cabeca.html" %}<title>Enviar material · Chamilion</title></head>
+<head>{% include "prototipo/_cabeca.html" %}<title>Enviar material · Chamaleon</title></head>
 <body class="pg-progresso tema-base">
   {% include "prototipo/_topo_prof.html" %}
   <main class="pg">
     {% include "prototipo/_msgs.html" %}
     <section class="pg-hero"><div><p class="pg-sobre">Material → trilha</p><h1>Envie o material da aula</h1>
-      <p class="pg-sub">PDF, TXT ou texto colado. {% if ia_ok %}A IA lê o material e{% else %}O Chamilion lê o material e{% endif %} cria um módulo de questões: um mundo de até 10 fases curtas, cada uma com questões. Tudo entra como rascunho: os alunos só veem depois que você publica.</p></div>
+      <p class="pg-sub">PDF, TXT ou texto colado. {% if ia_ok %}A IA lê o material e{% else %}O Chamaleon lê o material e{% endif %} cria um módulo de questões: um mundo de até 10 fases curtas, cada uma com questões. Tudo entra como rascunho: os alunos só veem depois que você publica.</p></div>
       <div class="pg-estado estado-{% if ia_ok %}ok{% else %}atencao{% endif %}"><span class="pg-ponto"></span>{% if ia_ok %}IA conectada{% else %}IA não configurada: questões de rascunho locais{% endif %}</div></section>
     <section class="pg-grade">
       <form class="cartao-pg form-material" method="post" enctype="multipart/form-data">

@@ -229,6 +229,8 @@ def ver_aula(request, pk):
         "aula": aula,
         "conteudo": conteudo,
         "passos": passos,
+        # Cor das caixas de questão: o apoio mais restritivo do aluno (foco > textual > concreto), skill design-neuro
+        "tema_questoes": next((c for c in ("foco", "textual", "concreto") if perfil and getattr(perfil, c)), "base"),
         "itens": itens,
         "itens_multipla": [i for i in itens if i["questao"].tipo == "multipla"],
         "itens_abertos": [i for i in itens if i["questao"].tipo != "multipla"],

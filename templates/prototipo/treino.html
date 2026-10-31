@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ titulo }} · Chamilion</title>
+  <title>{{ titulo }} · Chamaleon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
 </head>
-<body class="tema-{% if foco %}foco{% else %}base{% endif %}{% if foco %} apoio-foco{% endif %}">
+<body class="tema-{{ tema }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
-    <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"></a>
+    <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="marca-logo"></a>
     <div class="topo-direita">
       <a href="{% url 'prototipo:painel_aluno' %}#calendario" class="btn-contorno"><svg class="ico" aria-hidden="true"><use href="#i-calendario"/></svg>Calendário</a>
       <a href="{% url 'prototipo:painel_aluno' %}" class="btn-link">Voltar para minha área</a>
@@ -24,8 +24,13 @@
       <div class="progresso" role="progressbar" aria-valuemin="0" aria-valuemax="{{ n }}" aria-valuenow="0" data-progresso><span></span></div>
       <p class="suave" data-contador>Questão 1 de {{ n }}</p>
       <section class="cartao questao" data-questao aria-live="polite">
-        <p class="mini" data-assunto></p>
-        <h1 data-enunciado></h1>
+        <div class="questao-cabeca">
+          {% include "prototipo/_camaleao.html" with tipo="aluno" %}
+          <div>
+            <p class="mini" data-assunto></p>
+            <h1 data-enunciado></h1>
+          </div>
+        </div>
         <button type="button" class="btn-link ouvir" data-ouvir>Ouvir</button>
         <div class="alternativas" role="radiogroup" data-alternativas></div>
         <p class="retorno" data-retorno hidden></p>

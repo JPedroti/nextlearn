@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Minha trilha · Chamilion</title>
+  <title>Minha trilha · Chamaleon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
@@ -11,7 +11,7 @@
 <body data-perfil-dev="{{ perfil_dev }}" data-ambiente-dev="{{ ambiente_dev }}" data-modo="{{ modo }}" class="modo-{{ modo }} tema-{{ tema|default:'base' }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}{% if concreto %} apoio-concreto{% endif %}{% if limpo %} modo-limpo{% endif %}{% if voz %} com-voz{% endif %}{% if letras %} letras-espacadas{% endif %}{% if alvos %} alvos-grandes{% endif %}" data-padrao-movimento="{% if foco or limpo %}0{% else %}1{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
-    <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"></a>
+    <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="marca-logo"></a>
     <div class="topo-direita">
       <span class="quem">{{ aluno.usuario.first_name|default:aluno.usuario.username }} · {{ aluno.turma.nome }}</span>
       {% if not sem_turma %}<a class="btn-contorno" href="{% url 'prototipo:progresso' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}"><svg class="ico" aria-hidden="true"><use href="#i-estrela"/></svg>Meu progresso</a>
@@ -224,29 +224,6 @@
     </div>
     {% if modo == "missao" %}</details>{% endif %}
   </main>
-
-  {% if dev %}
-  <aside class="dev" aria-label="Ferramenta do desenvolvedor">
-    <details open>
-      <summary>Ferramenta do desenvolvedor · {{ modo_nome }}</summary>
-      <form method="get" class="dev-form">
-        <label for="perfil_dev">Simular perfil (só para o time; o aluno nunca vê estes rótulos)</label>
-        <select id="perfil_dev" name="perfil_dev" onchange="this.form.submit()">
-          {% for p in perfis_dev %}<option value="{{ p.id }}" {% if p.id == perfil_dev %}selected{% endif %}>{{ p.nome }}</option>{% endfor %}
-        </select>
-        {% for p in perfis_dev %}{% if p.id == perfil_dev %}<p class="dev-desc">{{ p.desc }}</p>{% endif %}{% endfor %}
-        <label for="ambiente">Ambiente do mundo atual</label>
-        <select id="ambiente" name="ambiente" onchange="this.form.submit()">
-          <option value="">Automático</option>
-          {% for id, nome in ambientes %}<option value="{{ id }}" {% if id == ambiente_dev %}selected{% endif %}>{{ nome }}</option>{% endfor %}
-        </select>
-        <div class="dev-chips">{% for p in perfis_dev %}<a href="?perfil_dev={{ p.id }}{% if ambiente_dev %}&ambiente={{ ambiente_dev }}{% endif %}" {% if p.id == perfil_dev %}aria-current="page"{% endif %}>{{ p.nome|truncatechars:22 }}</a>{% endfor %}</div>
-        <p class="dev-desc"><a href="{% url 'prototipo:comparar' %}?a={{ perfil_dev|default:'tdah' }}&b=tea" target="_blank">Comparar dois perfis lado a lado ↗</a></p>
-        <p class="dev-desc">Mundo atual: {{ mundo_atual.cenario.nome }} · IA das falas: {% if ia.endpoint and ia.chave %}configurada{% elif ia.chave %}chave ok, falta API_BASE_URL{% else %}sem chave{% endif %} · <span data-origem-fala>…</span></p>
-      </form>
-    </details>
-  </aside>
-  {% endif %}
 
   <!-- Chat com o Next: dúvidas sobre a plataforma -->
   <button type="button" class="chat-abrir" data-chat-abrir aria-expanded="false" aria-controls="chat-next">

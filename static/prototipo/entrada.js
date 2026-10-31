@@ -1,4 +1,4 @@
-// Tela de entrada do Chamilion (deserto): o Next troca de cor e de pose; com o scroll ele anda até a
+// Tela de entrada do Chamaleon (deserto): o Next troca de cor e de pose; com o scroll ele anda até a
 // beirada, salta no lago, a tela fica submersa e o "Saiba mais" desce com ele nadando à direita.
 (function () {
   var body = document.body;
@@ -178,7 +178,7 @@
       var cadastro = b.dataset.abrir === "cadastro";
       janela.querySelector("[data-titulo]").textContent = cadastro ? "Criar acesso" : "Entrar como";
       janela.querySelector("[data-sub]").textContent = cadastro
-        ? "No Chamilion, quem cria os acessos é a escola e o professor. Veja como funciona para você:"
+        ? "No Chamaleon, quem cria os acessos é a escola e o professor. Veja como funciona para você:"
         : "Escolha quem você é. Depois é só usuário e senha.";
       janela.querySelectorAll("[data-desc-entrar]").forEach(function (e) { e.hidden = cadastro; });
       janela.querySelectorAll("[data-desc-cadastro]").forEach(function (e) { e.hidden = !cadastro; });

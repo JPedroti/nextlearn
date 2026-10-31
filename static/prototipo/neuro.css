@@ -1,4 +1,4 @@
-/* Protótipo Chamilion — tokens vêm do <body> (apps/prototipo/temas.py). Regras da skill design_neuro. */
+/* Protótipo Chamaleon — tokens vêm do <body> (apps/prototipo/temas.py). Regras da skill design_neuro. */
 body { margin: 0; background: var(--fundo); color: var(--texto); font-family: "Atkinson Hyperlegible", system-ui, sans-serif; font-size: 1.0625rem; line-height: 1.6; }
 .texto-suave { color: var(--texto-suave); }
 a { color: var(--destaque); }

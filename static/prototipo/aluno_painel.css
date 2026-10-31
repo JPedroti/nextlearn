@@ -535,3 +535,16 @@ body.modo-agenda .mapa .no-atual .no-bt { box-shadow: 0 7px 0 var(--sombra), 0 0
 
 .btn-sec { background: rgba(255,255,255,.16) !important; color: #FFFFFF !important; border: 2px solid rgba(255,255,255,.6); margin-left: 8px; }
 body.modo-limpo .btn-sec { background: #FFFFFF !important; color: var(--destaque) !important; border-color: var(--destaque); }
+
+/* Caixa da questão no jeito de cada aluno (skill design-neuro): a cor segue o apoio do aluno (tema da tela),
+   com uma faixa na cor de destaque e o camaleão do Chamaleon. */
+.questao { background: color-mix(in srgb, var(--destaque-claro) 55%, var(--cartao)); border-left: 8px solid var(--destaque); }
+.questao-cabeca { display: flex; align-items: flex-start; gap: 14px; }
+.questao-cabeca .camaleao { width: 84px; height: 54px; flex-shrink: 0; }
+/* Atenção e foco: enunciado maior e em linha curta, uma ideia por vez, sem animação. */
+body.apoio-foco .questao h1 { font-size: 1.7rem; line-height: 1.35; max-width: 34ch; }
+body.apoio-foco .questao, body.apoio-foco .alt { transition: none; animation: none; }
+/* Acessibilidade textual: texto maior, entrelinha folgada e linha de até 60 caracteres. */
+body.apoio-textual .questao h1 { font-size: 1.6rem; line-height: 1.75; max-width: 60ch; }
+body.apoio-textual .alt { font-size: 1.2rem; line-height: 1.6; }
+@media (max-width: 640px) { .questao-cabeca .camaleao { width: 60px; height: 40px; } }

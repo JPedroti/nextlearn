@@ -1,9 +1,9 @@
 {% load static %}<!DOCTYPE html>
 <html lang="pt-br">
-<head>{% include "prototipo/_cabeca.html" %}<title>Como o Chamilion resolve</title></head>
+<head>{% include "prototipo/_cabeca.html" %}<title>Como o Chamaleon resolve</title></head>
 <body class="pg-progresso tema-base">
   <header class="topo">
-    <a href="{% url 'prototipo:entrada' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"></a>
+    <a href="{% url 'prototipo:entrada' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="marca-logo"></a>
     <nav class="topo-direita"><a class="btn-contorno" href="{% url 'prototipo:login' %}?perfil=aluno">Entrar</a></nav>
   </header>
   <main class="pg">
@@ -19,7 +19,7 @@
 
     <section class="cartao-pg">
       <table class="tabela-aulas">
-        <thead><tr><th>Problema</th><th>O que o Chamilion faz</th><th>Onde ver</th><th>Base</th></tr></thead>
+        <thead><tr><th>Problema</th><th>O que o Chamaleon faz</th><th>Onde ver</th><th>Base</th></tr></thead>
         <tbody>
           <tr><td>O professor não tem tempo nem formação para adaptar a aula para cada aluno</td><td>Escreve a aula uma vez; a IA gera até 7 versões (foco, textual, concreto e combinações); gabarito e alternativas não mudam</td><td>Painel do professor → aula → gerar e aprovar versão</td><td>DUA; custo por aula, não por aluno</td></tr>
           <tr><td>A IA pode errar ou "facilitar" a questão</td><td>Toda versão passa pela aprovação do professor; o prompt proíbe reduzir a exigência cognitiva ou entregar a resposta</td><td>Tela "Revisar versão" + <code>ia/blocos/base.md</code></td><td>Parecer CNE/CP 15/2026 (decisão humana)</td></tr>
