@@ -195,7 +195,9 @@ a.opcao-papel:hover { border-color: #2B59C3; background: #F5F8FF; }
 .problema-nota { color: #B9CBE0; min-height: 3em; }
 .sala { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 22px; background: #13335C; border-radius: 22px; }
 .carteira { aspect-ratio: 1; border-radius: 50%; background: #3E5F8A; transition: background .25s, transform .25s; }
-.sala.ver-tdah .g-tdah, .sala.ver-dis .g-dis, .sala.ver-tea .g-tea { background: #F2B544; transform: scale(1.15); box-shadow: 0 0 0 4px rgba(242,181,68,.35); }
+.g-tdah, .g-dis, .g-tea { background: #F2B544; }  /* as 5 crianças de 30 ficam sempre pintadas */
+.sala[class*="ver-"] .carteira:is(.g-tdah, .g-dis, .g-tea) { opacity: .45; }
+.sala.ver-tdah .g-tdah, .sala.ver-dis .g-dis, .sala.ver-tea .g-tea { opacity: 1; background: #F2B544; transform: scale(1.15); box-shadow: 0 0 0 4px rgba(242,181,68,.35); }
 .sala-legenda { grid-column: 1 / -1; text-align: center; margin: 6px 0 0; color: #B9CBE0; font-size: .9rem; }
 .gargalos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; max-width: 1200px; margin: 40px auto 0; }
 .gargalos article { background: #13335C; border-radius: 18px; padding: 20px 22px; }
