@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 01:39 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 01:44 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -35,7 +35,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 | 3. Interface (OpenDyslexic, leitura em voz alta, modo limpo, registro de EventoUso) | 04h–06h | Thiago (feita pelo João com Claude Code) | ✅ código (adiantada) | Testar a leitura em voz alta num celular e no navegador da banca; testar no ar |
 | 4. Família (questionário → apoios sugeridos → revisão do professor) | 08h–09h15 | João | ✅ código (adiantada) | Trocar as 6 perguntas provisórias (`apps/perfis/questionario.py`) pelas do Cauã; testar no ar |
 | 5. Painel (acertos, adaptações usadas, sugestões de ajuste de perfil) | 09h15–10h30 | João | ✅ código (adiantada) | Testar no ar com respostas reais da equipe |
-| Docs finais | até 10h30 | João | ⏳ | Link do deploy no README; `docs/arquitetura.md`, `docs/decisoes.md` e `docs/contexto.md` |
+| Docs finais | até 10h30 | João | ✅ (adiantada) · ⚠️ | `docs/arquitetura.md`, `docs/decisoes.md` e `docs/contexto.md` prontos. Falta o link do deploy no README e revisar os docs se o código mudar |
 
 **Ordem de corte se atrasar:** (1) sugestões do painel → (2) questionário da família (o professor marca os apoios) →
 (3) modo limpo. As fatias 0, 1 e 2 não podem ser cortadas.
@@ -52,7 +52,9 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 - ✅ Fatia 4 (família), com perguntas provisórias
 - ✅ Fatia 3 (interface), no lugar do Thiago, que não tinha começado
 - ✅ Fatia 5 (painel)
-- ⏳ Docs finais e repositório público antes das 12h
+- ✅ Docs finais (arquitetura, decisões, contexto com dados do Inep 2025)
+- ⏳ Repositório público antes das 12h
+- ❔ O número "6,4% dos professores com formação continuada em educação especial" (usado no CLAUDE.md) não foi encontrado na apresentação pública do Censo 2025. Achar a fonte pública antes de usar no vídeo ou no plano de negócio
 
 ### Thiago (Produto: motor de IA, tela do aluno, preferências de interface)
 
@@ -76,6 +78,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 01:44 — Documentação final escrita (arquitetura com diagramas, decisões, contexto com dados conferidos no Inep). Todas as fatias do app concluídas no código; faltam deploy, provedor de IA e textos do Cauã.
 - 31/10, 01:39 — Fatia 5 concluída no código (painel da turma e sugestões a partir do uso); 80 testes passando. Material do Thiago (repositório learnext) juntado à `main`, com as marcas de conflito resolvidas.
 - 31/10, 01:33 — Fatia 3 concluída no código (barra de apoios de leitura, OpenDyslexic, voz, modo limpo, EventoUso); 70 testes passando.
 - 31/10, 01:28 — Fatia 4 concluída no código (família, questionário, sugestões aceitas ou recusadas pelo professor); 60 testes passando.

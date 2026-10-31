@@ -326,6 +326,6 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 
 > Perfeito, pode fazer todas então.
 
-**Resumo da resposta da IA:** _(preenchido ao final)_
+**Resumo da resposta da IA:** feitas em sequência, cada uma publicada na `main` com testes: Fatia 4 (família cadastrada pelo professor, questionário de 6 perguntas provisórias sem laudo, sugestões aceitas ou recusadas pelo professor); Fatia 3 (barra de apoios de leitura com OpenDyslexic, leitura em voz alta pela Web Speech API e modo limpo, padrão no perfil + escolha na sessão, EventoUso); Fatia 5 (painel da turma com acertos por aluno e por questão, comparação original × adaptada e sugestões a partir do uso); documentação final (arquitetura com diagramas validados, decisões, contexto com dados conferidos no Censo Escolar 2025 do Inep). 80 testes passando. No meio do trabalho, o Thiago juntou o repositório `learnext` à `main` com marcas de conflito no README, `.gitignore` e `.env.example`; a IA juntou os dois lados sem perder conteúdo, sem forçar push, e conferiu que não havia chaves no histórico. Horários do histórico corrigidos com o relógio real.
 
 ---
