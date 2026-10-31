@@ -1,0 +1,85 @@
+{% extends "prototipo/base.html" %}
+{% block titulo %}{{ aula.titulo }}{% endblock %}
+{% block conteudo %}
+<a href="{% url 'prototipo:aluno' %}?{{ qs }}" class="voltar">← Minhas aulas</a>
+<div class="mt-3 grid gap-6 lg:grid-cols-3">
+  <div class="space-y-6 lg:col-span-2">
+    <header>
+      <p class="texto-suave">{{ aula.turma }} · Matemática</p>
+      <h1 class="text-3xl font-bold">{{ aula.titulo }}</h1>
+    </header>
+
+    {% if passos %}
+      <section class="cartao leitura" aria-label="Aula em passos" data-passos>
+        <div class="flex items-center justify-between gap-3">
+          <p class="rotulo" data-contador>Passo 1 de {{ passos|length }}</p>
+          <button type="button" class="botao-sec ouvir" data-ouvir="[data-passo]:not([hidden]) p">Ouvir</button>
+        </div>
+        <div class="progresso mt-3" aria-hidden="true"><span data-barra></span></div>
+        {% for titulo, texto in passos %}
+          <div class="mt-5" data-passo {% if not forloop.first %}hidden{% endif %}>
+            <h2 class="text-xl font-bold">{{ titulo }}</h2>
+            <p class="mt-2 texto-aula">{{ texto }}</p>
+          </div>
+        {% endfor %}
+        {% if visual %}
+          <div class="mt-5">{% include "prototipo/_barras.html" %}</div>
+        {% endif %}
+        <div class="mt-6 flex justify-between gap-3">
+          <button type="button" class="botao-sec" data-anterior>Voltar</button>
+          <button type="button" class="botao" data-proximo>Próximo passo</button>
+        </div>
+      </section>
+    {% else %}
+      <article class="cartao leitura" aria-label="Texto da aula">
+        <div class="flex justify-end">
+          <button type="button" class="botao-sec ouvir" data-ouvir="article .texto-aula">Ouvir a aula</button>
+        </div>
+        <div class="mt-2 space-y-4">
+          {% for p in paragrafos %}<p class="texto-aula">{{ p }}</p>{% endfor %}
+        </div>
+        {% if visual %}
+          <div class="mt-6">{% include "prototipo/_barras.html" %}</div>
+        {% endif %}
+      </article>
+    {% endif %}
+
+    <section aria-labelledby="q-titulo">
+      <h2 id="q-titulo" class="text-2xl font-bold">Questões</h2>
+      <form class="mt-4 space-y-4" data-quiz>
+        {% for q in questoes %}
+          <fieldset class="cartao questao" data-correta="{{ q.correta }}">
+            <legend class="sr-only">Questão {{ q.n }}</legend>
+            <div class="flex items-start justify-between gap-3">
+              <p class="font-bold texto-aula" id="enun-{{ q.n }}">{{ q.n }}. {{ q.enunciado }}</p>
+              <button type="button" class="botao-sec ouvir" data-ouvir="#enun-{{ q.n }}" aria-label="Ouvir a questão {{ q.n }}">Ouvir</button>
+            </div>
+            <div class="mt-3 space-y-2">
+              {% for alt in q.alternativas %}
+                <label class="opcao">
+                  <input type="radio" name="q{{ q.n }}" value="{{ forloop.counter0 }}" required>
+                  <span><strong>{% cycle 'A' 'B' 'C' 'D' %})</strong> {{ alt }}</span>
+                </label>
+              {% endfor %}
+            </div>
+            <p class="feedback" data-feedback hidden></p>
+          </fieldset>
+        {% endfor %}
+        <button type="submit" class="botao">Enviar respostas</button>
+      </form>
+    </section>
+  </div>
+
+  <aside class="space-y-6">
+    {% include "prototipo/_preferencias.html" %}
+    <section class="cartao">
+      <h2 class="text-base font-bold">Formato desta aula</h2>
+      <ul class="mt-2 space-y-1 text-sm">
+        <li>{% if foco %}✓ Um passo de cada vez{% else %}— Texto corrido{% endif %}</li>
+        <li>{% if textual %}✓ Frases curtas e diretas{% else %}— Linguagem original{% endif %}</li>
+        <li>{% if concreto %}✓ Exemplo do dia a dia e figura{% else %}— Sem exemplo extra{% endif %}</li>
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}

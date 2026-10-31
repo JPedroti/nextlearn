@@ -1,0 +1,13 @@
+<figure>
+  <figcaption class="text-sm font-bold">Veja as frações</figcaption>
+  <div class="mt-3 space-y-3">
+    {% for b in visual %}
+      <div class="flex items-center gap-3">
+        <span class="w-12 text-right font-bold">{{ b.rotulo }}</span>
+        <div class="barra" role="img" aria-label="{{ b.rotulo }}: {{ b.marcadas }} de {{ b.partes }} partes pintadas">
+          {% for marcada in b.celulas %}<span class="celula{% if marcada %} marcada{% endif %}"></span>{% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</figure>

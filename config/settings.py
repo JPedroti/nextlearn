@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "apps.perfis",
     "apps.aulas",
     "apps.painel",
+    "apps.prototipo",  # protótipo de design (branch thiago/prototipo-neuro)
 ]
 
 MIDDLEWARE = [

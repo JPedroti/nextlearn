@@ -1,0 +1,44 @@
+{% extends "prototipo/base.html" %}
+{% block titulo %}Início{% endblock %}
+{% block conteudo %}
+<h1 class="text-3xl font-bold">Protótipo de estrutura</h1>
+<p class="mt-2 max-w-2xl texto-suave">Use “Ver como” no topo para trocar os apoios. A mesma aula muda de formato e a paleta acompanha o apoio ligado.</p>
+
+<div class="mt-8 grid gap-4 md:grid-cols-3">
+  <a href="{% url 'prototipo:aluno' %}?{{ qs }}" class="cartao cartao-link">
+    <span class="rotulo">Aluno</span>
+    <span class="mt-2 block text-xl font-bold">Minhas aulas e a aula adaptada</span>
+    <span class="mt-2 block texto-suave">Próxima aula em destaque, preferências de leitura, questões com feedback.</span>
+  </a>
+  <a href="{% url 'prototipo:professor' %}?{{ qs }}" class="cartao cartao-link">
+    <span class="rotulo">Professor</span>
+    <span class="mt-2 block text-xl font-bold">Painel da turma</span>
+    <span class="mt-2 block texto-suave">Acertos, apoios de cada aluno, versões da aula e sugestões para aprovar.</span>
+  </a>
+  <a href="{% url 'prototipo:familia' %}?{{ qs }}" class="cartao cartao-link">
+    <span class="rotulo">Família</span>
+    <span class="mt-2 block text-xl font-bold">Acompanhar e ajudar em casa</span>
+    <span class="mt-2 block texto-suave">Apoios definidos pelo professor, dicas práticas e questionário.</span>
+  </a>
+</div>
+
+<h2 class="mt-12 text-2xl font-bold">Paletas por apoio</h2>
+<p class="mt-1 texto-suave">Todas passam no contraste mínimo de 4,5:1 (conferido em <code>scripts/contraste_paletas.py</code>).</p>
+<div class="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+  {% for chave, t in temas.items %}
+    <div class="cartao">
+      <div class="flex gap-1" aria-hidden="true">
+        <span class="amostra" style="background: {{ t.fundo }}"></span>
+        <span class="amostra" style="background: {{ t.superficie }}"></span>
+        <span class="amostra" style="background: {{ t.texto }}"></span>
+        <span class="amostra" style="background: {{ t.texto_suave }}"></span>
+        <span class="amostra" style="background: {{ t.destaque }}"></span>
+        <span class="amostra" style="background: {{ t.destaque_suave }}"></span>
+      </div>
+      <h3 class="mt-3 font-bold">{{ t.nome }}</h3>
+      <p class="mt-1 text-sm texto-suave">{{ t.por_que }}</p>
+      <p class="mt-2 text-xs texto-suave">Fundo {{ t.fundo }} · Texto {{ t.texto }} · Destaque {{ t.destaque }}</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
