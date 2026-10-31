@@ -698,3 +698,44 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** achou a trilha (mundos com fases em bolinhas e cenário) intacta na branch `thiago/prototipo-neuro`; só a ferramenta de desenvolvedor tinha saído dela. Ela parecia sumida porque, com o apoio de foco e todas as fases feitas, o mundo ficava fechado; agora sempre abre um mundo, com 2 testes novos (78 passando). Explicou que, se o merge do Thiago usar a versão da `main`, o aluno cai na página antiga, sem trilha (`apps/contas/views.py` precisa ficar como na branch do Thiago).
 
 ---
+
+## Prompt 58 — 31/10/2026, 12:26 (BRT) — autor: João — ferramenta: Claude Code
+
+> mude a logo para svg. olhe o que acontece quando voce nao muda para svg: a resolucao cai e quando o fundo muda de cor fica com essa aparencia
+> [imagem: print da página inicial com a logo quadriculada sobre o fundo escuro]
+
+**Resumo da resposta da IA:** viu que a transparência da logo extraída do PDF veio com ruído (o quadriculado) e pediu permissão para instalar um vetorizador; o João interrompeu antes de responder.
+
+---
+
+## Prompt 59 — 31/10/2026, 12:27 (BRT) — autor: João — ferramenta: Claude Code
+
+> urgente! mande o link do site!
+
+**Resumo da resposta da IA:** conferiu que o site público estava no ar e mandou o link e os 4 logins de teste.
+
+---
+
+## Prompt 60 — 31/10/2026, 12:28 (BRT) — autor: João — ferramenta: Claude Code
+
+> agora continue fazendo aquela tarefa da logo
+
+**Resumo da resposta da IA:** conferiu que não havia vetorizador instalado e perguntou de novo sobre instalar; o João recusou a pergunta.
+
+---
+
+## Prompt 61 — 31/10/2026, 12:30 (BRT) — autor: João — ferramenta: Claude Code
+
+> arrume as bolas pintadas com as 5 criancas dentr as 30 e faca push. isso é urgente!
+
+**Resumo da resposta da IA:** na sala de 30 bolinhas da página inicial, as 5 crianças passaram a ficar sempre pintadas (antes só ao clicar num grupo); push na branch `thiago/prototipo-neuro` e site público reiniciado.
+
+---
+
+## Prompt 62 — 31/10/2026, 12:31 (BRT) — autor: João — ferramenta: Claude Code
+
+> agora continue resolvendo o problema da logo (jogar para svg)
+
+**Resumo da resposta da IA:** sem instalar nada, escreveu um vetorizador só com Pillow: refez a máscara pelas cores, traçou os contornos, suavizou e preencheu com degradês tirados das cores originais. Trocou o PNG pelo SVG em todas as telas; 78 testes passando; push e site público reiniciado.
+
+---

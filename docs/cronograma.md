@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 12:23 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 12:35 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -79,6 +79,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 12:35 — Logo Chamaleon em SVG em todas as telas (sem o quadriculado no fundo escuro); as 5 crianças de 30 ficam sempre pintadas na página inicial. Branch `thiago/prototipo-neuro`.
 - 31/10, 12:23 — Trilha do aluno (bolinhas e cenário) confirmada na branch do Thiago e sempre aberta; site público reiniciado com a correção.
 - 31/10, 12:19 — Site no ar por túnel temporário da Cloudflare (servidor do computador do João, branch `thiago/prototipo-neuro`, DEBUG desligado; só funciona com o computador e o servidor ligados). Contas de teste do vídeo e da banca criadas só no banco local (professor, aluno, família com e sem questionário).
 - 31/10, 07:45 — Decisão do grupo: o MVP roda localmente. README reorganizado (como rodar no computador primeiro; deploy vira nota de "depois do hackathon"); a chave de IA saiu da lista de variáveis pedidas pelo Render. O Thiago vai mandar um frontend novo para o app seguir.
