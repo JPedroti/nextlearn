@@ -1,5 +1,9 @@
 # Perfis funcionais e métricas da plataforma (v1, 30/10/2026)
 
+> **Pesquisa e brainstorm, anterior à versão final do produto.** No app, os 8 perfis viraram a justificativa de
+> 3 apoios (ver [mapeamento_pesquisa_app.md](mapeamento_pesquisa_app.md)); laudo e métricas de foco ou retenção
+> ficaram de fora. O índice dos documentos está em [README.md](README.md).
+
 > Base: `docs/pesquisa/base_cientifica_neurodivergencia_entrega1.md` (verificada abaixo) + pesquisa nova com fontes.
 > Convenção: **[LIT]** = parâmetro tirado da literatura · **[PRODUTO]** = valor inicial de projeto, sem estudo que o fixe; precisa ser calibrado com dados reais.
 

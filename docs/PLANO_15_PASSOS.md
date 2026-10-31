@@ -1,5 +1,9 @@
 # Plano de 15 passos até a entrega (sáb 31/10, 12h)
 
+> **Pesquisa e brainstorm, anterior à versão final do produto.** Este primeiro plano foi substituído pelo roteiro em
+> fatias do `CLAUDE.md`; os passos com respostas fictícias e personagens não foram feitos. O índice dos documentos está
+> em [README.md](README.md).
+
 Tempo disponível: ~18 h (sex 18h → sáb 12h). Time: 4 pessoas.
 P1 = front-end · P2 = IA · P3 = pedagogia/dados · P4 = negócio/pitch
 

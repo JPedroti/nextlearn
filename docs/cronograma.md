@@ -50,7 +50,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 - ✅ Revisão do que o Cauã enviou de madrugada, com as decisões registradas no prompt 36 do `joao.md`
 - ⚠️ Deploy no Render (ver Entregas)
 - ⏳ Repositório público antes das 12h
-- ❔ O número "6,4% dos professores com formação continuada em educação especial" precisa de fonte pública (o slide da Teachy cita Censo Escolar 2024, Anuário da Educação Básica 2025 e Panorama da Educação Especial 2025)
+- ✅ Fonte pública do "6,4% dos professores regentes com formação continuada em educação especial" (2024): Instituto Rodrigo Mendes, Panorama da Educação Especial 2025, com dados do Censo Escolar. Link em `docs/contexto.md`
 
 ### Thiago (Produto: motor de IA, tela do aluno, preferências de interface)
 

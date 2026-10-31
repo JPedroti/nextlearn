@@ -1,3 +1,5 @@
+-- Esboço de pesquisa, anterior à versão final do produto: o app NÃO usa este arquivo.
+-- O banco real vem dos models do Django, em apps/. Índice dos documentos: docs/README.md.
 -- =====================================================================
 -- Schema da plataforma (MVP hackathon) — SQLite
 -- Compatível com PostgreSQL trocando: INTEGER PRIMARY KEY -> SERIAL/UUID,

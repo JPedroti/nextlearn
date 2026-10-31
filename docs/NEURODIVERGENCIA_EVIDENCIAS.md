@@ -1,5 +1,8 @@
 # Neurodivergência e aprendizagem: tipos, métricas e evidências
 
+> **Pesquisa de base, anterior à versão final do produto.** O NextLearn é para a turma inteira e não usa
+> diagnóstico; esta pesquisa serviu para escolher os apoios. O índice dos documentos está em [README.md](README.md).
+
 > Base científica da tese (30/10/2026). Cada número tem fonte. Itens marcados **(conferir)** foram citados de memória/abstract e precisam ser checados no texto completo antes de entrar no slide.
 
 ## 1. Tipos de neurodivergência

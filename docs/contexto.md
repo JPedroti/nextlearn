@@ -15,6 +15,10 @@ Segundo o Censo Escolar 2025 do Inep:
 Fonte: Inep, [Censo Escolar da Educação Básica 2025, apresentação dos resultados](https://download.inep.gov.br/censo_escolar/resultados/2025/apresentacao_coletiva.pdf)
 (gráficos 27, 28 e 29). Em 2025, o TEA passou a ser o maior grupo da educação especial.
 
+Do lado de quem dá a aula: **em 2024, só 6,4% dos professores regentes tinham formação continuada em educação
+especial** (Instituto Rodrigo Mendes, [Panorama da Educação Especial 2025](https://institutorodrigomendes.org.br/panorama-educacao-especial-2025/),
+a partir dos dados do Censo Escolar).
+
 Na prática, isso quer dizer que o professor da turma comum recebe, na mesma sala, alunos que aprendem de jeitos
 muito diferentes. Mais da metade desses alunos não tem acesso a turmas de AEE, então o que eles aprendem depende,
 em grande parte, da aula da turma. Adaptar a mesma aula à mão para cada necessidade multiplica o trabalho do professor a cada

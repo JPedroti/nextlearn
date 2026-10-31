@@ -1,5 +1,9 @@
 # Métricas de ensino da plataforma (v1, 30/10/2026)
 
+> **Pesquisa e brainstorm, anterior à versão final do produto.** O app mede só o que consegue medir de verdade:
+> acertos (na versão original e na adaptada), tempo por aula e uso dos apoios de leitura. O índice dos documentos
+> está em [README.md](README.md).
+
 > Público: alunos de 6 a 18 anos (fundamental I ao ensino médio), com os perfis funcionais P1–P8 de `docs/PERFIS_E_METRICAS.md`.
 > Convenção: **[LIT]** = parâmetro de estudo ou dado publicado · **[DUO]** = prática documentada pelo Duolingo · **[PRODUTO]** = valor inicial de projeto, a calibrar com dados.
 

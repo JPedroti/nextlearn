@@ -1,5 +1,9 @@
 # Tese de produto — Hackathon Teachy <> LEPV 2026
 
+> **Pesquisa e brainstorm, anterior à versão final do produto.** Esta primeira tese ("Elo") não foi seguida: a equipe
+> escolheu adaptar a mesma aula para cada aluno. O que vale para o NextLearn está em [contexto.md](contexto.md) e
+> [decisoes.md](decisoes.md); o índice dos documentos está em [README.md](README.md).
+
 > Versão 1 (brainstorm), 30/10/2026. Nome provisório: **Elo**.
 
 ## 1. A tese em uma frase

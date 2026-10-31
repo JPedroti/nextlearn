@@ -58,7 +58,7 @@ Faça commit do cronograma junto com o trabalho da vez.
 
 ## 3. Produto (v1.0)
 
-**Problema (Desafio 1 da Teachy, Inclusão e acessibilidade):** 96% dos alunos da educação especial estão em classes comuns. Só 6,4% dos professores têm formação continuada em educação especial. As matrículas de alunos no espectro autista cresceram 4,4x desde 2021 (Inep, Censo Escolar 2025). A pergunta da Teachy: *"É necessário adaptar o mesmo conteúdo N vezes dependendo do número de alunos?"*
+**Problema (Desafio 1 da Teachy, Inclusão e acessibilidade):** 96% dos alunos da educação especial estão em classes comuns. Só 6,4% dos professores regentes têm formação continuada em educação especial (dado de 2024, Instituto Rodrigo Mendes, Panorama da Educação Especial 2025). As matrículas de alunos no espectro autista cresceram 4,4x desde 2021 (Inep, Censo Escolar 2025). A pergunta da Teachy: *"É necessário adaptar o mesmo conteúdo N vezes dependendo do número de alunos?"*
 
 **Solução:** o professor prepara a aula **uma vez** e cada aluno recebe a **mesma aula**, no formato em que consegue aprender. É para a turma inteira, sem ninguém à parte, seguindo o Desenho Universal para a Aprendizagem (DUA). **Não é uma "plataforma só para neurodivergentes".** Evite essa formulação na interface e nos textos.
 

@@ -1,5 +1,9 @@
 # 5 ideias de negócio rentável em educação (30/10, 19h30)
 
+> **Pesquisa e brainstorm, anterior à versão final do produto.** A ideia 1 é a mais próxima do NextLearn, mas o
+> produto final não usa laudo nem perfis por diagnóstico. O que vale está em [contexto.md](contexto.md) e
+> [decisoes.md](decisoes.md); o índice dos documentos está em [README.md](README.md).
+
 Critérios: alguém com dinheiro e com dor paga · margem alta · demo viável até amanhã 12h · aderente a um desafio da Teachy. Preços são hipóteses a validar.
 
 ## 1. Adapta — acessibilidade como serviço para escolas e sistemas de ensino privados (Desafio 01)

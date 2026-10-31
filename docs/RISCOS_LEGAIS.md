@@ -1,5 +1,9 @@
 # Riscos legais e regulatórios no Brasil (v1, 31/10/2026)
 
+> **Pesquisa de base, anterior à versão final do produto.** O app seguiu as conclusões principais: sem laudo, dados
+> mínimos, o aluno não conversa com a IA e o professor aprova tudo. O índice dos documentos está em
+> [README.md](README.md).
+
 > Levantamento para o produto (plataforma para alunos neurodivergentes de 6 a 18 anos, vendida a escolas).
 > **Não é parecer jurídico.** Antes de operar com dados reais, validar com advogado de proteção de dados e educação.
 
