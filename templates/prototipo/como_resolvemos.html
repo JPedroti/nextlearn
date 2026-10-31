@@ -1,0 +1,41 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>{% include "prototipo/_cabeca.html" %}<title>Como o NextLearn resolve</title></head>
+<body class="pg-progresso tema-base">
+  <header class="topo">
+    <a href="{% url 'prototipo:entrada' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn</a>
+    <nav class="topo-direita"><a class="btn-contorno" href="{% url 'prototipo:login' %}?perfil=aluno">Entrar</a></nav>
+  </header>
+  <main class="pg">
+    <section class="pg-hero"><div><p class="pg-sobre">Para a banca</p><h1>Cada problema, o que a plataforma faz e onde ver funcionando</h1>
+      <p class="pg-sub">A mesma aula para a turma inteira. O professor escreve uma vez, a IA prepara no máximo 7 versões, ele aprova, e cada aluno recebe o formato que remove a sua barreira.</p></div></section>
+
+    <section class="pg-kpis">
+      <article class="kpi kpi-roxo"><p class="kpi-rot">Alunos da educação especial em classe comum</p><p class="kpi-val">96%</p><div class="kpi-pe"><span class="kpi-sub">Censo Escolar/Inep</span></div></article>
+      <article class="kpi kpi-laranja"><p class="kpi-rot">Professores com formação em educação especial</p><p class="kpi-val">6,4%</p><div class="kpi-pe"><span class="kpi-sub">Censo Escolar/Inep</span></div></article>
+      <article class="kpi kpi-verde"><p class="kpi-rot">Versões por aula, no máximo</p><p class="kpi-val">7</p><div class="kpi-pe"><span class="kpi-sub">3 apoios = 2³ − 1, aprovadas pelo professor</span></div></article>
+      <article class="kpi kpi-verde2"><p class="kpi-rot">Laudo exigido</p><p class="kpi-val">0</p><div class="kpi-pe"><span class="kpi-sub">Decreto 12.686/2025 proíbe exigir</span></div></article>
+    </section>
+
+    <section class="cartao-pg">
+      <table class="tabela-aulas">
+        <thead><tr><th>Problema</th><th>O que o NextLearn faz</th><th>Onde ver</th><th>Base</th></tr></thead>
+        <tbody>
+          <tr><td>O professor não tem tempo nem formação para adaptar a aula para cada aluno</td><td>Escreve a aula uma vez; a IA gera até 7 versões (foco, textual, concreto e combinações); gabarito e alternativas não mudam</td><td>Painel do professor → aula → gerar e aprovar versão</td><td>DUA; custo por aula, não por aluno</td></tr>
+          <tr><td>A IA pode errar ou "facilitar" a questão</td><td>Toda versão passa pela aprovação do professor; o prompt proíbe reduzir a exigência cognitiva ou entregar a resposta</td><td>Tela "Revisar versão" + <code>ia/blocos/base.md</code></td><td>Parecer CNE/CP 15/2026 (decisão humana)</td></tr>
+          <tr><td>O professor não sabe o que dificulta a aula para alunos neurodivergentes</td><td>Análise da aula: índice de acessibilidade com 9 critérios (frases, blocos, duração, uma instrução por questão, negação, linguagem literal, exemplo concreto, roteiro) + acerto por questão e uso da aula online</td><td>Entrar como professor → Análise das aulas</td><td>Kofler 2020; Filderman 2021; NCAEP 2020</td></tr>
+          <tr><td>Exigir laudo exclui quem não tem diagnóstico</td><td>O perfil vem de apoios marcados pelo professor e de um questionário simples da família; nada de diagnóstico</td><td>Família → questionário; professor → apoios</td><td>Decreto 12.686/2025; LGPD</td></tr>
+          <tr><td>Aluno com TDAH se perde em telas cheias</td><td>Modo missão: uma ação por vez, plano Agora → Depois → Por fim, resto recolhido; aula online com pausa a cada trecho</td><td>Área do aluno (perfil de foco)</td><td>Memória de trabalho d = 1,63–2,03 (Kofler 2020)</td></tr>
+          <tr><td>Aluno autista se desregula com imprevisto e estímulo</td><td>Modo agenda: rotina fixa, nada pisca ou se mexe, cores suaves</td><td>Área do aluno (foco + textual)</td><td>NCAEP 2020; guia GOV.UK</td></tr>
+          <tr><td>Aluno com dislexia trava na leitura</td><td>Modo leitura: ouvir cada bloco, letras espaçadas, fundo creme; aula online narrada com legenda que acompanha a voz</td><td>Área do aluno (textual) → Assistir a aula</td><td>Áudio d = 0,35 (Wood 2018); espaçamento +20% (Zorzi 2012)</td></tr>
+          <tr><td>Aluno com discalculia não "vê" o número</td><td>Modo visual: acertos em figura ("2 de 3"), exemplos concretos</td><td>Área do aluno (concreto)</td><td>Intervenções digitais 0,55 (Benavides-Varela 2020)</td></tr>
+          <tr><td>Família e escola não enxergam o progresso</td><td>Relatório com resumo em linguagem simples, gráficos, dias de estudo e sinais para o professor (pistas, nunca diagnóstico)</td><td>Área do aluno → Meu progresso</td><td>Métrica-norte: assuntos dominados e retidos</td></tr>
+          <tr><td>Gamificação e IA podem fazer mal a crianças</td><td>Sem ranking, sem loot box, ofensiva sem punição, limite diário com a família; o aluno não conversa com IA generativa (dúvidas só com respostas prontas)</td><td>Trilha e "Dúvidas com o Next"</td><td>ECA Digital (Lei 15.211/2025); LGPD arts. 11 e 14</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <p class="pg-nota">Dados do aluno de teste são fictícios e só existem na branch do protótipo; a demonstração oficial usa contas criadas ao vivo.</p>
+  </main>
+  <script src="{% static 'prototipo/brilho.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>{% include "prototipo/_cabeca.html" %}<title>Minhas aulas · análise</title></head>
+<body class="pg-progresso tema-base">
+  <header class="topo">
+    <a href="{% url 'prototipo:prof_aulas' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn · Professor</a>
+    <nav class="topo-direita"><a class="btn-contorno" href="{% url 'painel:inicio' %}">Painel completo</a>
+      <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form></nav>
+  </header>
+  <main class="pg">
+    <section class="pg-hero"><div><p class="pg-sobre">Análise das aulas</p><h1>O que deixaria cada aula mais acessível</h1>
+      <p class="pg-sub">Um índice de 0 a 100 a partir do texto e das questões, mais o que os alunos fizeram. São sugestões: quem decide é você.</p></div></section>
+    <section class="cartao-pg">
+      <table class="tabela-aulas">
+        <thead><tr><th>Aula</th><th>Índice de acessibilidade</th><th>O que melhorar primeiro</th><th></th></tr></thead>
+        <tbody>{% for l in linhas %}
+          <tr><td><strong>{{ l.assunto }}</strong><span class="mini"> · {{ l.materia }} · {{ l.aula.turma.nome }}</span></td>
+            <td><span class="indice {% if l.indice >= 75 %}bom{% elif l.indice >= 50 %}medio{% else %}baixo{% endif %}">{{ l.indice }}</span></td>
+            <td>{% for f in l.faltam %}<span class="chip">{{ f }}</span>{% empty %}<span class="chip ok">Tudo certo</span>{% endfor %}</td>
+            <td><a class="btn-contorno" href="{% url 'prototipo:prof_analise' l.aula.pk %}">Ver análise</a></td></tr>
+        {% empty %}<tr><td colspan="4">Nenhuma aula ainda. Crie uma no painel completo.</td></tr>{% endfor %}</tbody>
+      </table>
+    </section>
+  </main>
+  <script src="{% static 'prototipo/brilho.js' %}"></script>
+</body>
+</html>

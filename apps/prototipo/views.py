@@ -134,10 +134,10 @@ class Login(LoginView):
 
     def get_success_url(self):
         url = self.get_redirect_url()
-        if not url and self.request.user.papel == "aluno":
+        if not url and self.request.user.papel in ("aluno", "professor"):
             from django.urls import reverse
 
-            return reverse("prototipo:painel_aluno")
+            return reverse("prototipo:painel_aluno" if self.request.user.papel == "aluno" else "prototipo:prof_aulas")
         return url or super().get_success_url()
 
     def get_context_data(self, **kwargs):
@@ -908,3 +908,133 @@ def treino_concluido(request, tipo):
         feitas.append(timezone.now().isoformat())
         request.session["revisoes_feitas"] = feitas[-20:]
     return JsonResponse({"ok": True, "revisoes": len(request.session.get("revisoes_feitas", []))})
+
+
+# ---------------------------------------------------------------------------
+# Aula online (aluno): a aula narrada em trechos, com legenda que acompanha a voz, velocidade e pausas.
+# Se o texto da aula tiver um link do YouTube, o vídeo aparece em cima.
+# O uso (play, pausas, trechos repetidos) volta para o professor como sugestão (protótipo: cache; real: EventoUso).
+# ---------------------------------------------------------------------------
+def _trechos(texto):
+    import re
+
+    blocos = [b.strip() for b in re.split(r"\n\s*\n", texto) if b.strip()]
+    saida = []
+    for b in blocos:
+        if re.search(r"https?://\S+", b) and len(b.split()) < 4:
+            continue
+        frases = [f.strip() for f in re.split(r"(?<=[.!?])\s+", b) if f.strip()]
+        saida.append(frases)
+    return saida
+
+
+def _video_youtube(texto):
+    import re
+
+    m = re.search(r"(?:youtube\.com/watch\?v=|youtu\.be/)([\w-]{11})", texto)
+    return f"https://www.youtube-nocookie.com/embed/{m.group(1)}?cc_load_policy=1&hl=pt-BR" if m else None
+
+
+@papel_requerido("aluno")
+def aula_online(request, pk):
+    import json
+
+    from django.conf import settings
+    from django.http import Http404
+    from django.shortcuts import get_object_or_404
+
+    from apps.aulas.models import Aula
+    from apps.aulas.versoes import versao_para_aluno
+
+    aluno = _aluno_logado(request)
+    if not aluno:
+        raise Http404
+    aula = get_object_or_404(Aula, pk=pk, turma=aluno.turma, publicada=True)
+    conteudo, _ = versao_para_aluno(aula, aluno)
+    perfil = getattr(aluno, "perfil", None)
+    perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
+    a, tema, _ = _apoios_visuais(perfil, perfil_dev)
+    trechos = _trechos(conteudo)
+    return render(request, "prototipo/aula_online.html", {
+        "aula": aula, "materia": _materia(aula.titulo), "assunto": _assunto(aula.titulo), "trechos": trechos,
+        "trechos_json": json.dumps(trechos, ensure_ascii=False), "video": _video_youtube(aula.conteudo),
+        "tema": tema, "modo": modo_da_tela(a, perfil_dev), "foco": a["foco"], "textual": a["textual"], "limpo": a["limpo"],
+        "letras": a["letras"], "perfil_dev": perfil_dev,
+    })
+
+
+@papel_requerido("aluno")
+def aula_online_evento(request, pk):
+    import json
+
+    from django.core.cache import cache
+    from django.http import JsonResponse
+
+    if request.method != "POST":
+        return JsonResponse({"ok": False}, status=405)
+    try:
+        ev = json.loads(request.body or b"{}")
+    except ValueError:
+        ev = {}
+    chave = f"online-{pk}"
+    d = cache.get(chave) or {"plays": 0, "pausas": 0, "repeticoes": {}, "concluidas": 0, "segundos": 0}
+    tipo = ev.get("tipo")
+    if tipo == "play":
+        d["plays"] += 1
+    elif tipo == "pausa":
+        d["pausas"] += 1
+    elif tipo == "repetir":
+        k = str(int(ev.get("trecho", 0)))
+        d["repeticoes"][k] = d["repeticoes"].get(k, 0) + 1
+    elif tipo == "fim":
+        d["concluidas"] += 1
+        d["segundos"] += int(ev.get("segundos", 0))
+    cache.set(chave, d, 60 * 60 * 24 * 7)
+    return JsonResponse({"ok": True})
+
+
+# ---------------------------------------------------------------------------
+# Professor: análise de cada aula pensando nos alunos neurodivergentes
+# ---------------------------------------------------------------------------
+@papel_requerido("professor")
+def prof_aulas(request):
+    from apps.aulas.models import Aula
+
+    from .analise_aula import analisar
+
+    aulas = Aula.objects.filter(turma__professor=request.user).select_related("turma").prefetch_related("questoes").order_by("-criada_em")
+    linhas = []
+    for aula in aulas:
+        r = analisar(aula, list(aula.questoes.all()))
+        linhas.append({"aula": aula, "indice": r["indice"], "faltam": [c["nome"] for c in r["checagens"] if not c["ok"]][:3],
+                       "materia": _materia(aula.titulo), "assunto": _assunto(aula.titulo)})
+    return render(request, "prototipo/prof_aulas.html", {"linhas": linhas})
+
+
+@papel_requerido("professor")
+def prof_analise(request, pk):
+    from django.core.cache import cache
+    from django.shortcuts import get_object_or_404
+
+    from apps.aulas.models import Aula, Resposta
+    from apps.perfis.models import Perfil
+
+    from .analise_aula import analisar
+
+    aula = get_object_or_404(Aula.objects.select_related("turma"), pk=pk, turma__professor=request.user)
+    questoes = list(aula.questoes.all())
+    resp = list(Resposta.objects.filter(questao__aula=aula).select_related("aluno"))
+    por_q = [(q, [r.correta for r in resp if r.questao_id == q.pk]) for q in questoes]
+    mascaras = {p.aluno_id: p.mascara for p in Perfil.objects.filter(aluno__turma=aula.turma)}
+    grupos = {}
+    for r in resp:
+        grupos.setdefault(mascaras.get(r.aluno_id, 0), []).append(r.correta)
+    por_versao = {m: round(100 * sum(v) / len(v)) for m, v in grupos.items() if v}
+    r = analisar(aula, questoes, por_q, por_versao, cache.get(f"online-{pk}"))
+    return render(request, "prototipo/prof_analise.html", {"aula": aula, "r": r, "materia": _materia(aula.titulo),
+                                                           "assunto": _assunto(aula.titulo), "n_alunos": len({x.aluno_id for x in resp})})
+
+
+def como_resolvemos(request):
+    """Página para a banca: cada problema → o que a plataforma faz → onde ver funcionando → evidência."""
+    return render(request, "prototipo/como_resolvemos.html")

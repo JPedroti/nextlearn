@@ -1,0 +1,51 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>{% include "prototipo/_cabeca.html" %}<title>Análise · {{ assunto }}</title></head>
+<body class="pg-progresso tema-base">
+  <header class="topo">
+    <a href="{% url 'prototipo:prof_aulas' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn · Professor</a>
+    <nav class="topo-direita"><a class="btn-contorno" href="{% url 'prototipo:prof_aulas' %}">Todas as aulas</a><a class="btn-contorno" href="{% url 'aulas:editar' aula.pk %}">Editar aula</a><button class="btn-contorno" onclick="window.print()">Imprimir</button></nav>
+  </header>
+  <main class="pg">
+    <section class="pg-hero">
+      <div><p class="pg-sobre">Análise da aula · {{ materia }} · {{ aula.turma.nome }}</p><h1>{{ assunto }}</h1>
+        <p class="pg-sub">{{ r.palavras }} palavras · {{ r.frases }} frases · cerca de {{ r.minutos }} min · {{ n_alunos }} aluno{{ n_alunos|pluralize }} já responderam</p></div>
+      <div class="indice-grande {% if r.indice >= 75 %}bom{% elif r.indice >= 50 %}medio{% else %}baixo{% endif %}"><span>{{ r.indice }}</span><small>índice de acessibilidade</small></div>
+    </section>
+
+    <section class="cartao-pg">
+      <h2>Antes da aula: o texto e as questões</h2>
+      <ul class="checks">{% for c in r.checagens %}
+        <li class="{% if c.ok %}ok{% else %}melhorar{% endif %}">
+          <span class="ck-ico" aria-hidden="true">{% if c.ok %}✓{% else %}!{% endif %}</span>
+          <div><strong>{{ c.nome }}</strong> <span class="mini">· {{ c.valor }}</span>
+            {% if not c.ok %}<p class="ck-sug">{{ c.sugestao }}</p>{% endif %}
+            <p class="mini">Ajuda: {{ c.perfis }}</p></div>
+          <span class="ck-peso">{{ c.peso }} pts</span>
+        </li>{% endfor %}</ul>
+      {% if r.longas %}<details class="porque"><summary>Ver as frases mais longas</summary><ul>{% for f in r.longas %}<li>{{ f }}</li>{% endfor %}</ul></details>{% endif %}
+    </section>
+
+    <section class="pg-grade">
+      <article class="cartao-pg">
+        <h2>Depois da aula: acerto por questão</h2>
+        {% for d in r.dados %}<div class="barra-q"><span class="bq-rot">Questão {{ d.q }}</span><span class="bq-barra"><span style="width: {{ d.acerto }}%" class="{% if d.alerta %}alerta{% endif %}"></span></span><span class="bq-val">{{ d.acerto }}%</span></div>
+        {% empty %}<p class="vazio">Ainda ninguém respondeu.</p>{% endfor %}
+      </article>
+      <article class="cartao-pg">
+        <h2>Aula online</h2>
+        {% if r.online %}<ul class="pg-sinais um"><li class="sinal-neutro"><span class="pg-ponto"></span><div><strong>{{ r.online.plays|default:0 }} vez(es) assistida · {{ r.online.concluidas|default:0 }} até o fim</strong><p>{{ r.online.pausas|default:0 }} pausas · trechos repetidos: {% for k, v in r.online.repeticoes.items %}trecho {{ k|add:1 }} ({{ v }}×){% if not forloop.last %}, {% endif %}{% empty %}nenhum{% endfor %}</p></div></li></ul>
+        {% else %}<p class="vazio">Ninguém assistiu a versão online ainda.</p>{% endif %}
+      </article>
+    </section>
+
+    <section class="cartao-pg pg-resumo">
+      <h2>Sugestões para a próxima aula</h2>
+      <ol>{% for c in r.checagens %}{% if not c.ok %}<li>{{ c.sugestao }} <span class="mini">({{ c.perfis }})</span></li>{% endif %}{% endfor %}
+        {% for s in r.sugestoes_dados %}<li>{{ s }}</li>{% endfor %}</ol>
+      <p class="pg-nota">Sugestões, nunca decisão automática (Parecer CNE/CP 15/2026). Limites (ex.: 20 palavras por frase, 120 por bloco, 12 min) são valor de produto, a calibrar.</p>
+    </section>
+  </main>
+  <script src="{% static 'prototipo/brilho.js' %}"></script>
+</body>
+</html>

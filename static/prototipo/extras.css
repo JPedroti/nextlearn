@@ -1,0 +1,46 @@
+/* Aula online, análise do professor e página para a banca */
+.video { aspect-ratio: 16 / 9; border-radius: 22px; overflow: hidden; background: #000; }
+.video iframe { width: 100%; height: 100%; border: 0; }
+.player { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 20px; }
+.trechos { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; align-content: start; }
+.trechos button { width: 100%; min-height: 48px; display: flex; gap: 10px; align-items: center; padding: 8px 10px; border: 2px solid #E2E8F0; border-radius: 14px; background: #FFFFFF; color: #1E293B; font: inherit; font-size: .9rem; text-align: left; cursor: pointer; }
+.trechos button.ativo { border-color: #4F46E5; background: #EEF2FF; font-weight: 700; }
+.trechos button.feito .tr-num { background: #1E7B4A; color: #FFFFFF; }
+.tr-num { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 50%; background: #E2E8F0; font-weight: 700; font-size: .85rem; }
+.palco-aula { display: grid; gap: 14px; }
+.tr-rotulo { margin: 0; font-weight: 700; color: #4F46E5; }
+.legenda { min-height: 220px; padding: 22px; border-radius: 18px; background: #0F172A; color: #CBD5E1; font-size: 1.35rem; line-height: 1.6; }
+.legenda p { margin: 0 0 10px; transition: color .2s; }
+.legenda p.lida { color: #64748B; }
+.legenda p.atual { color: #FFFFFF; font-weight: 700; border-left: 4px solid #FACC15; padding-left: 12px; margin-left: -16px; }
+.barra-aula { height: 10px; border-radius: 999px; background: #E2E8F0; overflow: hidden; }
+.barra-aula span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #4F46E5, #0EA5E9); }
+.controles { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.controles .btn-missao { margin-top: 0; background: #4F46E5; color: #FFFFFF; }
+.vel { display: flex; align-items: center; gap: 8px; font-weight: 700; } .vel select { min-height: 44px; border-radius: 12px; padding: 0 10px; font: inherit; }
+.pausa-aviso { margin: 0; padding: 12px 14px; border-radius: 14px; background: #ECFDF5; color: #065F46; }
+.modo-leitura .legenda { font-size: 1.6rem; letter-spacing: .04em; } .modo-agenda .legenda p { transition: none; }
+
+.tabela-aulas { width: 100%; border-collapse: collapse; }
+.tabela-aulas th { text-align: left; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: #475569; padding: 10px; border-bottom: 2px solid #E2E8F0; }
+.tabela-aulas td { padding: 12px 10px; border-bottom: 1px solid #EEF2F6; vertical-align: top; }
+.indice { display: inline-grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; font-weight: 700; font-size: 1.1rem; color: #FFFFFF; }
+.indice.bom, .indice-grande.bom { background: #1E7B4A; } .indice.medio, .indice-grande.medio { background: #B45309; } .indice.baixo, .indice-grande.baixo { background: #B42318; }
+.chip { display: inline-block; margin: 2px 4px 2px 0; padding: 4px 10px; border-radius: 999px; background: #FEF3C7; color: #78350F; font-size: .8rem; font-weight: 700; }
+.chip.ok { background: #DCFCE7; color: #14532D; }
+.indice-grande { display: grid; place-items: center; width: 140px; height: 140px; border-radius: 50%; color: #FFFFFF; text-align: center; border: 6px solid rgba(255,255,255,.5); }
+.indice-grande span { font-size: 2.8rem; font-weight: 700; line-height: 1; } .indice-grande small { font-size: .72rem; max-width: 90px; }
+.checks { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.checks li { display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: start; padding: 12px 14px; border-radius: 16px; border: 1px solid #E2E8F0; background: #F8FAFC; }
+.checks li.melhorar { background: #FFFBEB; border-color: #FDE68A; }
+.ck-ico { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; font-weight: 700; color: #FFFFFF; background: #1E7B4A; }
+.melhorar .ck-ico { background: #B45309; }
+.ck-sug { margin: 4px 0 0; color: #1E293B; } .checks p.mini { margin: 2px 0 0; }
+.ck-peso { font-size: .78rem; color: #64748B; font-weight: 700; }
+.barra-q { display: grid; grid-template-columns: 90px 1fr 48px; gap: 10px; align-items: center; margin-top: 10px; }
+.bq-barra { height: 14px; border-radius: 999px; background: #E2E8F0; overflow: hidden; }
+.bq-barra span { display: block; height: 100%; background: #4F46E5; border-radius: 999px; } .bq-barra span.alerta { background: #E57A6B; }
+.bq-val { font-weight: 700; text-align: right; }
+.pg-sinais.um { grid-template-columns: 1fr; }
+.pg-resumo ol { margin: 10px 0 0; padding-left: 22px; display: grid; gap: 6px; }
+@media (max-width: 860px) { .player { grid-template-columns: 1fr; } .tabela-aulas { font-size: .9rem; } }

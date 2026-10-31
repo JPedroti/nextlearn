@@ -532,3 +532,6 @@ body.modo-agenda .mapa .no-atual .no-bt { box-shadow: 0 7px 0 var(--sombra), 0 0
 .nc-nota-mini { display: block; font-size: .8rem; font-weight: 700; opacity: .8; }
 .nc-visual .nc-nota { font-size: 1.5rem; line-height: 1.1; }
 .no-estrelas i:not(.cheia) { color: rgba(255,255,255,.95); text-shadow: 0 0 2px rgba(0,0,0,.35); }
+
+.btn-sec { background: rgba(255,255,255,.16) !important; color: #FFFFFF !important; border: 2px solid rgba(255,255,255,.6); margin-left: 8px; }
+body.modo-limpo .btn-sec { background: #FFFFFF !important; color: var(--destaque) !important; border-color: var(--destaque); }

@@ -1,0 +1,80 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>{% include "prototipo/_cabeca.html" %}<title>Aula online · {{ assunto }}</title></head>
+<body data-perfil-dev="{{ perfil_dev }}" class="pg-progresso modo-{{ modo }} tema-{{ tema }}{% if foco %} apoio-foco{% endif %}{% if limpo %} modo-limpo{% endif %}{% if letras %} letras-espacadas{% endif %}">
+  {% include "prototipo/_icones.html" %}
+  <header class="topo">
+    <a href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn</a>
+    <nav class="topo-direita"><a class="btn-contorno" href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}">Voltar à trilha</a></nav>
+  </header>
+  <main class="pg online">
+    {% csrf_token %}
+    <section class="pg-hero">
+      <div><p class="pg-sobre">Aula online · {{ materia }}</p><h1>{{ assunto }}</h1>
+        <p class="pg-sub">{{ trechos|length }} trecho{{ trechos|length|pluralize }} curtos · com legenda · você controla a velocidade{% if foco %} · pausa depois de cada trecho{% endif %}</p></div>
+    </section>
+    {% if video %}<div class="video"><iframe src="{{ video }}" title="Vídeo da aula" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>{% endif %}
+    <section class="player cartao-pg" aria-label="Aula narrada">
+      <ol class="trechos" data-lista-trechos>
+        {% for t in trechos %}<li><button type="button" data-ir-trecho="{{ forloop.counter0 }}"><span class="tr-num">{{ forloop.counter }}</span>{{ t.0|truncatewords:7 }}</button></li>{% endfor %}
+      </ol>
+      <div class="palco-aula">
+        <p class="tr-rotulo" data-rotulo>Trecho 1 de {{ trechos|length }}</p>
+        <div class="legenda" data-legenda aria-live="polite"></div>
+        <div class="barra-aula" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-barra><span></span></div>
+        <div class="controles">
+          <button type="button" class="btn-missao" data-play>▶ Assistir</button>
+          <button type="button" class="btn-contorno" data-repetir>⟲ Repetir trecho</button>
+          <button type="button" class="btn-contorno" data-proximo>Próximo trecho →</button>
+          <label class="vel">Velocidade <select data-vel><option value="0.75">0,75×</option><option value="0.9" {% if foco or textual %}selected{% endif %}>0,9×</option><option value="1" {% if not foco and not textual %}selected{% endif %}>1×</option><option value="1.2">1,2×</option></select></label>
+        </div>
+        <p class="pausa-aviso" data-pausa-aviso hidden>Trecho terminado. Respire. Quando quiser, toque em <strong>Próximo trecho</strong>.</p>
+        <p class="pg-nota" data-sem-voz hidden>Seu navegador não tem leitura em voz alta; a legenda avança sozinha.</p>
+      </div>
+    </section>
+    <p class="pg-nota">O professor recebe só números (pausas e trechos repetidos) para melhorar a aula. Nada do que você faz aqui vale nota.</p>
+  </main>
+  <script id="dados-trechos" type="application/json">{{ trechos_json|safe }}</script>
+  <script>
+  (function () {
+    var T = JSON.parse(document.getElementById("dados-trechos").textContent), foco = {{ foco|yesno:"true,false" }};
+    var i = 0, f = 0, tocando = false, inicio = Date.now(), voz = "speechSynthesis" in window;
+    var $ = function (s) { return document.querySelector(s); };
+    var leg = $("[data-legenda]"), play = $("[data-play]"), tk = document.querySelector("[name=csrfmiddlewaretoken]").value;
+    function ev(tipo, extra) { fetch(location.pathname + "evento/", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-CSRFToken": tk }, body: JSON.stringify(Object.assign({ tipo: tipo, trecho: i }, extra || {})) }); }
+    function mostrar() {
+      leg.innerHTML = "";
+      T[i].forEach(function (fr, k) { var p = document.createElement("p"); p.textContent = fr; if (k === f) p.className = "atual"; else if (k < f) p.className = "lida"; leg.appendChild(p); });
+      $("[data-rotulo]").textContent = "Trecho " + (i + 1) + " de " + T.length;
+      document.querySelectorAll("[data-ir-trecho]").forEach(function (b, k) { b.classList.toggle("ativo", k === i); b.classList.toggle("feito", k < i); });
+      var total = T.reduce(function (s, t) { return s + t.length; }, 0), feitas = T.slice(0, i).reduce(function (s, t) { return s + t.length; }, 0) + f;
+      $("[data-barra] span").style.width = (100 * feitas / total) + "%";
+    }
+    function falar() {
+      if (!tocando) return;
+      if (f >= T[i].length) {            // fim do trecho
+        if (i === T.length - 1) { tocando = false; play.textContent = "▶ Assistir de novo"; ev("fim", { segundos: Math.round((Date.now() - inicio) / 1000) }); return; }
+        if (foco) { tocando = false; play.textContent = "▶ Continuar"; $("[data-pausa-aviso]").hidden = false; return; }
+        i++; f = 0;
+      }
+      mostrar();
+      var texto = T[i][f];
+      if (voz) {
+        var u = new SpeechSynthesisUtterance(texto); u.lang = "pt-BR"; u.rate = parseFloat($("[data-vel]").value);
+        u.onend = function () { f++; falar(); };
+        speechSynthesis.speak(u);
+      } else { setTimeout(function () { f++; falar(); }, 600 + 60 * texto.split(" ").length / parseFloat($("[data-vel]").value)); }
+    }
+    function tocar() { $("[data-pausa-aviso]").hidden = true; if (f >= T[i].length) { if (i < T.length - 1) { i++; f = 0; } else { i = 0; f = 0; inicio = Date.now(); } } tocando = true; play.textContent = "❚❚ Pausar"; ev("play"); falar(); }
+    function pausar() { tocando = false; if (voz) speechSynthesis.cancel(); play.textContent = "▶ Continuar"; ev("pausa"); }
+    play.addEventListener("click", function () { tocando ? pausar() : tocar(); });
+    $("[data-repetir]").addEventListener("click", function () { if (voz) speechSynthesis.cancel(); f = 0; ev("repetir"); tocando = true; play.textContent = "❚❚ Pausar"; $("[data-pausa-aviso]").hidden = true; falar(); });
+    $("[data-proximo]").addEventListener("click", function () { if (voz) speechSynthesis.cancel(); if (i < T.length - 1) { i++; f = 0; } tocando = true; play.textContent = "❚❚ Pausar"; $("[data-pausa-aviso]").hidden = true; falar(); });
+    document.querySelectorAll("[data-ir-trecho]").forEach(function (b) { b.addEventListener("click", function () { if (voz) speechSynthesis.cancel(); tocando = false; i = +b.dataset.irTrecho; f = 0; play.textContent = "▶ Assistir"; mostrar(); }); });
+    if (!voz) $("[data-sem-voz]").hidden = false;
+    mostrar();
+  })();
+  </script>
+  <script src="{% static 'prototipo/brilho.js' %}"></script>
+</body>
+</html>

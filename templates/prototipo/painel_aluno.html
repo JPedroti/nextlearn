@@ -35,6 +35,7 @@
             <p class="missao-meta">{{ proxima.materia }} · {{ proxima.n_questoes }} questões{% if foco %} · um passo de cada vez{% endif %} ·
               prazo {% if proxima.dias_para_prazo == 0 %}hoje{% elif proxima.dias_para_prazo == 1 %}amanhã{% else %}em {{ proxima.dias_para_prazo }} dias{% endif %}</p>
             <a class="btn-missao" href="{% url 'aulas:ver' proxima.aula.pk %}">Começar fase</a>
+            <a class="btn-missao btn-sec" href="{% url 'prototipo:aula_online' proxima.aula.pk %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}">▶ Assistir a aula</a>
           {% else %}
             <h1 id="hoje-titulo">Oi, {{ aluno.usuario.first_name }}! Trilha em dia.</h1>
             <a class="btn-missao" href="{% url 'prototipo:treino' 'rapido' %}">Treinar 3 minutos</a>
