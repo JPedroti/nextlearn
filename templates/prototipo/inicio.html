@@ -4,6 +4,8 @@
 <h1 class="text-3xl font-bold">Protótipo de estrutura</h1>
 <p class="mt-2 max-w-2xl texto-suave">Use “Ver como” no topo para trocar os apoios. A mesma aula muda de formato e a paleta acompanha o apoio ligado.</p>
 
+<p class="mt-4"><a href="{% url 'prototipo:entrada' %}" class="botao">Ver a tela de entrada com o Next</a></p>
+
 <div class="mt-8 grid gap-4 md:grid-cols-3">
   <a href="{% url 'prototipo:aluno' %}?{{ qs }}" class="cartao cartao-link">
     <span class="rotulo">Aluno</span>

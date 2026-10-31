@@ -103,3 +103,16 @@ def familia(request):
     chaves = [k for k, ligado in (("foco", ctx["foco"]), ("textual", ctx["textual"]), ("concreto", ctx["concreto"])) if ligado] or ["base"]
     ctx["dicas"] = [dados.DICAS_FAMILIA[k] for k in chaves]
     return render(request, "prototipo/familia.html", ctx)
+
+
+CENAS = [
+    {"id": "deserto", "nome": "Deserto", "fala": "Aula longa demais? Eu divido em passos curtos, um de cada vez."},
+    {"id": "gelo", "nome": "Gelo", "fala": "Texto difícil? Eu deixo as frases curtas, simples e diretas."},
+    {"id": "agua", "nome": "Água", "fala": "Ideia abstrata? Eu trago um exemplo do dia a dia para você enxergar."},
+    {"id": "espaco", "nome": "Espaço", "fala": "Prefere ouvir? Eu leio a aula em voz alta para você."},
+]
+
+
+def entrada(request):
+    """Tela de entrada com o mascote Next. Os botões levam ao login real (contas:entrar)."""
+    return render(request, "prototipo/entrada.html", {"cenas": CENAS})

@@ -213,3 +213,9 @@ Registro cronológico e literal dos prompts que Thiago enviou à IA durante o ha
 > Não consegui abriri o site local, me ajude nisso por favor
 
 **Resumo da resposta da IA:** O `.env` local não tinha `DEBUG`/`SECRET_KEY`, o que faz o Django parar ao iniciar; completou o `.env` (fora do Git) e passou o passo a passo para rodar no Windows (venv, dependências, migrate, runserver) na branch do protótipo.
+
+## Prompt 25 — 31/10/2026, 02:34 (BRT) — autor: Thiago — ferramenta: Claude
+
+> Agora eu vou descrever como a interface vai funcionar, Ela deve ser extremamente minimalista. Quero que elemnte visual de um mascote, deve ser um camaleao chamado next. A princípio, deve haver uma área de login, nessa área terá o mascote em destaque, com algumas falas do que ele é capaz de fazer. As cores do mascoste devem alternar juntos com os baloes, mostrando que ele se adapta a qualquer situação, entao pode mudar os cenarios tambem, pode colocar o mascote no deserto, no gelo, na agua, no espaço e as cores devem combinar. Isso é só o ambiente de login, no canto superior direito deve ter o botao de cadastro e login. Ao aperta-lo deve aparecer as opceos de login como professor (pedagogico), como aluno ou como familiar. (Incluse nao sei muito bem como isso conversa com o backend)
+
+**Resumo da resposta da IA:** Criou a tela de entrada do protótipo com o camaleão Next (desenho próprio em SVG) trocando de cor junto com o cenário (deserto, gelo, água, espaço) e os balões de fala, botão Entrar/Cadastrar no canto com as três opções de perfil, botão de pausar a animação; explicou como isso se liga ao login único por papel do Django.

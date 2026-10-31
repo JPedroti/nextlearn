@@ -22,6 +22,6 @@ if errorlevel 1 (
 echo === 3/4 Banco de dados local ===
 python manage.py migrate
 echo === 4/4 Servidor: deixe esta janela aberta. Para parar, feche a janela. ===
-start "" http://127.0.0.1:8000/prototipo/
+start "" http://127.0.0.1:8000/prototipo/entrar/
 python manage.py runserver
 pause
