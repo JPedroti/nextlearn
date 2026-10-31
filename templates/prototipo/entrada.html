@@ -3,107 +3,131 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NextLearn · Entrar</title>
+  <title>NextLearn · A mesma aula, no jeito de cada um</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/entrada.css' %}">
 </head>
-<body>
-  <div class="palco" data-cena="deserto">
+<body data-cena="deserto">
 
-    <header class="topo">
-      <a href="{% url 'prototipo:entrada' %}" class="marca">NextLearn</a>
-      <div class="acoes">
-        <button type="button" class="btn-fantasma" data-abrir="cadastro">Cadastrar</button>
-        <button type="button" class="btn-cheio" data-abrir="entrar">Entrar</button>
+  <header class="topo">
+    <a href="{% url 'prototipo:entrada' %}" class="marca">NextLearn</a>
+    <div class="acoes">
+      <button type="button" class="btn-fantasma" data-abrir="cadastro">Cadastrar</button>
+      <button type="button" class="btn-cheio" data-abrir="entrar">Entrar</button>
+    </div>
+  </header>
+
+  <!-- 1. História guiada pelo scroll (palco fixo enquanto a seção rola) -->
+  <section class="historia" aria-label="Apresentação do Next">
+    <div class="palco">
+      <div class="ceu"></div>
+      <div class="decor" aria-hidden="true">
+        <div class="decor-deserto"><span class="sol"></span></div>
+        <div class="decor-gelo"><span class="lua-fria"></span></div>
+        <div class="decor-agua"><span class="sol sol-claro"></span></div>
+        <div class="decor-espaco"><span class="planeta"></span><span class="estrelas"></span></div>
       </div>
-    </header>
 
-    <main class="centro">
-      <div class="cena" aria-hidden="true">
-        <svg class="fundo" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid slice">
-          <!-- Deserto -->
-          <g class="camada camada-deserto">
-            <circle cx="640" cy="110" r="52" fill="#F2B544"/>
-            <path d="M0 360 C140 300 260 320 400 350 C540 380 660 330 800 350 V480 H0Z" fill="#E7C08A"/>
-            <path d="M0 410 C160 370 300 390 460 410 C600 428 700 400 800 405 V480 H0Z" fill="#D4A46A"/>
-            <path d="M120 360 v-70 a14 14 0 0 1 28 0 v70 M120 320 h-18 v-24 a9 9 0 0 1 18 0 M148 330 h18 v-20 a9 9 0 0 0 -18 0" fill="#7C9A5B"/>
-          </g>
-          <!-- Gelo -->
-          <g class="camada camada-gelo">
-            <path d="M0 380 L120 230 L210 330 L330 200 L470 360 L560 260 L680 350 L800 240 V480 H0Z" fill="#CFE5F2"/>
-            <path d="M330 200 L370 246 L345 240 L330 262 L312 236 L292 246Z M120 230 L150 266 L128 262 L110 280 L104 252Z" fill="#FFFFFF"/>
-            <path d="M0 420 C200 400 400 430 800 410 V480 H0Z" fill="#E9F4FA"/>
-            <g fill="#FFFFFF"><circle cx="90" cy="90" r="4"/><circle cx="260" cy="60" r="3"/><circle cx="520" cy="110" r="4"/><circle cx="700" cy="70" r="3"/><circle cx="420" cy="40" r="3"/></g>
-          </g>
-          <!-- Água -->
-          <g class="camada camada-agua">
-            <path d="M0 140 C100 120 200 160 300 140 C400 120 500 160 600 140 C700 120 760 150 800 140 V480 H0Z" fill="#7CC3CC"/>
-            <path d="M0 260 C120 240 240 280 360 260 C480 240 600 280 800 255 V480 H0Z" fill="#4FA3AF"/>
-            <path d="M80 480 C70 430 100 410 88 360 M110 480 C120 440 96 420 112 380 M690 480 C680 440 710 420 700 370" stroke="#2E7D5B" stroke-width="10" stroke-linecap="round" fill="none"/>
-            <g fill="none" stroke="#FFFFFF" stroke-width="3" opacity=".8"><circle cx="560" cy="210" r="9"/><circle cx="580" cy="180" r="6"/><circle cx="570" cy="150" r="4"/><circle cx="220" cy="230" r="7"/></g>
-          </g>
-          <!-- Espaço -->
-          <g class="camada camada-espaco">
-            <rect width="800" height="480" fill="#1E2247"/>
-            <g fill="#FFFFFF"><circle cx="60" cy="60" r="2"/><circle cx="180" cy="120" r="1.5"/><circle cx="300" cy="40" r="2"/><circle cx="460" cy="90" r="1.5"/><circle cx="740" cy="200" r="2"/><circle cx="620" cy="40" r="1.5"/><circle cx="90" cy="300" r="1.5"/><circle cx="520" cy="300" r="2"/><circle cx="380" cy="180" r="1.5"/></g>
-            <circle cx="650" cy="130" r="56" fill="#6B5FD3"/>
-            <ellipse cx="650" cy="130" rx="92" ry="18" fill="none" stroke="#B9B0F5" stroke-width="5"/>
-            <circle cx="130" cy="170" r="22" fill="#D9DAE8"/>
-            <path d="M0 430 C200 410 600 450 800 425 V480 H0Z" fill="#2C3166"/>
-          </g>
+      <div class="mundo" aria-hidden="true">
+        <svg class="terreno" viewBox="0 0 1600 1000" preserveAspectRatio="none">
+          <path class="chao-fundo" d="M0 60 C300 20 700 70 1000 40 C1250 15 1450 50 1600 40 V1000 H0Z"/>
+          <path class="chao" d="M0 120 C400 90 900 140 1440 110 L1520 112 L1530 1000 H0Z"/>
+          <path class="borda" d="M1520 112 L1530 1000" stroke-width="8"/>
         </svg>
-
-        <svg class="next" viewBox="0 0 320 220" role="img" aria-label="Next, o camaleão do NextLearn">
-          <rect class="galho" x="16" y="176" width="296" height="12" rx="6"/>
-          <path class="pele" d="M74 172 C40 172 26 150 34 132 C42 114 66 114 72 128 C78 140 66 150 58 144" fill="none" stroke-width="13" stroke-linecap="round"/>
-          <path class="pele-escura" d="M112 150 L100 180 M196 150 L210 180" stroke-width="12" stroke-linecap="round" fill="none"/>
-          <path class="pele" d="M70 126 C68 88 116 66 166 72 C214 78 246 100 252 128 C255 146 240 156 218 156 L106 156 C84 156 71 144 70 126Z"/>
-          <path class="pele-escura" d="M96 92 l10 -12 l10 10 l10 -12 l10 10 l10 -12 l10 10 l10 -10 l10 10" fill="none" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
-          <g class="pele-escura-fill"><circle cx="130" cy="120" r="7" opacity=".45"/><circle cx="158" cy="108" r="5" opacity=".45"/><circle cx="178" cy="130" r="6" opacity=".45"/></g>
-          <path class="pele" d="M204 82 C236 72 270 94 274 122 C276 138 264 150 246 152 L210 154Z"/>
-          <circle class="pele-escura-fill" cx="242" cy="110" r="18"/>
-          <circle cx="242" cy="110" r="11" fill="#FFFFFF"/>
-          <circle class="pupila" cx="246" cy="110" r="5" fill="#1F2933"/>
-          <path d="M252 136 Q264 138 270 129" stroke="#1F2933" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <path class="pele-escura" d="M200 160 l-6 12 M216 160 l-2 13 M116 160 l-8 12 M128 160 l-2 13" stroke-width="5" stroke-linecap="round" fill="none"/>
-        </svg>
-      </div>
-
-      <div class="balao" role="status" aria-live="polite">
-        <p class="balao-nome">Next</p>
-        <p class="balao-fala" data-fala>{{ cenas.0.fala }}</p>
-      </div>
-
-      <h1 class="titulo">A mesma aula para a turma inteira.<br>No jeito de cada um aprender.</h1>
-
-      <div class="controles">
-        <div class="pontos" role="group" aria-label="Escolher cenário">
-          {% for c in cenas %}
-            <button type="button" class="ponto" data-ir="{{ forloop.counter0 }}" aria-label="{{ c.nome }}" {% if forloop.first %}aria-current="true"{% endif %}></button>
-          {% endfor %}
+        <div class="enfeites">
+          <span class="enf enf-deserto e1"></span><span class="enf enf-deserto e2"></span>
+          <span class="enf enf-gelo e1"></span><span class="enf enf-gelo e2"></span>
+          <span class="enf enf-agua e1"></span><span class="enf enf-agua e2"></span>
+          <span class="enf enf-espaco e1"></span><span class="enf enf-espaco e2"></span>
         </div>
-        <button type="button" class="pausa" data-pausa aria-pressed="false">Pausar</button>
+        <div class="mar"><span class="onda"></span></div>
+        <div class="respingo"><span></span><span></span><span></span></div>
       </div>
-    </main>
-  </div>
+
+      <div class="submerso" aria-hidden="true">
+        <span class="raio r1"></span><span class="raio r2"></span><span class="raio r3"></span>
+        <span class="bolha b1"></span><span class="bolha b2"></span><span class="bolha b3"></span><span class="bolha b4"></span>
+      </div>
+
+      <div class="ator" data-pose="passos" aria-hidden="true">{% include "prototipo/_next.html" %}</div>
+
+      <div class="hero">
+        <div class="balao" role="status" aria-live="polite">
+          <p class="balao-nome">Next</p>
+          <p class="balao-fala" data-fala>{{ cenas.0.fala }}</p>
+        </div>
+        <h1 class="titulo">A mesma aula para a turma inteira.<br>No jeito de cada um aprender.</h1>
+        <div class="controles">
+          <div class="pontos" role="group" aria-label="Escolher o que o Next mostra">
+            {% for c in cenas %}<button type="button" class="ponto" data-ir="{{ forloop.counter0 }}" aria-label="{{ c.nome }}" {% if forloop.first %}aria-current="true"{% endif %}></button>{% endfor %}
+          </div>
+          <button type="button" class="pausa" data-pausa aria-pressed="false">Pausar</button>
+        </div>
+        <p class="dica-rolar">Role para saber mais ↓</p>
+      </div>
+
+      <p class="frase-mar">Um mar de<br>conhecimento</p>
+    </div>
+  </section>
+
+  <!-- 2. Saiba mais: o Next nada pelo canto direito -->
+  <section class="saiba" id="saiba-mais" aria-labelledby="saiba-titulo">
+    <div class="saiba-grade">
+      <div class="saiba-texto">
+        <h2 id="saiba-titulo">Saiba mais</h2>
+        <p class="saiba-lead">O professor prepara a aula uma vez. Cada aluno recebe a mesma aula no formato em que aprende melhor.</p>
+
+        <article class="etapa">
+          <span class="etapa-num">1</span>
+          <h3>O professor escreve a aula</h3>
+          <p>Texto e questões de múltipla escolha, uma única vez, para a turma inteira.</p>
+        </article>
+        <article class="etapa">
+          <span class="etapa-num">2</span>
+          <h3>A família conta como é o dia a dia</h3>
+          <p>Seis perguntas simples, sem laudo e sem diagnóstico. As respostas viram sugestões de apoio.</p>
+        </article>
+        <article class="etapa">
+          <span class="etapa-num">3</span>
+          <h3>O professor escolhe os apoios</h3>
+          <p>Atenção e foco, linguagem simples, exemplos concretos. Nada muda sem a aprovação dele.</p>
+        </article>
+        <article class="etapa">
+          <span class="etapa-num">4</span>
+          <h3>A IA adapta, o professor aprova</h3>
+          <p>Uma versão para cada combinação de apoios da turma. As alternativas e o gabarito continuam os do professor.</p>
+        </article>
+        <article class="etapa">
+          <span class="etapa-num">5</span>
+          <h3>Cada aluno aprende do seu jeito</h3>
+          <p>Passos curtos, letras espaçadas, leitura em voz alta. Ninguém fica à parte da turma.</p>
+        </article>
+
+        <button type="button" class="btn-cheio btn-grande" data-abrir="entrar">Entrar no NextLearn</button>
+      </div>
+      <div class="saiba-next" aria-hidden="true">
+        <div class="nadador" data-pose="nadar">{% include "prototipo/_next.html" %}</div>
+      </div>
+    </div>
+  </section>
 
   <dialog class="janela" data-janela aria-labelledby="janela-titulo">
     <form method="dialog" class="fechar-form"><button class="fechar" aria-label="Fechar">×</button></form>
     <h2 id="janela-titulo" data-titulo>Entrar como</h2>
     <p class="janela-sub" data-sub>Escolha quem você é. Depois é só usuário e senha.</p>
     <ul class="opcoes">
-      <li><a class="opcao-papel" href="{% url 'contas:entrar' %}?perfil=professor" data-papel="professor">
+      <li><a class="opcao-papel" href="{% url 'contas:entrar' %}?perfil=professor">
         <span class="papel-nome">Professor(a)</span>
         <span class="papel-desc" data-desc-entrar>Prepare a aula uma vez. Revise as versões e os apoios da turma.</span>
         <span class="papel-desc" data-desc-cadastro hidden>O acesso de professor é criado pela escola. Peça à coordenação.</span>
       </a></li>
-      <li><a class="opcao-papel" href="{% url 'contas:entrar' %}?perfil=aluno" data-papel="aluno">
+      <li><a class="opcao-papel" href="{% url 'contas:entrar' %}?perfil=aluno">
         <span class="papel-nome">Aluno(a)</span>
         <span class="papel-desc" data-desc-entrar>Veja suas aulas no formato que ajuda você a aprender.</span>
         <span class="papel-desc" data-desc-cadastro hidden>Seu professor cria o seu usuário e a primeira senha.</span>
       </a></li>
-      <li><a class="opcao-papel" href="{% url 'contas:entrar' %}?perfil=familia" data-papel="familia">
+      <li><a class="opcao-papel" href="{% url 'contas:entrar' %}?perfil=familia">
         <span class="papel-nome">Família</span>
         <span class="papel-desc" data-desc-entrar>Conte como é o dia a dia de estudo e acompanhe os apoios.</span>
         <span class="papel-desc" data-desc-cadastro hidden>O professor cria o acesso da família junto com o do aluno.</span>
@@ -111,7 +135,7 @@
     </ul>
   </dialog>
 
-  <script id="dados-cenas" type="application/json">[{% for c in cenas %}{"id":"{{ c.id }}","fala":"{{ c.fala|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]</script>
+  <script id="dados-cenas" type="application/json">[{% for c in cenas %}{"id":"{{ c.id }}","pose":"{{ c.pose }}","fala":"{{ c.fala|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]</script>
   <script src="{% static 'prototipo/entrada.js' %}"></script>
 </body>
 </html>
