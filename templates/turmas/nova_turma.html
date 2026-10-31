@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block titulo %}Nova turma · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'painel:inicio' %}" class="voltar">← Minhas turmas</a>
+<div class="cartao max-w-lg mt-3">
+  <h1 class="text-2xl font-semibold mb-4">Nova turma</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% include "_campo.html" with campo=form.nome %}
+    <button type="submit" class="btn">Criar turma</button>
+  </form>
+</div>
+{% endblock %}

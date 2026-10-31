@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ aula.titulo }} · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'aulas:inicio' %}" class="voltar">← Minhas aulas</a>
+<h1 class="text-2xl font-semibold mt-3 mb-4">{{ aula.titulo }}</h1>
+
+<article class="cartao mb-8 text-lg leading-relaxed space-y-4">{{ conteudo|linebreaks }}</article>
+
+<h2 class="text-xl font-semibold mb-3">Questões</h2>
+
+{% if respondida %}
+  <p class="mb-4 font-medium">Você acertou {{ acertos }} de {{ itens|length }}.</p>
+  {% for item in itens %}
+    <div class="cartao mb-4">
+      <p class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</p>
+      <ul class="space-y-1">
+        {% for alternativa in item.questao.alternativas %}
+          {% with escolhida=item.resposta.indice_escolhido correta=item.questao.indice_correto %}
+            <li class="rounded px-2 py-1 {% if forloop.counter0 == correta %}bg-green-50 text-green-900{% elif forloop.counter0 == escolhida %}bg-red-50 text-red-900{% endif %}">
+              {{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}
+              {% if forloop.counter0 == escolhida %}· sua resposta{% endif %}
+              {% if forloop.counter0 == correta %}· correta{% endif %}
+            </li>
+          {% endwith %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endfor %}
+{% else %}
+  <form method="post">
+    {% csrf_token %}
+    {% for item in itens %}
+      <fieldset class="cartao mb-4">
+        <legend class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</legend>
+        {% for alternativa in item.questao.alternativas %}
+          <label class="flex items-start gap-2 rounded px-2 py-1 hover:bg-slate-50">
+            <input type="radio" name="questao_{{ item.questao.pk }}" value="{{ forloop.counter0 }}" required class="mt-1.5">
+            <span>{{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}</span>
+          </label>
+        {% endfor %}
+      </fieldset>
+    {% endfor %}
+    <button type="submit" class="btn">Enviar respostas</button>
+  </form>
+{% endif %}
+{% endblock %}
