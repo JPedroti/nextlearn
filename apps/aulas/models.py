@@ -100,3 +100,25 @@ class EventoUso(models.Model):
 
     def __str__(self):
         return f"{self.aluno} — {self.get_tipo_display()}"
+
+
+class FeedbackVersao(models.Model):
+    """Avaliação do professor sobre uma versão adaptada. Alimenta as métricas de eficácia dos apoios."""
+
+    versao = models.ForeignKey(VersaoAdaptada, on_delete=models.CASCADE, related_name="feedbacks")
+    professor = models.ForeignKey(
+        "contas.Usuario", on_delete=models.CASCADE, related_name="feedbacks_dados",
+        limit_choices_to={"papel": "professor"},
+    )
+    nota = models.PositiveSmallIntegerField(
+        help_text="1 (ruim) a 5 (excelente)",
+        choices=[(i, str(i)) for i in range(1, 6)],
+    )
+    comentario = models.TextField(blank=True, help_text="O que funcionou bem ou mal nesta versão.")
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+
+    def __str__(self):
+        return f"Nota {self.nota} para {self.versao}"
