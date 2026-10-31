@@ -380,7 +380,7 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 > Relatório da família e sugestões por padrão de erro. R: Manter e corrigir.
 > O comando `criar_aula_demo` cria professor e alunos de mentira, o que o CLAUDE.md proíbe. R: Apagar o comando e passar a aula para um texto que o professor cola no app (`docs/aula_exemplo.md`).
 
-**Resumo da resposta da IA:** _(preencher ao final)_
+**Resumo da resposta da IA:** fez o plano (8 blocos) e começou a executar: nome "João" no repositório e nos próximos commits; histórico do Thiago trazido para a `main` sem o protótipo. No meio, o Cauã enviou bastante trabalho; a IA revisou cada envio, perguntou ao João o que mudava decisões do `CLAUDE.md` e aplicou as respostas acima, mantendo os blocos pedagógicos e as 9 perguntas do Cauã. Também consertou bugs encontrados nesses envios (relatório com conta errada, tempo multiplicado, aula de uma questão que não enviava). A execução seguiu no prompt 37.
 
 ---
 
@@ -388,6 +388,6 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 
 > Antes de continuar, quero que voce faça tudo de modo automático, isto é, que eu não precise interagir com você enquanto voce estiver executando o planejamento do prompt anterior. Entendido? Pode continuar o que estava fazendo quando te interrompi
 
-**Resumo da resposta da IA:** _(preencher ao final)_
+**Resumo da resposta da IA:** seguiu o plano sem novas perguntas, decidindo pelo `CLAUDE.md`. Fez: texto em passos para o apoio de foco; aviso e botão desligado quando não há chave de IA; páginas de erro em português; junção do cliente de IA com vários provedores do Cauã (faltava a biblioteca `openai`); correção da barra de apoios e da tela de login (dicas de contas de mentira); fonte pública do 6,4% (Instituto Rodrigo Mendes); índice `docs/README.md` com aviso nos rascunhos antigos; README, arquitetura e decisões atualizados; rascunhos do roteiro do vídeo e da base do plano de negócio; testes automáticos no GitHub. Conferiu o app no navegador (computador e celular) e em modo de produção. 120 testes passando; tudo publicado na `main`.
 
 ---

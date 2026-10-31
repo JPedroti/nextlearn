@@ -1,0 +1,24 @@
+# Roda os testes automatizados a cada envio para a main e em cada pull request.
+# Não precisa de segredo nenhum: nos testes, a chamada à IA é simulada e o banco é um SQLite temporário.
+name: Testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
+      - name: Rodar os testes
+        run: python manage.py test
+        env:
+          DEBUG: "True"

@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 06:58 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 07:24 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -36,7 +36,8 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 | 4. Família (questionário → apoios sugeridos → revisão do professor) | João | ✅ | 9 perguntas definitivas do Cauã ✅. Testar no ar |
 | 5. Painel (acertos, adaptações usadas, sugestões de ajuste de perfil) | João | ✅ | Testar no ar com respostas reais da equipe |
 | Extras do Cauã (madrugada) | Cauã (revisados pelo João) | ✅ | Nova aula a partir de PDF, relatório da família, página de cada aluno para o professor, sugestão de apoio pelos acertos, visual novo. Corrigidos às 06h30–06h55 (ver registro) |
-| Docs finais | João | 🔄 | Atualizar `README.md`, `docs/arquitetura.md` e `docs/decisoes.md` com as mudanças da manhã; índice de `docs/` |
+| Docs finais | João | ✅ · ⚠️ | `README.md` (com macOS/Linux e teste em 5 minutos), `docs/arquitetura.md`, `docs/decisoes.md` e o índice `docs/README.md` atualizados às 07h10. Falta o link do deploy no README e rever os docs se o código mudar de novo |
+| Testes automáticos no GitHub | João | ✅ | `.github/workflows/testes.yml` roda os 120 testes a cada envio para a `main` (aba Actions do GitHub) |
 
 **Ordem de corte se atrasar:** (1) sugestões do painel → (2) questionário da família (o professor marca os apoios) →
 (3) modo limpo. As fatias 0, 1 e 2 não podem ser cortadas.
@@ -67,7 +68,8 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 - ✅ 9 perguntas do questionário da família (3 por apoio), com campo de observações. **Mudança (decisão do João, 06h30):** as observações da família ficam só para o professor ler e **não vão para a IA**, como manda a regra de privacidade do `CLAUDE.md` (a família pode escrever um diagnóstico, que é dado sensível de criança). Pelo mesmo motivo saiu o histórico do aluno que ia para o prompt
 - ✅ Aula de exemplo (equações do 2º grau) em `docs/aula_exemplo.md`. **Mudança (decisão do João, 06h45):** o comando `criar_aula_demo` foi apagado, porque criava professor e alunos de mentira (Daniel e Talita), o que o `CLAUDE.md` proíbe; na demo, o professor cola a aula no app
 - ✅ Nova aula via PDF (corrigida: faltava a biblioteca e a aula não era salva), relatório da família, página do aluno para o professor, sugestão por acertos, modo concentração, visual novo e IA com vários provedores
-- ⏳ Roteiro e narração do vídeo
+- 🔄 Roteiro e narração do vídeo: rascunho de roteiro de telas em `docs/roteiro_demo.md`, para adaptar
+- ⚠️ No histórico dele, os prompts 09 e 10 estão com horário estimado ("~07:10", "~07:25"); trocar pelo horário real do relógio, como pede a seção 9 do `CLAUDE.md`
 
 ### Gabriel (Negócio: plano de negócio, edição do vídeo)
 
@@ -76,6 +78,9 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 07:24 — Testes automáticos no GitHub (`.github/workflows/testes.yml`). Tela de login sem as dicas de usuários e senha de contas de mentira. App conferido em modo de produção (`DEBUG` desligado): arquivos estáticos, página 404 em português e todas as migrações num banco novo. 120 testes passando.
+- 31/10, 07:12 — Rascunhos de `docs/roteiro_demo.md` (roteiro de telas do vídeo) e `docs/plano_negocio.md` (base do plano de negócio, só com números de fonte conferida).
+- 31/10, 07:05 — Documentos organizados para a banca: índice `docs/README.md` e aviso no topo dos rascunhos antigos; fonte pública do 6,4% (Instituto Rodrigo Mendes); README, arquitetura e decisões atualizados. Barra de apoios voltou a mudar de cor na hora.
 - 31/10, 06:58 — Juntados os envios do Cauã das 06h46 (IA com Gemini ou API compatível com a OpenAI) e 06h55 (visual novo dos painéis e do login). Acrescentada a biblioteca `openai` (faltava), `IA_PROVEDOR` no `render.yaml` e aviso de IA não configurada para os dois provedores. 119 testes passando.
 - 31/10, 06:50 — Tela do aluno: versão com apoio de foco em passos; aula com uma questão volta a poder ser enviada; sem JavaScript tudo funciona. Painel individual: tempo deixou de ser multiplicado pelo número de questões. Páginas de erro em português. Sem chave de IA, o botão "Gerar com IA" fica desligado com aviso.
 - 31/10, 06:45 — Comando `criar_aula_demo` apagado (criava alunos de mentira); aula de exemplo em `docs/aula_exemplo.md`.

@@ -137,7 +137,8 @@ Para gerar versões com IA no seu computador, coloque a chave em `GEMINI_API_KEY
 python manage.py test
 ```
 
-São 119 testes, em `tests/`. A chamada à IA é simulada, então não precisam de chave nem de internet.
+São 120 testes, em `tests/`. A chamada à IA é simulada, então não precisam de chave nem de internet.
+No GitHub, eles rodam sozinhos a cada envio para a `main` ([.github/workflows/testes.yml](.github/workflows/testes.yml)).
 
 ## Variáveis de ambiente
 

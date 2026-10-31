@@ -38,7 +38,7 @@ flowchart LR
 | `ia/` | Motor de IA: blocos do prompt (`blocos/*.md`), montagem do prompt, chamada ao provedor (Gemini ou API compatível com a da OpenAI, em `cliente.py`) e geração com cache |
 | `templates/` | Páginas HTML (Django templates + Tailwind), inclusive as páginas de erro 403, 404 e 500 |
 | `static/` | CSS das preferências e os scripts da barra de apoios, da leitura em voz alta e da navegação da aula (`aula.js`) |
-| `tests/` | Testes automatizados (119) |
+| `tests/` | Testes automatizados (120), que também rodam no GitHub a cada envio (`.github/workflows/testes.yml`) |
 
 ## Modelo de dados
 
@@ -151,11 +151,11 @@ Sem chave de IA configurada, a tela da aula avisa e o botão "Gerar com IA" fica
 
 ## Testes
 
-`python manage.py test` roda 119 testes, em `tests/`:
+`python manage.py test` roda 120 testes, em `tests/`:
 
 | Arquivo | O que confere |
 |---|---|
-| `test_contas.py`, `test_fatia1.py` | Login e papéis; turma, aula e correção pelo gabarito do professor |
+| `test_contas.py`, `test_fatia1.py` | Login e papéis (e a tela de entrar sem dicas de usuário ou senha); turma, aula e correção pelo gabarito do professor |
 | `test_fatia2.py` | Máscara, montagem do prompt, cache, gabarito intocado pela IA, aprovação, aviso sem chave |
 | `test_fatia3.py`, `test_fatia4.py`, `test_fatia5.py` | Preferências de tela e registro de uso; questionário e sugestões; painel e sugestões pelo uso |
 | `test_privacidade_ia.py` | Observações da família e dados do aluno nunca chegam à IA; cache e aprovação preservados |
