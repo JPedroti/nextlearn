@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-.env
-.env.*
-!.env.example
-__pycache__/
-*.pyc
-.venv/
-venv/
-.vscode/
-.idea/
-=======
 # Segredos
 .env
 
@@ -25,4 +14,9 @@ staticfiles/
 # Material de referência (PDFs do evento; o deck da Teachy é confidencial)
 referencias/
 *.pdf
->>>>>>> 87d341e8f5a30f199d1a5860e701ea53d6165bbe
+
+# Extras (pasta local do Thiago)
+.env.*
+!.env.example
+.vscode/
+.idea/

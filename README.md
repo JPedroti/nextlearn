@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-# HACKATON NEXTLEARN
-
-Projeto do hackathon NextLearn.
-
-## Estrutura
-- `prompts/` - registro de todos os prompts enviados durante o desenvolvimento (apenas o texto, um arquivo por prompt).
-- `scripts/` - utilitarios do projeto.
-- `.env` - chaves locais (fora do git). Use `.env.example` como modelo.
-
-## Configuracao
-1. Copie `.env.example` para `.env`.
-2. Preencha `API_KEY` e `API_BASE_URL`.
-3. Teste com `python scripts/testar_chave.py`.
-=======
 # NextLearn
 
 O professor prepara a aula **uma vez** e cada aluno recebe a **mesma aula** no formato em que consegue aprender.
@@ -143,4 +128,18 @@ static/        CSS, JS e fontes
 tests/         testes automatizados
 docs/          histórico de prompts e documentação
 ```
->>>>>>> 87d341e8f5a30f199d1a5860e701ea53d6165bbe
+
+## Pesquisa e documentação de apoio
+
+Material de pesquisa produzido durante o hackathon (base científica, perfis, métricas e riscos legais):
+
+| Arquivo | Conteúdo |
+|---|---|
+| [docs/PERFIS_E_METRICAS.md](docs/PERFIS_E_METRICAS.md) | Perfis funcionais por barreira (P1–P8) e verificação da base científica |
+| [docs/METRICAS_ENSINO.md](docs/METRICAS_ENSINO.md) | Métricas de ensino em 6 camadas, inspiradas no Duolingo |
+| [docs/RISCOS_LEGAIS.md](docs/RISCOS_LEGAIS.md) | Leis e normas que afetam a plataforma (CNE, LGPD, ECA Digital, Decreto 12.686) |
+| [docs/NEURODIVERGENCIA_EVIDENCIAS.md](docs/NEURODIVERGENCIA_EVIDENCIAS.md) | Tipos de neurodivergência, prevalência e evidências |
+| [docs/pesquisa/](docs/pesquisa/) | Revisão sistemática (entrega 1) |
+| [db/schema.sql](db/schema.sql) | Esboço de modelo de dados (referência; o app usa os models do Django) |
+| [design/](design/) | Mockup da tela inicial do aluno |
+| [prompts/](prompts/) | Prompts usados pelo Thiago, um arquivo por prompt |
