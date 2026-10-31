@@ -1,0 +1,16 @@
+# Segredos
+.env
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Django
+db.sqlite3
+staticfiles/
+
+# Material de referência (PDFs do evento; o deck da Teachy é confidencial)
+referencias/
+*.pdf
