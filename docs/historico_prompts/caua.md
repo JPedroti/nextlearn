@@ -44,3 +44,43 @@ Registro cronológico e literal dos prompts que Cauã enviou à IA durante o hac
 > @nextlearn/CLAUDE.md ajuste os 2 primeiros, rode o código depois, procure erros sugestões / melhorias. dê features, correções pra fazer a primeira demo. busque correções de código, possíveis erros lógicos, race condition ou ferramentas estéticas que serão importantes pra cada perfis de alunos que não foram adotadas. ademais, precisamos fazer um "exemplo" de exercício pro aluno. como funciona? eu preciso mandar um pdf, por exemplo, de equação do 2 grau e eele faz? é possível na configuração de tela cheia, usarmos como se fosse um "Kahoot" pra manter a atenção dele? é possível adcionar um dashboard de monitoriamento do aluno com quantass horas de uso, exercícios feitos, progresso, etc? avalie essas sugestões
 
 **Resumo da resposta da IA:** (1) Ajustes CSS: `letter-spacing: 0.12em` (evidência Zorzi 2012) e botões ≥ 44px (WCAG 2.2). (2) Modo concentração implementado: uma questão por vez com navegação Anterior/Próxima, barra de progresso, botão tela cheia (Fullscreen API), navegação no gabarito pós-resposta. (3) Explicação do fluxo PDF → aula: professor sobe PDF → PyPDF2 extrai texto → formulário pré-preenchido → professor adiciona questões → IA adapta por máscara. (4) Dashboard de monitoramento: viável com dados existentes (~30 min). (5) Auditoria de código: race condition baixa no cache, IntegrityError amplo, sem problemas críticos. Commit `559e953`, 80 testes passando.
+
+---
+
+## Prompt 06 — 31/10/2026, 06:31 (BRT) — autor: Cauã — ferramenta: Qwen
+
+> @nextlearn/CLAUDE.md dashboard individual do aluno e uma aula exemplo de matemática
+
+**Resumo da resposta da IA:** Dashboard em `/professor/alunos/X/dashboard/` com acertos, tempo de uso, evolução por aula, original vs adaptada, apoios. Comando `python manage.py criar_aula_demo` criando prof/turma/alunos (Daniel textual+voz, Talita foco+limpo) + aula de Equações do 2º grau com 5 questões.
+
+---
+
+## Prompt 07 — 31/10/2026, 06:42 (BRT) — autor: Cauã — ferramenta: Qwen
+
+> @nextlearn/CLAUDE.md Puxe a skill de desingh em https://github.com/anthropics/skills --skill frontend-design. e melhore todos os padrões estéticos do site, paineis, etc, precisamos criar algo profissional e funcional e bonito de se usar. mantenha uma paleta de cor constante e atenção aos detalhes front ending. Ademais essa GEMINI_API não pode virar uma API compativel OPENAI? facilitaria a gente poderia ser usado um modelo de baixa ingestão de token como deepseek flash
+
+**Resumo da resposta da IA:** Skill frontend-design carregada do GitHub Anthropic. Design System v2 aplicado: paleta de 10 variáveis CSS (:root), componentes card/card-elevated/card-highlight, botões btn/btn-secondary/btn-ghost, tags coloridas, tipografia system font stack. API multi-provedor: `IA_PROVEDOR=openai` aceita DeepSeek, Groq, OpenAI via `IA_API_KEY`/`IA_BASE_URL`/`IA_MODEL`. Mantém Gemini como padrão. Anti-padrões removidos: ALL-CAPS, cartões idênticos, gradientes.
+
+---
+
+## Prompt 08 — 31/10/2026, 06:54 (BRT) — autor: Cauã — ferramenta: Qwen
+
+> @nextlearn/CLAUDE.md O painel, frontending dos paineis de login, turma etc estão a mesma coisa. adcione essa skill pra você e refaça o frontending de todos esses arquivos, paineis, etc. @attachment:///Frontend%20Design%20Approach%E2%80%A6.txt
+
+**Resumo da resposta da IA:** Redesign completo: login com hero section (sem card box), lista de turmas em grid com hover, painel da turma com tabela limpa + barras finas + tags por faixa de acerto, detalhe da turma com cards individuais e tags coloridas. Princípios Anthropic aplicados: um elemento memorável por página, sem cartões idênticos, cores com significado.
+
+---
+
+## Prompt 09 — 31/10/2026, ~07:10 (BRT) — autor: Cauã — ferramenta: Qwen
+
+> @nextlearn/CLAUDE.md altere os desigs de navegação, uso de paletas inteligentes, botões bem colocados, precisa ser um site "gostoso" de se mexer e depois de mudar como posso atualizar o site pra ver as mudanças? só dar f5?
+
+**Resumo da resposta da IA:** Header com tag de papel colorida, barra de preferências com ícones (🔤🔊☀️) e fundo indigo-50, micro-interações CSS (hover reduz opacidade, cards mudam borda, botões scale(0.97) no clique), transições .15s ease em tudo. Confirmado: F5 atualiza (Django StatReloader).
+
+---
+
+## Prompt 10 — 31/10/2026, ~07:25 (BRT) — autor: Cauã — ferramenta: Qwen
+
+> @nextlearn/CLAUDE.md adcionou o historico das conversas nossas lá?
+
+**Resumo da resposta da IA:** Histórico conferido e complementado — prompts 01 a 10 registrados com resumos. Commits `4cbd62a` em diante. 119 testes passando.
