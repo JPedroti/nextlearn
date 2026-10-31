@@ -329,3 +329,27 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** feitas em sequência, cada uma publicada na `main` com testes: Fatia 4 (família cadastrada pelo professor, questionário de 6 perguntas provisórias sem laudo, sugestões aceitas ou recusadas pelo professor); Fatia 3 (barra de apoios de leitura com OpenDyslexic, leitura em voz alta pela Web Speech API e modo limpo, padrão no perfil + escolha na sessão, EventoUso); Fatia 5 (painel da turma com acertos por aluno e por questão, comparação original × adaptada e sugestões a partir do uso); documentação final (arquitetura com diagramas validados, decisões, contexto com dados conferidos no Censo Escolar 2025 do Inep). 80 testes passando. No meio do trabalho, o Thiago juntou o repositório `learnext` à `main` com marcas de conflito no README, `.gitignore` e `.env.example`; a IA juntou os dois lados sem perder conteúdo, sem forçar push, e conferiu que não havia chaves no histórico. Horários do histórico corrigidos com o relógio real.
 
 ---
+
+## Prompt 32 — 31/10/2026, 05:55 (BRT) — autor: João — ferramenta: Claude Code
+
+> Analise o github e o que já foi feito (outros integrantes do grupo enviaram coisas, então sugiro que faça um pull) e explore a situação atual do projeto. Não esteja muito preso ao cronograma que fizemos porque o grupo está sendo bem flexível em relação a isso.
+
+**Resumo da resposta da IA:** fez fetch do GitHub: a `main` não mudou desde 01h45; chegou só a branch `thiago/prototipo-neuro`, um protótipo de design com dados de exemplo (paleta por apoio, aula em passos, barras de fração, painel com menu lateral). Rodou o protótipo para ver as telas, conferiu que não há chaves nos commits novos e que a branch partiu de uma `main` anterior às Fatias 3–5. Alertou que o protótipo não pode ir para a `main` nem para o deploy (dados inventados) e que o deploy é a maior pendência. 80 testes passando; cronograma atualizado.
+
+---
+
+## Prompt 33 — 31/10/2026, 05:59 (BRT) — autor: João — ferramenta: Claude Code
+
+> Perfeito. Agora que voce entende onde estamos, queria te notificar te que o grupo estava pensando em deixar o mvp rodando apenas local (talvez voce tenha confirmado isso ao explorar o github atulizado). Apenas responda o prompt, nao faça nada)
+
+**Resumo da resposta da IA:** disse que o GitHub não mostra essa decisão e desaconselhou: o deploy é entrega obrigatória da Fase 1 e o pilar Tech avalia se a solução funciona (nota abaixo de 1,0 elimina). Lembrou que o deploy está quase pronto e é grátis, e propôs usar a chave grátis da Gemini só na demo (registrando em `docs/decisoes.md` a troca de provedor num produto real) ou publicar com a chave `pendente`. Sugeriu conferir no manual se app local é aceito. Não mexeu em nada; este prompt foi registrado depois, junto com o 34, pelo mesmo motivo dos prompts 29 e 30.
+
+---
+
+## Prompt 34 — 31/10/2026, 06:01 (BRT) — autor: João — ferramenta: Claude Code
+
+> Tudo o que eu fiz, aquela parada do neon console e etc por exemplo, eu consigo voltar atrás? E outra pergunta: se eu nao voltar atras pode dar algum problema para mim? Tem algum custo envolvido? Como eu cancelo?
+
+**Resumo da resposta da IA:** explicou que tudo dá para desfazer (excluir o projeto e a conta no Neon, o serviço/Blueprint e a conta no Render, a chave no Google AI Studio e o acesso do Render ao GitHub) e que, nos planos grátis sem cartão cadastrado, deixar como está não gera cobrança. Orientou a conferir a página de cobrança de cada serviço e recomendou não cancelar nada antes de o grupo decidir sobre o deploy.
+
+---
