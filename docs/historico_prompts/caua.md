@@ -36,3 +36,11 @@ Registro cronológico e literal dos prompts que Cauã enviou à IA durante o hac
 > @nextlearn/CLAUDE.md Quero que faça esse sistema de adaptação do conteúdo, enviando feedbacks diretamente para o professor em caso de ero/fraqueza específica, pelo menos faça algo simples que mexa com isso pro MVP. Faça alguma forma de guardar a memoria da interação, seja adcionando um com as conversas ou melhorado o system prompt. dÊ um relatório de como o filho está performando. faça com que o professor possa upar um PDF que será compreendido pelo agente de IA e será ensinado, com cada estratégia pra o aluno, após isso de commit
 
 **Resumo da resposta da IA:** 4 features implementadas: (1) Memória de interação via `Perfil.historico_ia` — acumula eventos de geração e respostas, alimenta o system prompt; (2) Feedbacks automáticos via `analise.py` — detecta 3 padrões de erro e gera `SugestaoPerfil` para o professor; (3) Relatório da família em `/familia/alunos/X/relatorio/` com acertos, original vs adaptada e apoios usados; (4) Upload de PDF com PyPDF2 — professor sobe PDF, texto é extraído e pré-preenche formulário. 80 testes passando. Commit `216f3f4`.
+
+---
+
+## Prompt 05 — 31/10/2026, 06:24 (BRT) — autor: Cauã — ferramenta: Qwen
+
+> @nextlearn/CLAUDE.md ajuste os 2 primeiros, rode o código depois, procure erros sugestões / melhorias. dê features, correções pra fazer a primeira demo. busque correções de código, possíveis erros lógicos, race condition ou ferramentas estéticas que serão importantes pra cada perfis de alunos que não foram adotadas. ademais, precisamos fazer um "exemplo" de exercício pro aluno. como funciona? eu preciso mandar um pdf, por exemplo, de equação do 2 grau e eele faz? é possível na configuração de tela cheia, usarmos como se fosse um "Kahoot" pra manter a atenção dele? é possível adcionar um dashboard de monitoriamento do aluno com quantass horas de uso, exercícios feitos, progresso, etc? avalie essas sugestões
+
+**Resumo da resposta da IA:** _(a preencher ao final)_
