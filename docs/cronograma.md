@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 00:50 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 01:20 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -19,10 +19,11 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 | Entrega | Responsável | Status | Observação |
 |---|---|---|---|
-| Deploy da aplicação para a banca testar | João | ⚠️ | Configuração pronta no repositório (`render.yaml`, `build.sh`) e conferida com `check --deploy`. O serviço no Render ainda não foi criado (00h50). Depois: testar no ar e pôr o link no README. O endereço `nextlearn.onrender.com` é de outro projeto; o nosso vai ter um sufixo |
+| Deploy da aplicação para a banca testar | João | ⚠️ | Configuração pronta no repositório (`render.yaml`, `build.sh`) e conferida com `check --deploy`. Banco criado no Neon (São Paulo). Blueprint do Render aberto, mas o deploy foi pausado (01h15) até decidir o provedor de IA; dá para publicar antes com `GEMINI_API_KEY=pendente`. Depois: testar no ar e pôr o link no README. O endereço `nextlearn.onrender.com` é de outro projeto; o nosso vai ter um sufixo |
 | Vídeo de demo (até 5 min) | Cauã (roteiro e narração), Gabriel (edição) | ❔ | |
 | Plano de negócio em PDF | Gabriel | ❔ | |
 | Repositório público ou com acesso para a banca | João | ⏳ | Fazer antes das 12h: o agente que avalia o pilar Tech precisa ler o código |
+| **Decisão: provedor de IA** | Equipe (João decide) | ⚠️ | Os termos da Gemini API (grátis e paga) proíbem apps voltados a menores de 18 anos. Opções: API da Anthropic (Claude), que aceita produtos para menores com salvaguardas mas é paga; ou Vertex AI (Google Cloud), com termos a conferir. Trocar o provedor mexe só em `ia/cliente.py`. Sem isso, a geração por IA não funciona no ar |
 
 ## Fatias do app
 
@@ -30,10 +31,10 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 |---|---|---|---|---|
 | 0. Esqueleto (login com 3 papéis, deploy) | 23h–00h | João | ✅ código · ⚠️ deploy | Criar o serviço no Render e testar no ar |
 | 1. Aula base (turma, aluno, aula, aluno responde a versão 000) | 00h–02h | João | ✅ (adiantada) | Testar no ar |
-| 2. Motor de IA (apoios, geração com cache, aprovação, aluno vê a sua versão) | 02h–04h | Thiago (feita pelo João com Claude Code) | ✅ código (adiantada) · ⚠️ | Testar a geração real com a chave do Gemini; trocar os blocos provisórios de `ia/blocos/` pelo texto do Cauã |
-| 3. Interface (OpenDyslexic, leitura em voz alta, modo limpo, registro de EventoUso) | 04h–06h | Thiago | ⏳ | Tudo |
-| 4. Família (questionário → apoios sugeridos → revisão do professor) | 08h–09h15 | João | ⏳ | Tudo. Depende das 6 perguntas do Cauã |
-| 5. Painel (acertos, adaptações usadas, sugestões de ajuste de perfil) | 09h15–10h30 | João | ⏳ | Tudo |
+| 2. Motor de IA (apoios, geração com cache, aprovação, aluno vê a sua versão) | 02h–04h | Thiago (feita pelo João com Claude Code) | ✅ código (adiantada) · ⚠️ | Decidir o provedor de IA (ver Entregas) e testar a geração real; trocar os blocos provisórios de `ia/blocos/` pelo texto do Cauã |
+| 3. Interface (OpenDyslexic, leitura em voz alta, modo limpo, registro de EventoUso) | 04h–06h | Thiago | ⏳ | Tudo. O João pediu à IA para fazer, se o Thiago não tiver começado (sem commits dele às 01h18) |
+| 4. Família (questionário → apoios sugeridos → revisão do professor) | 08h–09h15 | João | 🔄 | Em andamento desde 01h20, com perguntas provisórias até o Cauã entregar as 6 dele |
+| 5. Painel (acertos, adaptações usadas, sugestões de ajuste de perfil) | 09h15–10h30 | João | ⏳ | Tudo. Na fila, depois das Fatias 4 e 3 |
 | Docs finais | até 10h30 | João | ⏳ | Link do deploy no README; `docs/arquitetura.md`, `docs/decisoes.md` e `docs/contexto.md` |
 
 **Ordem de corte se atrasar:** (1) sugestões do painel → (2) questionário da família (o professor marca os apoios) →
@@ -46,7 +47,8 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 - ✅ Ideia, escopo e decisões do projeto (prompts 01–14 no claude.ai)
 - ✅ Repositório no GitHub, `CLAUDE.md` e histórico de prompts separado por integrante
 - ✅ Fatias 0, 1 e 2 (código na `main`, 45 testes passando)
-- ⚠️ Deploy no Render: falta criar o serviço e colar `DATABASE_URL` (Neon) e `GEMINI_API_KEY` no painel
+- ✅ Projeto criado no Neon
+- ⚠️ Deploy no Render: pausado no Blueprint; falta escolher o provedor de IA (ou publicar com a chave `pendente`)
 - ⏳ Fatia 4 (família) e Fatia 5 (painel)
 - ⏳ Docs finais e repositório público antes das 12h
 
@@ -70,5 +72,6 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 01:20 — Neon criado; deploy pausado pela questão dos termos da IA. O João pediu à IA as Fatias 4, 3 e 5 e a documentação final, em sequência.
 - 31/10, 00:50 — Teste do deploy pedido; o serviço no Render ainda não existe. Passo a passo reenviado ao João.
 - 30/10, 23:52 — Cronograma criado. Fatias 0, 1 e 2 concluídas no código, adiantadas em relação ao plano. O deploy ainda não foi feito (João).

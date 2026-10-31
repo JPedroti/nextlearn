@@ -187,7 +187,7 @@ A banca (e o agente que avalia "condução da IA") lê `docs/historico_prompts/`
 
    **Resumo da resposta da IA:** <1–3 linhas, preenchido ao final da sua resposta>
    ```
-2. Numere em sequência **dentro do arquivo do autor**, continuando do último número dele. Os prompts 01–14 do João foram feitos no Claude (claude.ai).
+2. Numere em sequência **dentro do arquivo do autor**, continuando do último número dele. Use o horário real do relógio (rode `date`), nunca uma estimativa. Os prompts 01–14 do João foram feitos no Claude (claude.ai).
 3. Se não souber quem é o autor, pergunte uma vez e depois mantenha.
 4. Ao final da sua resposta, preencha o "Resumo da resposta da IA" daquela entrada.
 5. Integrantes que usam outras ferramentas (Qwen, ChatGPT) podem colar os prompts deles. Registre-os no arquivo de quem fez o prompt, com o nome da ferramenta.

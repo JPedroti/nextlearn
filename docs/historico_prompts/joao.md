@@ -200,7 +200,7 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 
 ---
 
-## Prompt 17 — 30/10/2026, 23:40 (BRT) — autor: João — ferramenta: Claude Code
+## Prompt 17 — 30/10/2026, 23:39 (BRT) — autor: João — ferramenta: Claude Code
 
 > Faça a Fatia 2
 
@@ -208,7 +208,7 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 
 ---
 
-## Prompt 18 — 30/10/2026, 23:52 (BRT) — autor: João — ferramenta: Claude Code
+## Prompt 18 — 30/10/2026, 23:51 (BRT) — autor: João — ferramenta: Claude Code
 
 > Antes de qualquer coisa, quero que voce atualize o cronograma conforme as atividades vao sendo feitas, com as atividades completas, imcompletas, a fazer etc. Quando alguem criar uma conversar e abrir nessa pasta com alguma ia, este integrante do grupo deve primeiramente ser questionado quem ele é (João, Thiago, Cauã ou Gabriel) e, depois, deve ser oferecido um breve resumo da situação do projeto e das entregas.
 
@@ -221,5 +221,111 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 > Testar o deploy
 
 **Resumo da resposta da IA:** `nextlearn.onrender.com` responde, mas é outro projeto (Express, de jan/2025), não o nosso. O João confirmou que o serviço ainda não foi criado. `check --deploy` sem problemas graves (só avisos de HSTS e redirecionamento HTTPS, que o Render já faz). Passo a passo do Neon e do Render reenviado; o teste no ar fica para quando o serviço existir. Cronograma atualizado.
+
+---
+
+## Prompt 20 — 31/10/2026, 00:53 (BRT) — autor: João — ferramenta: Claude Code
+
+> Você não consegue fazer isso por mim? Responda apenas com sim ou não
+
+**Resumo da resposta da IA:** "Não." (a IA não cria contas nem digita senhas, chaves ou connection strings em sites; essa parte do Render/Neon fica com o João).
+
+---
+
+## Prompt 21 — 31/10/2026, 00:58 (BRT) — autor: João — ferramenta: Claude Code
+
+**Anexo:** captura da tela "Welcome to Neon" (criação do projeto)
+
+> estou fazendo aqui ainda. me oriente
+
+**Resumo da resposta da IA:** a tela está correta (nome `nextlearn`, região São Paulo, só Postgres ligado; Better Auth desligado, porque o login é do Django). Orientação para criar o projeto, copiar a connection string sem colar no chat e seguir para o Render.
+
+---
+
+## Prompt 22 — 31/10/2026, 00:59 (BRT) — autor: João — ferramenta: Claude Code
+
+**Anexo:** captura da tela do Neon "Your new project was created" (com um "Agent prompt" sugerido pelo Neon)
+
+> (mensagem só com a imagem, sem texto)
+
+**Resumo da resposta da IA:** projeto criado no Neon. Orientação para não usar o "Agent prompt" do Neon (é para apps Node e grava variáveis em arquivos locais; o projeto usa `DATABASE_URL` no painel do Render) e seguir por "Go to project" → Connect para copiar a connection string.
+
+---
+
+## Prompt 23 — 31/10/2026, 01:02 (BRT) — autor: João — ferramenta: Claude Code
+
+**Anexo:** captura do painel "Connect" do Neon (branch production, banco neondb, role neondb_owner, connection pooling ligado)
+
+> já peguei a password e nao colei para voce
+
+**Resumo da resposta da IA:** configuração do Neon confirmada como correta. Lembrete de que o Render precisa da connection string inteira (não só a senha) e passo a passo do Blueprint no Render.
+
+---
+
+## Prompt 24 — 31/10/2026, 01:08 (BRT) — autor: João — ferramenta: Claude Code
+
+**Anexo:** captura da tela "Review Blueprint configurations" do Render (branch main, render.yaml, 5 variáveis a preencher)
+
+> (mensagem só com a imagem, sem texto)
+
+**Resumo da resposta da IA:** tela correta. Orientação campo a campo para preencher as 5 variáveis (sem espaços extras, string inteira do Neon, senha forte de admin), clicar em Deploy Blueprint e acompanhar o log.
+
+---
+
+## Prompt 25 — 31/10/2026, 01:10 (BRT) — autor: João — ferramenta: Claude Code
+
+> Eu acho que nao tenho GEMINI_API_KEY, DJANGO_SUPERUSER_USERNAME, DJANGO_SUPERUSER_EMAIL e nem DJANGO_SUPERUSER_PASSWORD
+
+**Resumo da resposta da IA:** explicado que os três campos DJANGO_SUPERUSER_* não existem em lugar nenhum: o João os inventa agora (são o login de administrador que o próprio deploy cria). Passo a passo para criar a chave gratuita do Gemini no Google AI Studio.
+
+---
+
+## Prompt 26 — 31/10/2026, 01:11 (BRT) — autor: João — ferramenta: Claude Code
+
+> mas e se eu tiver que pagar? vou gastar dinheiro em algo?
+
+**Resumo da resposta da IA:** não, se nenhum cartão for cadastrado: Neon, Render (plano free do render.yaml) e Gemini (camada gratuita) funcionam sem cobrança; sem cartão ou faturamento ativado, não há como cobrar. Limites do plano grátis explicados e regra prática: se alguma tela pedir cartão, parar e avisar.
+
+---
+
+## Prompt 27 — 31/10/2026, 01:12 (BRT) — autor: João — ferramenta: Claude Code
+
+**Anexo:** captura da tela "Welcome to Google AI Studio" (termos: maior de 18 anos, produto para usuários 18+, prompts podem ser usados para treinar a IA do Google)
+
+> (mensagem só com a imagem, sem texto)
+
+**Resumo da resposta da IA:** alerta sobre dois pontos dos termos: (1) a camada gratuita exige produto para usuários maiores de 18 anos, e o NextLearn é para alunos da escola; (2) os prompts podem ser usados para treino, o que reforça a regra de não enviar dados do aluno (já garantida pelo código). Sugestão: usar a chave gratuita só na demo do hackathon (quem gera é o professor) e registrar como próximo passo a troca para um plano com termos para educação, mudando só `ia/cliente.py`. Decisão deixada para o João; desmarcar o e-mail promocional.
+
+---
+
+## Prompt 28 — 31/10/2026, 01:13 (BRT) — autor: João — ferramenta: Claude Code
+
+> nao posso colocar meu nome nisso, porque nao atende os requisitos do uso gratuito, correto? teria outra opcao?
+
+**Resumo da resposta da IA:** confirmado nos termos oficiais da Gemini API que a restrição a menores de 18 vale para o plano gratuito e também para o pago, então pagar o Gemini não resolve. Opções apresentadas: (1) API da Anthropic (Claude), cuja política permite produtos para menores com salvaguardas, mas exige créditos pré-pagos com cartão; (2) Vertex AI do Google Cloud, que exige cartão e cujos termos ainda precisam ser conferidos. Aviso de conflito de interesse (a IA é da Anthropic). Trocar o provedor muda uma decisão da seção 4 e só mexe em `ia/cliente.py`; decisão deixada para o João e a equipe.
+
+---
+
+## Prompt 29 — 31/10/2026, 01:15 (BRT) — autor: João — ferramenta: Claude Code
+
+> Posso parar com esse processo por um tempo e deixar voce adiantando outra parte? Tem como voce fazer alguma outra parte grande que nao precisa que eu faca isso antes? Nao faca nada por enquanto, apenas responda minhas perguntas
+
+**Resumo da resposta da IA:** sim; o código não depende do deploy nem da escolha da IA (os testes simulam a IA). Partes independentes listadas: Fatia 4 (família, com perguntas provisórias), Fatia 5 (painel), Fatia 3 (interface, que é do Thiago: confirmar antes) e documentação final. Registrado depois, porque o autor pediu para a IA não mexer em nada naquele momento.
+
+---
+
+## Prompt 30 — 31/10/2026, 01:16 (BRT) — autor: João — ferramenta: Claude Code
+
+> Nao faca nada, apenas me responda. Qual o máximo de trabalho que eu posso te mandar desses aí para voce ficar o maior tempo possível trabalhando de uma vez? Posso te mandar todas essas tarefas?
+
+**Resumo da resposta da IA:** sim, todas de uma vez, na ordem Fatia 4 → 3 → 5 → docs, com commit e push ao fim de cada parte; pediu ordem de prioridade, regra para conteúdo faltante (usar provisório) e confirmação de que o Thiago não está na Fatia 3. Registrado depois, pelo mesmo motivo do prompt 29.
+
+---
+
+## Prompt 31 — 31/10/2026, 01:16 (BRT) — autor: João — ferramenta: Claude Code
+
+> Perfeito, pode fazer todas então.
+
+**Resumo da resposta da IA:** _(preenchido ao final)_
 
 ---
