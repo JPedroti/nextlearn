@@ -67,6 +67,9 @@ class Resposta(models.Model):
     tempo_ms = models.PositiveIntegerField(
         null=True, blank=True, help_text="Tempo entre abrir a aula e enviar as respostas, em milissegundos."
     )
+    versao_mascara = models.PositiveSmallIntegerField(
+        default=0, help_text="Máscara da versão que o aluno viu ao responder (0 = aula original)."
+    )
     criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:

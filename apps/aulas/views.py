@@ -180,7 +180,7 @@ def ver_aula(request, pk):
     if not aluno:
         raise Http404
     aula = get_object_or_404(Aula, pk=pk, turma=aluno.turma, publicada=True)
-    conteudo, questoes = versao_para_aluno(aula, aluno)
+    conteudo, questoes, mascara_vista = versao_para_aluno(aula, aluno)
     respostas = {r.questao_id: r for r in Resposta.objects.filter(aluno=aluno, questao__aula=aula)}
     chave_tempo = f"aula_{aula.pk}_aberta_em"  # guardada na sessão para medir o tempo até o envio
 
@@ -207,6 +207,7 @@ def ver_aula(request, pk):
                         indice_escolhido=indice,
                         correta=indice == questao.indice_correto,  # gabarito do professor
                         tempo_ms=tempo_ms,
+                        versao_mascara=mascara_vista,
                     )
         except IntegrityError:
             pass  # envio duplicado (ex.: dois cliques); as respostas já estão salvas
