@@ -259,9 +259,12 @@ def _aluno_logado(request):
     return Aluno.objects.select_related("turma", "perfil", "usuario").filter(usuario=request.user).first()
 
 
+from django.views.decorators.clickjacking import xframe_options_sameorigin  # noqa: E402
+
 from apps.contas.decorators import papel_requerido  # noqa: E402
 
 
+@xframe_options_sameorigin
 @papel_requerido("aluno")
 def painel_aluno(request):
     import json
@@ -568,7 +571,7 @@ def _grafico_linha(valores, rotulos, maximo=None, sufixo="", altura=150, cor="va
          f'<line x1="{m}" y1="{H - m}" x2="{W - m}" y2="{H - m}" stroke="var(--borda)" stroke-width="2"/>',
          f'<path d="{area}" fill="{cor}" opacity=".12"/><polyline points="{linha}" fill="none" stroke="{cor}" stroke-width="3" stroke-linejoin="round"/>']
     for (x, y), v in zip(pts, vals):
-        s.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="4.5" fill="#FFFFFF" stroke="{cor}" stroke-width="3"/><text x="{x:.0f}" y="{y - 10:.0f}" text-anchor="middle" class="graf-v">{v:g}{sufixo}</text>')
+        s.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="4.5" fill="#FFFFFF" stroke="{cor}" stroke-width="3"/><text x="{x:.0f}" y="{y - 10:.0f}" text-anchor="middle" class="graf-v">{str(round(v, 1)).replace(".", ",").removesuffix(",0")}{sufixo}</text>')
     for x, r in zip(xs, rotulos):
         s.append(f'<text x="{x:.0f}" y="{H - 8}" text-anchor="middle" class="graf-r">{r}</text>')
     return "".join(s) + "</svg>"
@@ -592,6 +595,7 @@ def _grafico_barras(valores, rotulos, sufixo="", altura=150, cor="#0F9D6E", linh
     return "".join(s) + "</svg>"
 
 
+@xframe_options_sameorigin
 @papel_requerido("aluno")
 def progresso(request):
     import statistics

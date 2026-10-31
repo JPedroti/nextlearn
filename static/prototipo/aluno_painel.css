@@ -361,7 +361,7 @@ body.tema-brisa .no-bt, body.tema-brisa .nota-cartao { filter: saturate(.7); }  
 .mapa .no { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .mapa .no-bt { width: 70px; height: 70px; border: 5px solid #FFFFFF; }
 .mapa .no-atual .no-bt { width: 86px; height: 86px; border-width: 6px; outline: none; }
-.no-legenda { position: absolute; top: calc(100% - 4px); display: flex; flex-direction: column; align-items: center; min-width: 120px; max-width: 170px;
+.no-legenda { position: absolute; top: calc(100% - 4px); display: flex; flex-direction: column; align-items: center; min-width: 120px; max-width: 160px;
   padding: 4px 10px 6px; border-radius: 12px; background: rgba(255, 255, 255, .94); color: #1F2933; text-align: center; line-height: 1.2;
   box-shadow: 0 2px 0 rgba(0, 0, 0, .12); font-size: .8rem; pointer-events: none; }
 .no-feita .no-legenda, .no-atual .no-legenda { top: calc(100% + 14px); }
@@ -371,12 +371,12 @@ body.tema-brisa .no-bt, body.tema-brisa .nota-cartao { filter: saturate(.7); }  
 .no-atual .no-legenda { background: #FFFFFF; outline: 3px solid var(--atual); }
 .no-estrelas { position: absolute; top: calc(100% - 2px); font-size: .95rem; text-shadow: 0 1px 0 #FFFFFF; }
 .no-estrelas i { color: rgba(255,255,255,.85); } .no-estrelas i.cheia { color: #F5B400; }
-.mapa .next-no { position: absolute; bottom: 30%; display: flex; align-items: flex-end; gap: 0; margin: 0; }
-.mapa .lado-dir .next-no { left: calc(100% + 6px); flex-direction: row-reverse; }
-.mapa .lado-esq .next-no { right: calc(100% + 6px); }
+.mapa .next-no { position: absolute; bottom: -34px; display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 0; width: 180px; }
+.mapa .lado-dir .next-no { left: calc(100% + 4px); }
+.mapa .lado-esq .next-no { right: calc(100% + 4px); }
 .mapa .next-no .next-trilha { width: 110px; flex: none; }
-.mapa .fala-next { width: 170px; margin: 0 0 54px; font-size: .86rem; }
-.mapa .lado-dir .fala-next::after { right: auto; left: -9px; border-left-color: transparent; border-right: 9px solid #FFFFFF; border-left: 0; }
+.mapa .fala-next { width: 180px; margin: 0; font-size: .84rem; }
+.mapa .fala-next::after { right: auto; left: 50%; bottom: -9px; margin-left: -9px; border: 9px solid transparent; border-top-color: #FFFFFF; border-bottom: 0; }
 .mundo-rodape { margin: 8px 6px 0; font-size: .88rem; color: var(--suave); font-weight: 700; }
 .mundo-rodape.ok { color: #1E7B4A; }
 body.com-movimento .nuvem-mov { animation: nuvem 40s linear infinite; }

@@ -7,6 +7,9 @@
   function gravar(k, v) { try { localStorage.setItem("nl-" + k, v); } catch (e) {} }
   function el(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
 
+  // Dentro da tela de comparação (iframe), esconde o painel do desenvolvedor
+  if (window.self !== window.top) { var dv = document.querySelector('.dev'); if (dv) dv.hidden = true; }
+
   // ---------- Preferências (só para o aluno, na hora) ----------
   var classes = { letras: "letras-espacadas", voz: "com-voz", limpo: "modo-limpo", movimento: "com-movimento" };
   $$("[data-pref]").forEach(function (bt) {

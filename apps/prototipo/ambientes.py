@@ -284,7 +284,7 @@ def mapa(ambiente_id, semente, nos, intensidade):
     densidade = intensidade["densidade"]
     matiz = rnd.uniform(-10, 10)
     aj = lambda c: _ajustar(c, sat, luz, matiz)  # noqa: E731
-    W, topo, passo = LARGURA, 250, 132
+    W, topo, passo = LARGURA, 250, 172
     zigue = [0, 95, 140, 95, 0, -95, -140, -95]
     inicio = rnd.randint(0, len(zigue) - 1)
     pos = [(W / 2 + zigue[(inicio + i) % len(zigue)], topo + 40 + i * passo) for i in range(len(nos))]
