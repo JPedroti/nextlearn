@@ -11,15 +11,58 @@ Projeto do 1º Hackathon LEPV × FGV (tema: Educação, patrocínio Teachy) — 
 - **Decisões técnicas e de produto (e por quê):** [docs/decisoes.md](docs/decisoes.md)
 - **Cronograma e status das entregas:** [docs/cronograma.md](docs/cronograma.md)
 - **Histórico de prompts usados com IA:** [docs/historico_prompts/](docs/historico_prompts/README.md) (um arquivo por integrante)
+- **Índice de todos os documentos** (produto, pesquisa e brainstorm): [docs/README.md](docs/README.md)
 
 ## Equipe
 
 João, Thiago, Cauã e Gabriel Franco (IME, 4º período).
 
+## Como funciona
+
+1. **Contas de professor** são criadas em `/admin/`, em **Usuários → Adicionar**, escolhendo o **papel**.
+   As contas de aluno e de família o próprio professor cria nas telas da turma.
+2. O **professor** cria uma turma e, dentro dela:
+   - **Cadastrar aluno**: cria o usuário e a senha de primeiro acesso do aluno;
+   - **Nova aula**: escreve o texto e as questões de múltipla escolha (2 a 4 alternativas, com a correta marcada).
+     **Criar via PDF** copia o texto de um PDF para essa mesma tela, para o professor revisar e completar.
+     A aula nasce como rascunho; **Publicar para a turma** libera para os alunos.
+3. **Cadastrar família** cria o login do responsável. A família responde 9 perguntas sobre o dia a dia do aluno
+   (sem laudo e sem diagnóstico) e pode deixar observações. As respostas viram **sugestões de apoio**, que o professor
+   aceita ou recusa na tela de **Apoios** do aluno. As observações da família ficam só para o professor ler: não vão
+   para a IA.
+4. Em **Apoios** (na lista de alunos da turma), o professor marca o que ajuda cada aluno: **Atenção e foco**, **Acessibilidade textual**
+   e/ou **Interativo e concreto**. Cada combinação vira uma máscara de 3 bits (F×4 + S×2 + C×1, de 0 a 7);
+   0 é a aula original.
+5. Na página da aula, em **Versões adaptadas**, aparece uma linha para cada combinação presente na turma.
+   **Gerar com IA** cria a versão (o texto e os enunciados reescritos). O professor revisa, pode corrigir e clica em
+   **Aprovar versão**. Cada versão é gerada uma vez e fica guardada (cache); **Gerar de novo** refaz.
+   Sem chave de IA configurada, o botão fica desligado e a tela avisa; o resto do app funciona normalmente.
+6. O **aluno** vê as aulas publicadas na versão aprovada da sua combinação (ou a original, enquanto não houver versão
+   aprovada). Com o apoio de foco, o texto aparece **um passo por vez**. As questões vêm uma por vez, com barra de
+   progresso, e o **modo concentração** abre a aula em tela cheia. A correção usa sempre o gabarito do professor:
+   a IA nunca mexe em alternativas nem na resposta certa.
+7. A barra **Apoios de leitura** (sem IA) vale para qualquer aluno: **Fonte para dislexia** (OpenDyslexic, com mais
+   espaço entre as letras), **Leitura em voz alta** (voz do próprio navegador) e **Modo limpo**. O professor escolhe o
+   que já vem ligado; o aluno liga e desliga quando quiser, e cada vez que ele liga um apoio o sistema registra o uso.
+8. O professor acompanha tudo, calculado na hora a partir do uso real:
+   - **Painel da turma** (botão **Ver painel**): acertos por aluno e por questão, comparação entre a aula original e as versões adaptadas,
+     uso dos apoios de leitura e as **sugestões de ajuste de perfil** (do questionário da família, do uso dos apoios
+     e dos acertos). Nada muda sem o professor aceitar;
+   - **Página de cada aluno** (link "Dashboard" na turma): acertos por aula, tempo nas aulas e apoios usados.
+9. A **família** vê o **relatório** do próprio filho: acertos, versão original × adaptada e apoios de leitura usados.
+
+A IA recebe só os apoios ligados e o conteúdo da aula: nunca nome, login, respostas, questionário ou observações do aluno.
+
+| Papel | Página inicial |
+|---|---|
+| Professor | `/professor/` |
+| Família | `/familia/` |
+| Aluno | `/aluno/` |
+
 ## Stack
 
 Python + Django 5.2, templates do Django com Tailwind (CDN), SQLite no computador e Postgres (Neon) em produção,
-Gemini (`google-genai`) para gerar as versões adaptadas, deploy no Render.
+IA pelo Gemini (`google-genai`) ou por uma API compatível com a da OpenAI (`openai`), deploy no Render.
 
 ## Como rodar no Windows
 
@@ -59,52 +102,42 @@ Abra http://127.0.0.1:8000 e entre com o usuário criado.
 - *Erro de certificado SSL no `pip install`*: atualize o pip (`python -m pip install --upgrade pip --use-feature=truststore`)
   e repita o passo 3.
 
-### Como usar (o que já funciona)
+## Como rodar no macOS ou no Linux
 
-1. **Contas de professor** são criadas em http://127.0.0.1:8000/admin/, em **Usuários → Adicionar**,
-   escolhendo o **papel**. As contas de aluno e de família o próprio professor cria nas telas da turma.
-2. O **professor** entra e, em **Minhas turmas**, cria uma turma. Dentro dela:
-   - **Cadastrar aluno**: cria o usuário e a senha de primeiro acesso do aluno;
-   - **Nova aula**: escreve o texto da aula e as questões de múltipla escolha (2 a 4 alternativas, com a correta marcada).
-     A aula nasce como rascunho; o botão **Publicar para a turma** libera para os alunos.
-3. Na lista de alunos da turma, **Cadastrar família** cria o login do responsável. A família entra e responde
-   6 perguntas sobre o dia a dia do aluno (sem laudo e sem diagnóstico). As respostas viram **sugestões de apoio**,
-   que o professor aceita ou recusa em **Ajustar apoios**: a família não muda o perfil sozinha.
-4. Em **Ajustar apoios**, o professor também marca direto o que ajuda cada aluno:
-   **Atenção e foco**, **Acessibilidade textual** e/ou **Interativo e concreto**. Cada combinação vira uma máscara
-   de 3 bits (F×4 + S×2 + C×1, de 0 a 7); 0 é a aula original.
-5. Na página da aula, em **Versões adaptadas**, aparece uma linha para cada combinação presente na turma.
-   **Gerar com IA** cria a versão (o texto e os enunciados reescritos pelo Gemini). O professor revisa, pode corrigir
-   e clica em **Aprovar versão**. Cada versão é gerada uma vez e fica guardada (cache); **Gerar de novo** refaz.
-   Se o professor editar a aula, as versões são apagadas e precisam ser geradas de novo.
-6. O **aluno** entra, vê as aulas publicadas da turma na versão aprovada da sua combinação (ou a original, enquanto
-   não houver versão aprovada), responde e vê na hora quantas acertou.
-   A correção usa sempre o gabarito do professor: a IA nunca mexe em alternativas nem na resposta certa.
-7. Nas telas do aluno há a barra **Apoios de leitura**, sem IA, que qualquer aluno pode ligar e desligar:
-   **Fonte para dislexia** (OpenDyslexic), **Leitura em voz alta** (botões "Ouvir", com a voz do próprio navegador)
-   e **Modo limpo** (menos cores e enfeites, letra maior). O professor escolhe em **Ajustar apoios** quais já vêm
-   ligados; a escolha do aluno vale até ele sair. Cada vez que o aluno liga um apoio, o sistema registra um
-   evento de uso, que o painel do professor usa.
-8. O **Painel** da turma (em **Minhas turmas** ou na página da turma) mostra, calculado na hora a partir do uso real:
-   acertos por aluno e por questão, quantas aulas cada aluno fez na versão adaptada, a comparação de acertos entre a
-   aula original e as versões adaptadas, e quantas vezes cada aluno ligou cada apoio de leitura. Lá também ficam as
-   **sugestões de ajuste de perfil**: as do questionário da família e as do uso (ex.: o aluno ligou a leitura em voz
-   alta 3 vezes → sugerir deixar ligada desde o início). Nada muda sem o professor aceitar.
+```bash
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+cp .env.example .env
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
 
-Para testar a geração no seu computador, coloque a sua chave do Google AI Studio em `GEMINI_API_KEY` no `.env`.
-A IA recebe só os apoios ligados e o conteúdo da aula, nunca dados do aluno.
+## Testar em 5 minutos
 
-| Papel | Página inicial |
-|---|---|
-| Professor | `/professor/` |
-| Família | `/familia/` |
-| Aluno | `/aluno/` |
+Tudo é feito pela própria pessoa que testa: o repositório não traz alunos, respostas nem aulas prontas.
+
+1. Com o servidor rodando, entre em `/admin/` com o administrador e crie um usuário com papel **Professor**.
+2. Entre como esse professor, crie uma turma e cadastre dois alunos.
+3. Em **Apoios**, ligue **Atenção e foco** para um dos alunos.
+4. Crie uma aula: o texto e as questões de [docs/aula_exemplo.md](docs/aula_exemplo.md) servem, ou use **Criar via PDF**.
+   Publique a aula.
+5. Com uma chave de IA no `.env`, clique em **Gerar com IA**, revise e aprove a versão.
+6. Numa janela anônima, entre como o aluno com foco: o texto aparece em passos. Responda as questões.
+7. Volte ao professor e abra **Ver painel** e o **Dashboard** do aluno: os números são os das respostas que você deu.
+
+Para gerar versões com IA no seu computador, coloque a chave em `GEMINI_API_KEY` no `.env` (ou use as variáveis
+`IA_*`, abaixo, para outro provedor).
 
 ### Rodar os testes
 
 ```powershell
 python manage.py test
 ```
+
+São 119 testes, em `tests/`. A chamada à IA é simulada, então não precisam de chave nem de internet.
 
 ## Variáveis de ambiente
 
@@ -116,15 +149,17 @@ Ficam no `.env` (local, fora do Git) ou no painel do Render (produção). Modelo
 | `DEBUG` | `True` só no computador; `False` em produção |
 | `ALLOWED_HOSTS` | Endereços aceitos. O endereço do Render entra sozinho |
 | `DATABASE_URL` | Connection string do Postgres (Neon). Vazia = SQLite local |
-| `GEMINI_API_KEY` | Chave do Google AI Studio |
+| `IA_PROVEDOR` | `gemini` (padrão) ou `openai` (qualquer API compatível com a da OpenAI) |
+| `GEMINI_API_KEY` | Chave do Google AI Studio. Vazia = geração com IA desligada, com aviso na tela |
 | `GEMINI_MODEL` | Modelo do Gemini (padrão: `gemini-flash-latest`) |
+| `IA_API_KEY`, `IA_BASE_URL`, `IA_MODEL` | Chave, endereço e modelo quando `IA_PROVEDOR=openai` (ex.: DeepSeek, Groq, OpenAI) |
 | `DJANGO_SUPERUSER_*` | Só no Render: cria o primeiro administrador durante o deploy |
 
 ## Deploy (Render)
 
 O arquivo [render.yaml](render.yaml) descreve o serviço. A cada push na `main`, o Render roda
 [build.sh](build.sh) (instala dependências, `collectstatic`, `migrate` e cria o administrador se ainda não existir)
-e inicia o site com `gunicorn`.
+e inicia o site com `gunicorn`. O site funciona mesmo sem chave de IA: só a geração de versões fica desligada.
 
 ## Créditos
 
@@ -136,28 +171,16 @@ e inicia o site com `gunicorn`.
 ```
 config/        configurações do Django (settings, urls)
 apps/contas/   usuário com papel (professor, família, aluno), login e logout
-apps/turmas/   turmas e alunos
-apps/perfis/   perfil de adaptações e questionário da família
-apps/aulas/    aulas, questões, versões adaptadas e respostas
-apps/painel/   telas do professor
-ia/            motor de IA: blocos do prompt (ia/blocos/), montagem do prompt e chamada ao Gemini
+apps/turmas/   turmas, alunos e famílias
+apps/perfis/   apoios do aluno, questionário e relatório da família, sugestões de ajuste
+apps/aulas/    aulas, questões, versões adaptadas, respostas, importação de PDF e a tela do aluno
+apps/painel/   telas do professor com os números da turma
+ia/            motor de IA: blocos do prompt (ia/blocos/), montagem do prompt e chamada ao provedor
 templates/     páginas HTML
-static/        CSS, JS e fontes
+static/        CSS e JavaScript (apoios de leitura, leitura em voz alta, navegação da aula)
 tests/         testes automatizados
-docs/          cronograma, histórico de prompts e documentação
+docs/          contexto, arquitetura, decisões, cronograma, histórico de prompts e pesquisa
 ```
 
-## Pesquisa e documentação de apoio
-
-Material de pesquisa produzido durante o hackathon (base científica, perfis, métricas e riscos legais):
-
-| Arquivo | Conteúdo |
-|---|---|
-| [docs/PERFIS_E_METRICAS.md](docs/PERFIS_E_METRICAS.md) | Perfis funcionais por barreira (P1–P8) e verificação da base científica |
-| [docs/METRICAS_ENSINO.md](docs/METRICAS_ENSINO.md) | Métricas de ensino em 6 camadas, inspiradas no Duolingo |
-| [docs/RISCOS_LEGAIS.md](docs/RISCOS_LEGAIS.md) | Leis e normas que afetam a plataforma (CNE, LGPD, ECA Digital, Decreto 12.686) |
-| [docs/NEURODIVERGENCIA_EVIDENCIAS.md](docs/NEURODIVERGENCIA_EVIDENCIAS.md) | Tipos de neurodivergência, prevalência e evidências |
-| [docs/pesquisa/](docs/pesquisa/) | Revisão sistemática (entrega 1) |
-| [db/schema.sql](db/schema.sql) | Esboço de modelo de dados (referência; o app usa os models do Django) |
-| [design/](design/) | Mockup da tela inicial do aluno |
-| [prompts/](prompts/) | Prompts usados pelo Thiago, um arquivo por prompt |
+A pesquisa feita durante o hackathon (base científica, perfis, métricas, riscos legais) e os rascunhos de
+brainstorm estão listados em [docs/README.md](docs/README.md), com o que foi aproveitado de cada um.

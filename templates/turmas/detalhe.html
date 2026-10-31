@@ -79,7 +79,7 @@
                 <span class="tag tag-sky">{{ preferencia }}</span>
               {% endfor %}
               {% if aluno.sugestoes_pendentes %}
-                <span class="tag tag-indigo">{{ aluno.sugestoes_pendentes }}</span>
+                <span class="tag tag-indigo">{{ aluno.sugestoes_pendentes }} sugest{{ aluno.sugestoes_pendentes|pluralize:"ão,ões" }}</span>
               {% endif %}
               <a href="{% url 'perfis:dashboard' aluno.pk %}" style="color: var(--color-primary); font-size: 0.8125rem;" class="font-medium">Dashboard</a>
               <a href="{% url 'perfis:editar_apoios' aluno.pk %}" style="color: var(--color-primary); font-size: 0.8125rem;">Apoios</a>

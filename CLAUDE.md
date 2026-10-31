@@ -76,7 +76,7 @@ Faça commit do cronograma junto com o trabalho da vez.
 
 ### Fluxo
 
-1. **Família** responde ~6 perguntas sobre o dia a dia do filho (ex.: "se perde em textos longos?"). As respostas ligam os bits. **Sem laudo e sem diagnóstico.** Nunca peça nem armazene laudo médico (LGPD, dado sensível de criança).
+1. **Família** responde ~6 perguntas (hoje são 9, 3 por apoio) sobre o dia a dia do filho (ex.: "se perde em textos longos?"). As respostas ligam os bits. **Sem laudo e sem diagnóstico.** Nunca peça nem armazene laudo médico (LGPD, dado sensível de criança).
 2. **Professor** revisa e ajusta o perfil (o professor tem a palavra final), cria a turma e insere a aula (texto + questões de múltipla escolha com gabarito).
 3. **IA** gera a versão de cada máscara presente na turma, sob demanda e com cache. **O professor aprova a versão antes de ela ficar visível ao aluno.**
 4. **Aluno** vê a versão da sua máscara, responde as questões e liga/desliga as preferências de interface.
@@ -103,7 +103,7 @@ Faça commit do cronograma junto com o trabalho da vez.
 | **Configuração por variáveis de ambiente** (`.env` local, painel do Render em produção) | Nenhum segredo no código |
 | Nomes de domínio (models, URLs, telas) **em português**; o resto do código em inglês | A banca entende o domínio |
 
-Variáveis de ambiente: `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL`. Liste todas em `.env.example`, sempre com valores falsos.
+Variáveis de ambiente: `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, `GEMINI_API_KEY`, `GEMINI_MODEL` e, desde 31/10, `IA_PROVEDOR` (`gemini` ou `openai`) com `IA_API_KEY`, `IA_BASE_URL` e `IA_MODEL` para uma API compatível com a da OpenAI. Liste todas em `.env.example`, sempre com valores falsos.
 
 ## 5. Estrutura do repositório
 
