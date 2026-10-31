@@ -23,3 +23,6 @@ referencias/
 
 # Contas de teste locais (senhas geradas)
 contas_teste_local.txt
+
+# Log do envio automatico para o GitHub
+envio_git.log
