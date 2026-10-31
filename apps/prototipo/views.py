@@ -132,6 +132,14 @@ class Login(LoginView):
     template_name = "prototipo/login.html"
     redirect_authenticated_user = True
 
+    def get_success_url(self):
+        url = self.get_redirect_url()
+        if not url and self.request.user.papel == "aluno":
+            from django.urls import reverse
+
+            return reverse("prototipo:painel_aluno")
+        return url or super().get_success_url()
+
     def get_context_data(self, **kwargs):
         contexto = super().get_context_data(**kwargs)
         chave = self.request.GET.get("perfil") or self.request.POST.get("perfil") or "aluno"
@@ -139,3 +147,170 @@ class Login(LoginView):
         contexto["perfil"] = PERFIS_LOGIN[contexto["perfil_chave"]]
         contexto["perfis"] = PERFIS_LOGIN
         return contexto
+
+
+# ---------------------------------------------------------------------------
+# Painel do aluno (dados reais do banco; no teste local, o aluno fictício do `contas_teste`)
+# ---------------------------------------------------------------------------
+# Parâmetros seguidos (docs/METRICAS_ENSINO.md e docs/PERFIS_E_METRICAS.md):
+# - o aluno se compara só com ele mesmo (nada de ranking); certo/errado sempre com texto;
+# - ofensiva SEMANAL e sem perda (semana parada só pausa); meta mínima pequena;
+# - tempo de estudo mostrado junto do limite combinado com a família (ECA Digital);
+# - apoio de foco (P3): uma ação principal por vez, listas recolhidas, sem animação;
+# - treino curto, uma questão por tela, com confirmação antes de enviar.
+
+META_SEMANAL = 2          # aulas por semana (combinada com professor e família)
+LIMITE_DIARIO_MIN = 40    # minutos por dia combinados com a família
+
+
+def _materia(titulo):
+    return titulo.split(":", 1)[0].strip() if ":" in titulo else "Geral"
+
+
+def _assunto(titulo):
+    return titulo.split(":", 1)[1].strip() if ":" in titulo else titulo
+
+
+def _dados_aluno(aluno):
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from apps.aulas.models import Resposta
+
+    agora = timezone.localtime()
+    respostas = list(Resposta.objects.filter(aluno=aluno).select_related("questao__aula"))
+    por_aula = {}
+    for r in respostas:
+        d = por_aula.setdefault(r.questao.aula_id, {"acertos": 0, "total": 0, "quando": r.criado_em, "ms": r.tempo_ms or 0})
+        d["total"] += 1
+        d["acertos"] += r.correta
+        d["quando"] = min(d["quando"], r.criado_em)
+
+    feitas, pendentes = [], []
+    for aula in aluno.turma.aulas.filter(publicada=True).order_by("pk"):
+        item = {"aula": aula, "materia": _materia(aula.titulo), "assunto": _assunto(aula.titulo), "n_questoes": aula.questoes.count()}
+        if aula.pk in por_aula:
+            d = por_aula[aula.pk]
+            item.update(acertos=d["acertos"], total=d["total"], quando=timezone.localtime(d["quando"]), ms=d["ms"],
+                        nota=round(10 * d["acertos"] / d["total"], 1))
+            feitas.append(item)
+        else:
+            pendentes.append(item)
+    feitas.sort(key=lambda i: i["quando"])
+
+    def media(itens):
+        return round(sum(i["nota"] for i in itens) / len(itens), 1) if itens else None
+
+    # Notas por matéria e evolução (as últimas 6, para ver o próprio progresso)
+    materias = {}
+    for i in feitas:
+        materias.setdefault(i["materia"], []).append(i)
+    por_materia = [{"nome": m, "media": media(its), "n": len(its), "pct": int(media(its) * 10)} for m, its in sorted(materias.items())]
+    evolucao = [{"nota": i["nota"], "rotulo": i["assunto"], "altura": max(6, int(i["nota"] * 12))} for i in feitas[-6:]]
+
+    corte = agora - timedelta(days=30)
+    recentes = [i for i in feitas if i["quando"] >= corte]
+    antigas = [i for i in feitas if i["quando"] < corte]
+    m_rec, m_ant = media(recentes), media(antigas)
+
+    # Ofensiva semanal: semanas seguidas com a meta mínima. A semana atual ainda em andamento não quebra.
+    def semana(dt):
+        return (dt.date() - timedelta(days=dt.weekday()))
+
+    contagem = {}
+    for i in feitas:
+        contagem[semana(i["quando"])] = contagem.get(semana(i["quando"]), 0) + 1
+    esta = semana(agora)
+    feitas_semana = contagem.get(esta, 0)
+    ofensiva, s = (1 if feitas_semana >= META_SEMANAL else 0), esta - timedelta(days=7)
+    while contagem.get(s, 0) >= META_SEMANAL:
+        ofensiva += 1
+        s -= timedelta(days=7)
+
+    min_semana = sum(i["ms"] for i in feitas if semana(i["quando"]) == esta) // 60000
+    min_hoje = sum(i["ms"] for i in feitas if i["quando"].date() == agora.date()) // 60000
+
+    # Habilidades: cada aula é uma habilidade (por enquanto). Dominada = 100%; revisar = abaixo de 60%.
+    dominadas = [i for i in feitas if i["nota"] >= 10]
+    revisar = [i for i in feitas if i["nota"] < 6]
+    erradas = [r for r in respostas if not r.correta]
+    revisao_7d = [i for i in feitas if (agora - i["quando"]).days >= 7]
+
+    return {
+        "feitas": list(reversed(feitas)), "pendentes": pendentes, "proxima": pendentes[0] if pendentes else None,
+        "media_geral": media(feitas), "media_recente": m_rec, "media_antiga": m_ant,
+        "delta": round(m_rec - m_ant, 1) if m_rec is not None and m_ant is not None else None,
+        "delta_abs": abs(round(m_rec - m_ant, 1)) if m_rec is not None and m_ant is not None else None,
+        "por_materia": por_materia, "evolucao": evolucao,
+        "ofensiva": ofensiva, "feitas_semana": feitas_semana, "meta_semanal": META_SEMANAL,
+        "meta_bolinhas": [n < feitas_semana for n in range(META_SEMANAL)],
+        "min_semana": min_semana, "min_hoje": min_hoje, "limite_diario": LIMITE_DIARIO_MIN,
+        "pct_hoje": min(100, int(100 * min_hoje / LIMITE_DIARIO_MIN)),
+        "dominadas": dominadas, "revisar": revisar, "n_erradas": len(erradas), "n_revisao": len(revisao_7d),
+        "respostas": respostas,
+    }
+
+
+def _aluno_logado(request):
+    from apps.turmas.models import Aluno
+
+    return Aluno.objects.select_related("turma", "perfil", "usuario").filter(usuario=request.user).first()
+
+
+from apps.contas.decorators import papel_requerido  # noqa: E402
+
+
+@papel_requerido("aluno")
+def painel_aluno(request):
+    aluno = _aluno_logado(request)
+    if not aluno:
+        return render(request, "prototipo/painel_aluno.html", {"sem_turma": True})
+    perfil = getattr(aluno, "perfil", None)
+    contexto = _dados_aluno(aluno)
+    contexto.update(aluno=aluno, perfil=perfil, apoios=perfil.nomes_apoios() if perfil else [],
+                    foco=bool(perfil and perfil.foco))
+    return render(request, "prototipo/painel_aluno.html", contexto)
+
+
+TREINOS = {
+    "erros": ("Revisar o que errei", "As questões que você errou, uma de cada vez."),
+    "rapido": ("Treino rápido", "3 questões, uns 3 minutos."),
+    "revisao": ("Revisão da semana passada", "Para não esquecer o que já aprendeu."),
+}
+
+
+@papel_requerido("aluno")
+def treino(request, tipo):
+    import json
+    import random
+
+    from django.http import Http404
+
+    if tipo not in TREINOS:
+        raise Http404
+    aluno = _aluno_logado(request)
+    if not aluno:
+        raise Http404
+    dados = _dados_aluno(aluno)
+    if tipo == "erros":
+        questoes = [r.questao for r in dados["respostas"] if not r.correta]
+    elif tipo == "revisao":
+        from django.utils import timezone
+
+        agora = timezone.localtime()
+        ids = {i["aula"].pk for i in dados["feitas"] if (agora - i["quando"]).days >= 7}
+        questoes = [r.questao for r in dados["respostas"] if r.questao.aula_id in ids]
+        random.shuffle(questoes)
+        questoes = questoes[:5]
+    else:
+        questoes = [r.questao for r in dados["respostas"]]
+        random.shuffle(questoes)
+        questoes = questoes[:3]
+    itens = [{"enunciado": q.enunciado, "alternativas": q.alternativas, "correta": q.indice_correto,
+              "assunto": _assunto(q.aula.titulo)} for q in questoes]
+    perfil = getattr(aluno, "perfil", None)
+    return render(request, "prototipo/treino.html", {
+        "titulo": TREINOS[tipo][0], "descricao": TREINOS[tipo][1], "itens_json": json.dumps(itens, ensure_ascii=False),
+        "n": len(itens), "foco": bool(perfil and perfil.foco), "aluno": aluno,
+    })

@@ -1,0 +1,95 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ titulo }} · NextLearn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
+</head>
+<body class="{% if foco %}apoio-foco{% endif %}">
+  <header class="topo">
+    <a href="{% url 'prototipo:painel_aluno' %}" class="marca">NextLearn</a>
+    <a href="{% url 'prototipo:painel_aluno' %}" class="btn-link">Voltar para minha área</a>
+  </header>
+  <main class="pagina treino-pagina">
+    <p class="rotulo">{{ titulo }}</p>
+    {% if n %}
+      <div class="progresso" role="progressbar" aria-valuemin="0" aria-valuemax="{{ n }}" aria-valuenow="0" data-progresso><span></span></div>
+      <p class="suave" data-contador>Questão 1 de {{ n }}</p>
+      <section class="cartao questao" data-questao aria-live="polite">
+        <p class="mini" data-assunto></p>
+        <h1 data-enunciado></h1>
+        <button type="button" class="btn-link ouvir" data-ouvir>🔊 Ouvir</button>
+        <div class="alternativas" role="radiogroup" data-alternativas></div>
+        <p class="retorno" data-retorno hidden></p>
+        <button type="button" class="btn-principal" data-acao disabled>Confirmar resposta</button>
+      </section>
+      <section class="cartao fim" data-fim hidden>
+        <div class="hoje-next" aria-hidden="true" data-pose="pizza">{% include "prototipo/_next.html" %}</div>
+        <h1 data-fim-titulo></h1>
+        <p class="suave">Treino não vale nota. Seu professor vê só se você treinou, para ajustar as próximas aulas.</p>
+        <a class="btn-principal" href="{% url 'prototipo:painel_aluno' %}">Voltar para minha área</a>
+      </section>
+      <script id="itens" type="application/json">{{ itens_json|safe }}</script>
+    {% else %}
+      <section class="cartao"><h1>Nada para treinar aqui ainda.</h1><p class="suave">Faça uma aula primeiro.</p>
+        <a class="btn-principal" href="{% url 'prototipo:painel_aluno' %}">Voltar</a></section>
+    {% endif %}
+  </main>
+  <script>
+  (function () {
+    var dados = document.getElementById("itens"); if (!dados) return;
+    var itens = JSON.parse(dados.textContent), i = 0, escolha = null, conferido = false, acertos = 0;
+    var $ = function (s) { return document.querySelector(s); };
+    var alt = $("[data-alternativas]"), acao = $("[data-acao]"), ret = $("[data-retorno]");
+    function mostrar() {
+      var q = itens[i]; escolha = null; conferido = false;
+      $("[data-contador]").textContent = "Questão " + (i + 1) + " de " + itens.length;
+      $("[data-progresso] span").style.width = (100 * i / itens.length) + "%";
+      $("[data-progresso]").setAttribute("aria-valuenow", i);
+      $("[data-assunto]").textContent = q.assunto;
+      $("[data-enunciado]").textContent = q.enunciado;
+      alt.innerHTML = ""; ret.hidden = true; acao.disabled = true; acao.textContent = "Confirmar resposta";
+      q.alternativas.forEach(function (t, j) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "alt"; b.setAttribute("role", "radio"); b.setAttribute("aria-checked", "false");
+        b.textContent = t;
+        b.addEventListener("click", function () {
+          if (conferido) return; escolha = j; acao.disabled = false;
+          alt.querySelectorAll(".alt").forEach(function (o, k) { o.setAttribute("aria-checked", k === j ? "true" : "false"); });
+        });
+        alt.appendChild(b);
+      });
+    }
+    acao.addEventListener("click", function () {
+      var q = itens[i];
+      if (!conferido) {
+        conferido = true; var certo = escolha === q.correta; if (certo) acertos++;
+        alt.querySelectorAll(".alt").forEach(function (o, k) {
+          if (k === q.correta) o.classList.add("certa"); else if (k === escolha) o.classList.add("errada");
+        });
+        ret.hidden = false; ret.className = "retorno " + (certo ? "ok" : "nao");
+        ret.textContent = certo ? "✓ Certo!" : "✗ Ainda não. A resposta é: " + q.alternativas[q.correta];
+        acao.textContent = i + 1 < itens.length ? "Próxima" : "Terminar";
+        return;
+      }
+      i++;
+      if (i < itens.length) { mostrar(); return; }
+      $("[data-questao]").hidden = true; $("[data-contador]").hidden = true;
+      $("[data-progresso] span").style.width = "100%";
+      $("[data-fim]").hidden = false;
+      $("[data-fim-titulo]").textContent = "Você acertou " + acertos + " de " + itens.length + ". Bom treino!";
+    });
+    var ouvir = $("[data-ouvir]");
+    if (!("speechSynthesis" in window)) ouvir.hidden = true;
+    ouvir.addEventListener("click", function () {
+      var q = itens[i], u = new SpeechSynthesisUtterance(q.enunciado + ". " + q.alternativas.join(". "));
+      u.lang = "pt-BR"; speechSynthesis.cancel(); speechSynthesis.speak(u);
+    });
+    mostrar();
+  })();
+  </script>
+</body>
+</html>

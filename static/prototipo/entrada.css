@@ -28,7 +28,7 @@ body.no-mar .ator { --pele: #2FA38F; --pele-escura: #1C6F61; --barriga: #8ED8C9;
 .palco { position: sticky; top: 0; height: 100vh; overflow: hidden; }
 .ceu { position: absolute; inset: 0; background: linear-gradient(var(--ceu1), var(--ceu2)); }
 .decor { position: absolute; inset: 0; will-change: transform; }
-.sol { position: absolute; top: 14vh; right: 30vw; width: 12vw; max-width: 170px; aspect-ratio: 1; border-radius: 50%; background: #F2B544; box-shadow: 0 0 0 18px rgba(242,181,68,.18); }
+.sol { will-change: transform, background; position: absolute; top: 14vh; right: 30vw; width: 12vw; max-width: 170px; aspect-ratio: 1; border-radius: 50%; background: #F2B544; box-shadow: 0 0 0 18px rgba(242,181,68,.18); }
 .duna-longe { position: absolute; left: -10vw; right: -10vw; top: 60vh; height: 30vh; border-radius: 50% 50% 0 0 / 100% 100% 0 0; background: #EFD3A2; }
 
 .mundo { position: absolute; left: 0; top: 0; width: 100vw; height: 100vh; will-change: transform; }
@@ -61,8 +61,12 @@ body.no-mar .ator { --pele: #2FA38F; --pele-escura: #1C6F61; --barriga: #8ED8C9;
 .next-svg .perna-tras { transform: rotate(var(--pt, 0deg)); }
 .next-svg .prop { display: none; }
 [data-pose="livro"] .prop-livro, [data-pose="pizza"] .prop-pizza,
-[data-pose="fone"] .prop-fone, [data-pose="nadar"] .prop-mascara { display: inline; }
+[data-pose="fone"] .prop-fone { display: inline; }
 [data-pose="livro"] .prop-livro, [data-pose="pizza"] .prop-pizza, [data-pose="fone"] .prop-fone { animation: surgir .5s ease-out; }
+.next-svg .guelras { transform-box: fill-box; transform-origin: 50% 100%; transform: scale(0); opacity: 0; transition: transform .6s cubic-bezier(.3,1.6,.5,1), opacity .3s; }
+[data-pose="nadar"] .guelras { transform: scale(1); opacity: 1; }
+[data-pose="nadar"] .guelra-franja { animation: ondular 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes ondular { 50% { transform: rotate(-5deg) scaleY(1.06); } }
 @keyframes surgir { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .next-svg .pupila { animation: olhar 6s infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes olhar { 0%, 40%, 100% { transform: translateX(0); } 50%, 80% { transform: translateX(-4px); } }

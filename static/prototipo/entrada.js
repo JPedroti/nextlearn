@@ -6,6 +6,7 @@
   var historia = document.querySelector(".historia");
   var mundo = document.querySelector(".mundo");
   var decor = document.querySelector(".decor");
+  var sol = document.querySelector(".sol");
   var ator = document.querySelector(".ator");
   var hero = document.querySelector(".hero");
   var submerso = document.querySelector(".submerso");
@@ -82,6 +83,10 @@
     }
     mundo.style.transform = "translate(" + (-camX) + "px," + (-camY) + "px)";
     decor.style.transform = "translate(" + (-camX * 0.15) + "px," + (-camY * 0.5) + "px)";
+    // Sol desce devagar (pôr do sol) enquanto ele anda e salta; fica mais alaranjado perto do horizonte
+    var desce = faixa(p, 0, 0.5);
+    sol.style.transform = "translateY(" + (desce * 0.42 * H) + "px)";
+    sol.style.background = "rgb(242," + Math.round(lerp(181, 128, desce)) + "," + Math.round(lerp(68, 50, desce)) + ")";
     ator.style.transform = "translate(" + (x - camX) + "px," + (yy - camY) + "px) rotate(" + rot + "deg)";
     ator.style.setProperty("--pf", pf + "deg"); ator.style.setProperty("--pt", pt + "deg");
     if (ator.dataset.pose !== pose) ator.dataset.pose = pose;

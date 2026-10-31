@@ -29,7 +29,7 @@ body[data-cor="lilas"]   { --pele: #9B8CF5; --pele-escura: #5F51C7; --barriga: #
 .next-svg .barriga { stroke: var(--barriga); }
 .next-svg .destaque-fill { fill: var(--destaque); }
 .next-svg .destaque-traco { stroke: var(--destaque); }
-.next-svg .prop { display: none; }
+.next-svg .prop, .next-svg .guelras { display: none; }
 [data-pose="livro"] .prop-livro, [data-pose="pizza"] .prop-pizza, [data-pose="fone"] .prop-fone { display: inline; }
 .next-login { animation: respirar 4s ease-in-out infinite; }
 @keyframes respirar { 50% { transform: translateY(-6px); } }
