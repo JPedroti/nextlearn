@@ -201,3 +201,9 @@ Registro cronológico e literal dos prompts que Thiago enviou à IA durante o ha
 > Bom faça esse mapeamento, pois preciso começar a trabalhar no front end. Pois nao gostei nem um pouco daquela tela que você enviou aqui, ficou bem feio.
 
 **Resumo da resposta da IA:** Leu o código Django e o CLAUDE.md; mapeou os perfis e métricas da pesquisa nos models existentes e detalhou a Fatia 3 (interface) em docs/mapeamento_pesquisa_app.md; atualizou o cronograma.
+
+## Prompt 23 — 31/10/2026, 02:04 (BRT) — autor: Thiago — ferramenta: Claude
+
+> Olha só, pegue o que for util e faça um branch só nosso por favor. No caso voc6e pode usar um back que nao esteja funcionando perfeitamente do jeito que pretendemos, mas que seja capaz de atender as minhas necessidades. Quero conseguir desenhar melhor como vai ser a estrutura do site, está muito longe do que eu pensei. Além disso, crie a skill design_neuro, com o objetivo de usar os parametros já discutidos a respeito dos perfis de neuro divergente, para construir a interface. Você também vai me dar uma sugestao de associação de uma paleta de cores com um determinado perfil.
+
+**Resumo da resposta da IA:** Criou a branch `thiago/prototipo-neuro` com um protótipo navegável (app `prototipo`, dados de exemplo só para desenhar a estrutura, fora da demo oficial), paletas por apoio com contraste verificado e a proposta da skill `design_neuro`.
