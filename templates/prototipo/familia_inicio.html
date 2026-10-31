@@ -1,0 +1,98 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>{% include "prototipo/_cabeca.html" %}<title>Família · Chamilion</title></head>
+<body class="pg-progresso tema-base pg-familia">
+  <header class="topo">
+    <a href="{% url 'prototipo:familia' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>Chamilion · Família</a>
+    <nav class="topo-direita">
+      {% if filhos|length > 1 %}<form method="get">{% for f in filhos %}<button name="aluno" value="{{ f.pk }}" class="btn-contorno{% if f.pk == aluno.pk %} ativo{% endif %}">{{ f.usuario.first_name }}</button>{% endfor %}</form>{% endif %}
+      <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form>
+    </nav>
+  </header>
+  <main class="pg">
+    {% include "prototipo/_msgs.html" %}
+    {% if sem_filho %}
+      <section class="cartao-pg"><h2>Ainda não há aluno ligado a este acesso</h2><p>O professor liga o acesso da família ao aluno na tela da turma.</p></section>
+    {% else %}
+    <section class="pg-hero">
+      <div><p class="pg-sobre">{{ aluno.turma.nome }} · professor(a) {{ aluno.turma.professor.first_name|default:aluno.turma.professor.username }}</p>
+        <h1>Como {{ aluno.usuario.first_name }} está indo</h1>
+        <p class="pg-sub">Tudo comparado só com ele mesmo. Sem nota de colegas, sem ranking.</p></div>
+      <div class="pg-estado estado-{{ r.estado.0 }}"><span class="pg-ponto"></span>{{ r.estado.1 }}</div>
+    </section>
+
+    <section class="pg-kpis">
+      <article class="kpi kpi-roxo"><p class="kpi-rot">Acerto recente</p><p class="kpi-val">{% if r.acerto is not None %}{{ r.acerto }}%{% else %}–{% endif %}</p><div class="kpi-pe"><span class="kpi-sub">últimas 4 aulas</span></div></article>
+      <article class="kpi kpi-verde"><p class="kpi-rot">Aulas feitas</p><p class="kpi-val">{{ d.feitas|length }}</p><div class="kpi-pe"><span class="kpi-sub">{{ d.pendentes|length }} para fazer</span></div></article>
+      <article class="kpi kpi-verde2"><p class="kpi-rot">Estudo hoje</p><p class="kpi-val">{{ d.min_hoje }} min</p><div class="kpi-pe"><span class="kpi-sub">de {{ cfg.limite }} combinados</span><span class="mini-barra"><span style="width: {{ pct_hoje }}%"></span></span></div></article>
+      <article class="kpi kpi-laranja"><p class="kpi-rot">Meta da semana</p><p class="kpi-val">{{ d.feitas_semana }} de {{ cfg.meta }}</p><div class="kpi-pe"><span class="kpi-sub">{% if cfg.ofensiva %}{{ d.ofensiva }} semana(s) seguidas{% else %}ofensiva escondida{% endif %}</span></div></article>
+    </section>
+
+    <section class="pg-grade">
+      <article class="cartao-pg pg-resumo">
+        <h2>Esta semana, em poucas palavras</h2>
+        <ul>
+          {% if d.proxima %}<li>Próxima fase: <strong>{{ d.proxima.assunto }}</strong> ({{ d.proxima.materia }}){% if d.proxima.dias_para_prazo is not None %}, prazo em {{ d.proxima.dias_para_prazo }} dia(s){% endif %}.</li>{% endif %}
+          {% if reforco %}<li>Onde vale um reforço em casa: <strong>{{ reforco }}</strong>.</li>{% endif %}
+          <li>Meta combinada: {{ cfg.meta }} aula(s) por semana · já fez {{ d.feitas_semana }}.</li>
+          <li>Tempo de estudo na semana: {{ d.min_semana }} min.</li>
+        </ul>
+        <a class="btn-contorno" href="{% url 'prototipo:progresso' %}?aluno={{ aluno.pk }}">Ver o relatório completo</a>
+      </article>
+      <article class="cartao-pg atividade-casa">
+        <h2>Atividade de 10 minutos para casa</h2>
+        {% if ultima_reforco %}
+          <p>Peça para {{ aluno.usuario.first_name }} explicar com as próprias palavras: <strong>{{ ultima_reforco.assunto }}</strong>.</p>
+          <ol><li>Ele explica em 2 minutos (pode desenhar).</li><li>Vocês inventam juntos um exemplo da vida real.</li><li>Ele faz o "Treino rápido" na área do aluno.</li></ol>
+        {% else %}<p>Quando houver aulas feitas, sugerimos aqui uma atividade curta.</p>{% endif %}
+        <p class="pg-nota">Uma atividade curta por semana, sem cobrança de nota.</p>
+      </article>
+    </section>
+
+    <section class="cartao-pg">
+      <h2>Como {{ aluno.usuario.first_name }} aprende melhor (apoios escolhidos pelo professor)</h2>
+      <div class="dicas-grade">{% for ap, ds in dicas %}<div class="dica"><h3>{{ ap }}</h3><ul>{% for x in ds %}<li>{{ x }}</li>{% endfor %}</ul></div>{% endfor %}</div>
+      {% if r.prefs %}<p class="mini">Na tela, ele também usa: {{ r.prefs|join:", " }}.</p>{% endif %}
+      <p class="pg-nota">Apoio não é diagnóstico. Não pedimos laudo (Decreto 12.686/2025).</p>
+    </section>
+
+    <section class="pg-grade">
+      <article class="cartao-pg">
+        <h2>Notas por matéria</h2>
+        {% for m, med in medias %}<div class="barra-q"><span class="bq-rot">{{ m }}</span><span class="bq-barra"><span style="width: {% widthratio med 10 100 %}%"></span></span><span class="bq-val">{{ med }}</span></div>{% empty %}<p class="vazio">Ainda sem aulas feitas.</p>{% endfor %}
+        <h3 class="sub-h">Próximas tarefas</h3>
+        <ul class="lista-simples">{% for t in d.pendentes|slice:":4" %}<li><strong>{{ t.assunto }}</strong> · {{ t.materia }}</li>{% empty %}<li class="mini">Nada pendente.</li>{% endfor %}</ul>
+      </article>
+      <form class="cartao-pg combinados" method="post">
+        {% csrf_token %}
+        <h2>Combinados da família</h2>
+        <p class="mini">Valem na hora para a área do aluno.</p>
+        <label>Limite de estudo por dia <span class="val" data-val-limite>{{ cfg.limite }} min</span><input type="range" name="limite" min="15" max="120" step="5" value="{{ cfg.limite }}" oninput="this.form.querySelector('[data-val-limite]').textContent=this.value+' min'"></label>
+        <label>Meta de aulas por semana <span class="val" data-val-meta>{{ cfg.meta }}</span><input type="range" name="meta" min="1" max="7" value="{{ cfg.meta }}" oninput="this.form.querySelector('[data-val-meta]').textContent=this.value"></label>
+        <label class="check"><input type="checkbox" name="ofensiva" {% if cfg.ofensiva %}checked{% endif %}> Mostrar a ofensiva semanal para ele <span class="mini">(desligue se contadores deixam ansioso)</span></label>
+        <label class="check"><input type="checkbox" name="resumo" {% if not cfg.obj or cfg.obj.resumo_semanal %}checked{% endif %}> Quero o resumo semanal</label>
+        <button class="btn-missao" type="submit">Salvar combinados</button>
+      </form>
+    </section>
+
+    <section class="pg-grade">
+      <article class="cartao-pg">
+        <h2>Questionário do dia a dia</h2>
+        {% if questionario %}<p>Respondido. O professor recebeu as sugestões e decide os apoios.</p>{% else %}<p>Seis perguntas simples sobre como é o estudo em casa. Sem laudo e sem diagnóstico; viram sugestões para o professor.</p>{% endif %}
+        <a class="btn-contorno" href="{% url 'perfis:questionario' aluno.pk %}">{% if questionario %}Responder de novo{% else %}Responder agora{% endif %}</a>
+      </article>
+      <article class="cartao-pg">
+        <h2>Transparência e dados</h2>
+        <ul class="lista-simples">
+          <li>A IA só ajuda o professor a adaptar o texto da aula; ele revisa e aprova tudo.</li>
+          <li>{{ aluno.usuario.first_name }} não conversa com IA: as dúvidas na plataforma têm respostas prontas.</li>
+          <li>Guardamos só as respostas das aulas (acerto, tempo e data). Nada de câmera, voz ou emoção.</li>
+          <li>Vocês podem pedir para ver ou apagar os dados a qualquer momento com a escola (LGPD).</li>
+        </ul>
+      </article>
+    </section>
+    {% endif %}
+  </main>
+  <script src="{% static 'prototipo/brilho.js' %}"></script>
+</body>
+</html>

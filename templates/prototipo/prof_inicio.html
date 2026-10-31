@@ -1,0 +1,72 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>{% include "prototipo/_cabeca.html" %}<title>Minha turma · Chamilion</title></head>
+<body class="pg-progresso tema-base">
+  {% include "prototipo/_topo_prof.html" %}
+  <main class="pg">
+    {% include "prototipo/_msgs.html" %}
+    {% if not turma %}
+      <section class="cartao-pg"><h2>Você ainda não tem turma</h2><p><a class="btn-contorno" href="{% url 'turmas:nova' %}">Criar turma</a></p></section>
+    {% else %}
+    <section class="pg-hero">
+      <div><p class="pg-sobre">Olá, {{ request.user.first_name|default:request.user.username }}</p><h1>{{ turma.nome }}</h1>
+        <p class="pg-sub">A mesma aula para todos; cada aluno recebe o formato que remove a sua barreira. Você decide tudo.</p></div>
+      {% if turmas|length > 1 %}<form method="get"><select name="turma" onchange="this.form.submit()" class="sel-turma">{% for t in turmas %}<option value="{{ t.pk }}" {% if t.pk == turma.pk %}selected{% endif %}>{{ t.nome }}</option>{% endfor %}</select></form>{% endif %}
+    </section>
+
+    <section class="pg-kpis">
+      <article class="kpi kpi-roxo"><p class="kpi-rot">Alunos</p><p class="kpi-val">{{ kpis.alunos }}</p><div class="kpi-pe"><span class="kpi-sub">{{ kpis.atencao }} pedem atenção</span></div></article>
+      <article class="kpi kpi-verde"><p class="kpi-rot">Acerto da turma</p><p class="kpi-val">{% if kpis.acerto is not None %}{{ kpis.acerto }}%{% else %}–{% endif %}</p><div class="kpi-pe"><span class="kpi-sub">últimas aulas de cada aluno</span></div></article>
+      <article class="kpi kpi-verde2"><p class="kpi-rot">Aulas na trilha</p><p class="kpi-val">{{ kpis.publicadas }}</p><div class="kpi-pe"><span class="kpi-sub">{{ kpis.rascunhos }} rascunho(s) · acessibilidade média {{ kpis.indice|default:"–" }}</span></div></article>
+      <article class="kpi kpi-laranja"><p class="kpi-rot">Sugestões para decidir</p><p class="kpi-val">{{ kpis.sugestoes }}</p><div class="kpi-pe"><span class="kpi-sub">vindas da família e dos dados de uso</span></div></article>
+    </section>
+
+    <section class="pg-grade">
+      <article class="cartao-pg destaque-upload">
+        <h2>Transformar material em trilha</h2>
+        <p>Envie um PDF ou texto. O Chamilion divide em fases curtas (até 10 por mundo), põe um roteiro no início de cada uma e mede a acessibilidade. Você revisa, adiciona as questões e publica.</p>
+        <a class="btn-missao" href="{% url 'prototipo:prof_material' %}">Enviar PDF ou material</a>
+      </article>
+      <article class="cartao-pg">
+        <h2>Sugestões de apoio</h2>
+        {% for s in sugestoes %}
+          <div class="sug"><div><strong>{{ s.aluno.usuario.first_name|default:s.aluno }}</strong>: {{ s.get_campo_display }} → {% if s.valor_sugerido %}ligar{% else %}desligar{% endif %}<p class="mini">{{ s.motivo }} · origem: {{ s.get_origem_display }}</p></div>
+            <form method="post" action="{% url 'perfis:aceitar_sugestao' s.pk %}">{% csrf_token %}<button class="btn-contorno">Aceitar</button></form>
+            <form method="post" action="{% url 'perfis:recusar_sugestao' s.pk %}">{% csrf_token %}<button class="btn-link">Recusar</button></form></div>
+        {% empty %}<p class="vazio">Nenhuma sugestão pendente.</p>{% endfor %}
+      </article>
+    </section>
+
+    <section class="cartao-pg">
+      <header><h2>Alunos</h2><a class="btn-contorno" href="{% url 'turmas:novo_aluno' turma.pk %}">+ Aluno</a></header>
+      <table class="tabela-aulas">
+        <thead><tr><th>Aluno</th><th>Apoios (você escolhe)</th><th>Acerto recente</th><th>Situação</th><th>Família</th><th></th></tr></thead>
+        <tbody>{% for x in alunos %}
+          <tr><td><strong>{{ x.aluno.usuario.first_name|default:x.aluno.usuario.username }}</strong></td>
+            <td>{% for ap in x.apoios %}<span class="chip">{{ ap }}</span>{% empty %}<span class="mini">aula original</span>{% endfor %}{% for p in x.prefs %}<span class="chip ok">{{ p }}</span>{% endfor %}</td>
+            <td>{% if x.acerto is not None %}<strong>{{ x.acerto }}%</strong>{% else %}–{% endif %}</td>
+            <td><span class="estado-mini estado-{{ x.estado.0 }}"><span class="pg-ponto"></span>{{ x.estado.1 }}</span></td>
+            <td>{% if x.aluno.responsavel %}<span class="chip ok">tem acesso</span>{% else %}<a href="{% url 'turmas:nova_familia' turma.pk x.aluno.pk %}">criar acesso</a>{% endif %}</td>
+            <td class="acoes-linha"><a class="btn-contorno" href="{% url 'prototipo:progresso' %}?aluno={{ x.aluno.pk }}">Progresso</a><a class="btn-link" href="{% url 'perfis:editar_apoios' x.aluno.pk %}">Apoios</a></td></tr>
+        {% empty %}<tr><td colspan="6">Nenhum aluno ainda.</td></tr>{% endfor %}</tbody>
+      </table>
+    </section>
+
+    <section class="cartao-pg">
+      <header><h2>Aulas</h2><a class="btn-contorno" href="{% url 'aulas:nova' turma.pk %}">+ Aula</a></header>
+      <table class="tabela-aulas">
+        <thead><tr><th>Aula</th><th>Acessibilidade</th><th>Questões</th><th>Status</th><th></th></tr></thead>
+        <tbody>{% for l in linhas %}
+          <tr><td><strong>{{ l.assunto }}</strong><span class="mini"> · {{ l.materia }}</span></td>
+            <td><span class="indice {% if l.indice >= 75 %}bom{% elif l.indice >= 50 %}medio{% else %}baixo{% endif %}">{{ l.indice }}</span></td>
+            <td>{{ l.n_q }}</td>
+            <td>{% if l.aula.publicada %}<span class="chip ok">na trilha</span>{% else %}<span class="chip">rascunho</span>{% endif %}</td>
+            <td class="acoes-linha"><a class="btn-contorno" href="{% url 'prototipo:prof_analise' l.aula.pk %}">Análise</a><a class="btn-link" href="{% url 'aulas:detalhe_professor' l.aula.pk %}">Versões e questões</a></td></tr>
+        {% empty %}<tr><td colspan="5">Nenhuma aula. Envie um material para começar.</td></tr>{% endfor %}</tbody>
+      </table>
+    </section>
+    {% endif %}
+  </main>
+  <script src="{% static 'prototipo/brilho.js' %}"></script>
+</body>
+</html>

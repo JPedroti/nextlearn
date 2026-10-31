@@ -134,10 +134,10 @@ class Login(LoginView):
 
     def get_success_url(self):
         url = self.get_redirect_url()
-        if not url and self.request.user.papel in ("aluno", "professor"):
+        if not url:
             from django.urls import reverse
 
-            return reverse("prototipo:painel_aluno" if self.request.user.papel == "aluno" else "prototipo:prof_aulas")
+            return reverse({"aluno": "prototipo:painel_aluno", "professor": "prototipo:professor", "familia": "prototipo:familia"}[self.request.user.papel])
         return url or super().get_success_url()
 
     def get_context_data(self, **kwargs):
@@ -164,6 +164,19 @@ PRAZO_DIAS = 7            # valor de produto, a calibrar: o backend ainda não t
 LIMITE_DIARIO_MIN = 40    # minutos por dia combinados com a família
 
 
+def combinados(aluno):
+    """Combinados da família (ConfigFamilia). Se a tabela ainda não existir (falta migrate), usa o padrão."""
+    try:
+        from .models import ConfigFamilia
+
+        c = ConfigFamilia.objects.filter(aluno=aluno).first()
+        if c:
+            return {"meta": c.meta_semanal, "limite": c.limite_diario_min, "ofensiva": c.mostrar_ofensiva, "obj": c}
+    except Exception:
+        pass
+    return {"meta": META_SEMANAL, "limite": LIMITE_DIARIO_MIN, "ofensiva": True, "obj": None}
+
+
 def _materia(titulo):
     return titulo.split(":", 1)[0].strip() if ":" in titulo else "Geral"
 
@@ -180,6 +193,8 @@ def _dados_aluno(aluno):
     from apps.aulas.models import Resposta
 
     agora = timezone.localtime()
+    cfg = combinados(aluno)
+    meta_sem, limite_dia = cfg["meta"], cfg["limite"]
     respostas = list(Resposta.objects.filter(aluno=aluno).select_related("questao__aula"))
     por_aula = {}
     for r in respostas:
@@ -224,8 +239,8 @@ def _dados_aluno(aluno):
         contagem[semana(i["quando"])] = contagem.get(semana(i["quando"]), 0) + 1
     esta = semana(agora)
     feitas_semana = contagem.get(esta, 0)
-    ofensiva, s = (1 if feitas_semana >= META_SEMANAL else 0), esta - timedelta(days=7)
-    while contagem.get(s, 0) >= META_SEMANAL:
+    ofensiva, s = (1 if feitas_semana >= meta_sem else 0), esta - timedelta(days=7)
+    while contagem.get(s, 0) >= meta_sem:
         ofensiva += 1
         s -= timedelta(days=7)
 
@@ -245,13 +260,26 @@ def _dados_aluno(aluno):
         "delta": round(m_rec - m_ant, 1) if len(recentes) >= 3 and len(antigas) >= 3 else None,
         "delta_abs": abs(round(m_rec - m_ant, 1)) if len(recentes) >= 3 and len(antigas) >= 3 else None,
         "por_materia": por_materia, "evolucao": evolucao,
-        "ofensiva": ofensiva, "feitas_semana": feitas_semana, "meta_semanal": META_SEMANAL,
-        "meta_bolinhas": [n < feitas_semana for n in range(META_SEMANAL)],
-        "min_semana": min_semana, "min_hoje": min_hoje, "limite_diario": LIMITE_DIARIO_MIN,
-        "pct_hoje": min(100, int(100 * min_hoje / LIMITE_DIARIO_MIN)),
+        "ofensiva": ofensiva, "feitas_semana": feitas_semana, "meta_semanal": meta_sem,
+        "meta_bolinhas": [n < feitas_semana for n in range(meta_sem)],
+        "mostrar_ofensiva": cfg["ofensiva"], "min_semana": min_semana, "min_hoje": min_hoje, "limite_diario": limite_dia,
+        "pct_hoje": min(100, int(100 * min_hoje / limite_dia)),
         "dominadas": dominadas, "revisar": revisar, "n_erradas": len(erradas), "n_revisao": len(revisao_7d),
         "respostas": respostas,
     }
+
+
+def _aluno_para_quem_ve(request):
+    """Aluno vê o próprio; família vê o filho (responsavel); professor vê aluno da sua turma. ?aluno=<id>."""
+    from apps.turmas.models import Aluno
+
+    u = request.user
+    if u.papel == "aluno":
+        return _aluno_logado(request)
+    qs = Aluno.objects.select_related("turma", "usuario")
+    qs = qs.filter(responsavel=u) if u.papel == "familia" else qs.filter(turma__professor=u)
+    pk = request.GET.get("aluno")
+    return (qs.filter(pk=pk).first() if pk else None) or qs.first()
 
 
 def _aluno_logado(request):
@@ -260,6 +288,7 @@ def _aluno_logado(request):
     return Aluno.objects.select_related("turma", "perfil", "usuario").filter(usuario=request.user).first()
 
 
+from django.contrib.auth.decorators import login_required  # noqa: E402
 from django.views.decorators.clickjacking import xframe_options_sameorigin  # noqa: E402
 
 from apps.contas.decorators import papel_requerido  # noqa: E402
@@ -305,7 +334,7 @@ def painel_aluno(request):
                   "detalhe": f"{i['acertos']} de {i['total']} certas", "url": reverse("aulas:ver", args=[i["aula"].pk])}
                  for i in contexto["feitas"]]
     dados = {"hoje": hoje.date().isoformat(), "eventos": eventos, "minutos": minutos, "notas": notas,
-             "pendentes": pendentes_js, "feitas": feitas_js, "limite": LIMITE_DIARIO_MIN, "meta": META_SEMANAL}
+             "pendentes": pendentes_js, "feitas": feitas_js, "limite": contexto["limite_diario"], "meta": contexto["meta_semanal"]}
 
     from django.conf import settings
 
@@ -687,7 +716,7 @@ def _sparkline(valores, cor="#4F46E5"):
 
 
 @xframe_options_sameorigin
-@papel_requerido("aluno")
+@login_required
 def progresso(request):
     import statistics
     from datetime import timedelta
@@ -697,13 +726,14 @@ def progresso(request):
 
     from apps.aulas.models import Resposta
 
-    aluno = _aluno_logado(request)
+    aluno = _aluno_para_quem_ve(request)
     if not aluno:
         return render(request, "prototipo/painel_aluno.html", {"sem_turma": True})
     perfil = getattr(aluno, "perfil", None)
     perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
     a, tema, _ = _apoios_visuais(perfil, perfil_dev)
-    modo = modo_da_tela(a, perfil_dev)
+    modo = modo_da_tela(a, perfil_dev) if request.user.papel == "aluno" else "padrao"
+    META_SEMANAL = combinados(aluno)["meta"]  # noqa: N806 (meta combinada pela família)
     hoje = timezone.localtime()
     resp = list(Resposta.objects.filter(aluno=aluno).select_related("questao__aula").order_by("criado_em", "questao__ordem"))
 
@@ -838,6 +868,7 @@ def progresso(request):
         "por_materia": [(m, _grafico_linha(v, [f"aula {i + 1}" for i in range(len(v))], maximo=10, cor="#0EA5E9", id_=f"gm{k}"),
                          _fmt(sum(v[-3:]) / len(v[-3:]))) for k, (m, v) in enumerate(sorted(por_materia.items()))],
         "n_respostas": len(resp), "n_sessoes": len(sessoes), "hoje": hoje, "periodo": f"{rot[0]} a {hoje.strftime('%d/%m')}",
+        "quem_ve": request.user.papel, "meta_semanal": META_SEMANAL,
     }
     return render(request, "prototipo/progresso.html", contexto)
 
@@ -1038,3 +1069,227 @@ def prof_analise(request, pk):
 def como_resolvemos(request):
     """Página para a banca: cada problema → o que a plataforma faz → onde ver funcionando → evidência."""
     return render(request, "prototipo/como_resolvemos.html")
+
+
+# ===========================================================================
+# PROFESSOR (real, ligado ao backend): visão da turma + material que vira trilha
+# (substitui a tela de exemplo antiga, que usava dados.py)
+# ===========================================================================
+def _resumo_aluno(aluno):
+    """Números de um aluno para as telas do professor e da família."""
+    d = _dados_aluno(aluno)
+    feitas = d["feitas"]
+    rec = [i for i in feitas[:4]]
+    acerto = round(100 * sum(i["acertos"] for i in rec) / max(1, sum(i["total"] for i in rec))) if rec else None
+    ultima = feitas[0]["quando"] if feitas else None
+    from django.utils import timezone
+
+    dias = (timezone.localtime() - ultima).days if ultima else None
+    estado = ("ok", "Estudando com regularidade") if dias is not None and dias < 7 else \
+             (("atencao", f"Sem estudar há {dias} dias") if dias is not None else ("neutro", "Ainda não começou"))
+    perfil = getattr(aluno, "perfil", None)
+    return {"aluno": aluno, "d": d, "acerto": acerto, "estado": estado, "apoios": perfil.nomes_apoios() if perfil else [],
+            "prefs": [n for n, v in (("Letras espaçadas", getattr(perfil, "fonte_dislexia", False)), ("Ouvir", getattr(perfil, "leitura_voz", False)),
+                                     ("Modo limpo", getattr(perfil, "modo_limpo", False))) if v]}
+
+
+@papel_requerido("professor")
+def professor(request):
+    from apps.aulas.models import Aula
+    from apps.perfis.models import SugestaoPerfil
+    from apps.turmas.models import Aluno, Turma
+
+    from .analise_aula import analisar
+
+    turmas = list(Turma.objects.filter(professor=request.user))
+    turma = next((t for t in turmas if str(t.pk) == request.GET.get("turma")), turmas[0] if turmas else None)
+    alunos = [_resumo_aluno(a) for a in Aluno.objects.filter(turma=turma).select_related("usuario", "perfil", "responsavel")] if turma else []
+    aulas = list(Aula.objects.filter(turma=turma).prefetch_related("questoes").order_by("-criada_em")) if turma else []
+    linhas = []
+    for aula in aulas:
+        r = analisar(aula, list(aula.questoes.all()))
+        linhas.append({"aula": aula, "indice": r["indice"], "n_q": len(aula.questoes.all()), "assunto": _assunto(aula.titulo), "materia": _materia(aula.titulo)})
+    sugestoes = list(SugestaoPerfil.objects.filter(aluno__turma=turma, status="pendente").select_related("aluno__usuario")) if turma else []
+    acertos = [x["acerto"] for x in alunos if x["acerto"] is not None]
+    kpis = {"alunos": len(alunos), "publicadas": sum(1 for a in aulas if a.publicada), "rascunhos": sum(1 for a in aulas if not a.publicada),
+            "acerto": round(sum(acertos) / len(acertos)) if acertos else None, "sugestoes": len(sugestoes),
+            "atencao": sum(1 for x in alunos if x["estado"][0] != "ok"),
+            "indice": round(sum(l["indice"] for l in linhas) / len(linhas)) if linhas else None}
+    return render(request, "prototipo/prof_inicio.html", {"turmas": turmas, "turma": turma, "alunos": alunos, "linhas": linhas[:12],
+                                                          "sugestoes": sugestoes, "kpis": kpis})
+
+
+def _texto_do_arquivo(arquivo):
+    nome = (arquivo.name or "").lower()
+    if nome.endswith(".pdf"):
+        try:
+            from pypdf import PdfReader
+        except ImportError:
+            return None, "Para ler PDF, rode o rodar_prototipo.bat de novo (ele instala o pypdf)."
+        try:
+            leitor = PdfReader(arquivo)
+            return "\n\n".join((p.extract_text() or "") for p in leitor.pages[:40]), None
+        except Exception:
+            return None, "Não consegui ler esse PDF (pode ser imagem escaneada). Cole o texto no campo abaixo."
+    try:
+        return arquivo.read().decode("utf-8", errors="ignore"), None
+    except Exception:
+        return None, "Formato não reconhecido. Use PDF, TXT ou MD."
+
+
+def dividir_em_fases(texto, max_palavras=110, max_fases=10):
+    """Quebra o material em fases curtas (blocos de até ~110 palavras, P3 memória de trabalho), no máximo 10 = 1 mundo."""
+    import re
+
+    texto = re.sub(r"[ \t]+", " ", texto.replace("\r", ""))
+    paragrafos = [p.strip() for p in re.split(r"\n\s*\n|\n(?=[A-ZÁÉÍÓÚ0-9][^\n]{0,60}\n)", texto) if len(p.strip().split()) >= 5]
+    fases, atual = [], []
+    for p in paragrafos:
+        p = re.sub(r"\s*\n\s*", " ", p)
+        if atual and len(" ".join(atual).split()) + len(p.split()) > max_palavras:
+            fases.append(" ".join(atual))
+            atual = []
+        atual.append(p)
+    if atual:
+        fases.append(" ".join(atual))
+    # blocos ainda grandes: quebra por frases
+    final = []
+    for f in fases:
+        palavras = f.split()
+        if len(palavras) <= max_palavras * 1.5:
+            final.append(f)
+            continue
+        frases, bloco = re.split(r"(?<=[.!?])\s+", f), []
+        for fr in frases:
+            if bloco and len(" ".join(bloco).split()) + len(fr.split()) > max_palavras:
+                final.append(" ".join(bloco))
+                bloco = []
+            bloco.append(fr)
+        if bloco:
+            final.append(" ".join(bloco))
+    return final[:max_fases], max(0, len(final) - max_fases)
+
+
+@papel_requerido("professor")
+def prof_material(request):
+    """Professor envia PDF/material → vira um mundo da trilha (até 10 fases, criadas como rascunho para revisar)."""
+    from django.contrib import messages
+    from django.shortcuts import redirect
+
+    from apps.aulas.models import Aula
+    from apps.turmas.models import Turma
+
+    from .analise_aula import analisar
+
+    turmas = list(Turma.objects.filter(professor=request.user))
+    criadas = []
+    if request.method == "POST":
+        turma = next((t for t in turmas if str(t.pk) == request.POST.get("turma")), None)
+        materia = (request.POST.get("materia") or "Geral").strip()[:40]
+        titulo = (request.POST.get("titulo") or "Material").strip()[:80]
+        texto, erro = "", None
+        if request.FILES.get("arquivo"):
+            texto, erro = _texto_do_arquivo(request.FILES["arquivo"])
+        if not texto:
+            texto = request.POST.get("texto", "")
+        if erro and not request.POST.get("texto"):
+            messages.error(request, erro)
+        elif not turma or len((texto or "").split()) < 20:
+            messages.error(request, "Escolha a turma e envie um material com pelo menos 20 palavras.")
+        else:
+            fases, sobra = dividir_em_fases(texto)
+            ids = []
+            for n, conteudo in enumerate(fases, 1):
+                roteiro = f"Hoje vamos ver a parte {n} de {len(fases)} sobre {titulo}.\n\n"
+                a = Aula.objects.create(turma=turma, titulo=f"{materia}: {titulo} — parte {n}", conteudo=roteiro + conteudo, publicada=False)
+                ids.append(a.pk)
+            request.session["material_criado"] = ids
+            if sobra:
+                messages.info(request, f"O material deu mais de 10 fases; {sobra} ficaram de fora. Envie o resto como outro material (vira um novo mundo).")
+            messages.success(request, f"{len(fases)} fases criadas como rascunho. Revise, adicione as questões e publique.")
+            return redirect("prototipo:prof_material")
+    ids = request.session.get("material_criado", [])
+    for a in Aula.objects.filter(pk__in=ids, turma__professor=request.user).prefetch_related("questoes").order_by("pk"):
+        r = analisar(a, list(a.questoes.all()))
+        criadas.append({"aula": a, "indice": r["indice"], "faltam": [c["nome"] for c in r["checagens"] if not c["ok"]][:3],
+                        "palavras": r["palavras"], "minutos": r["minutos"], "n_q": a.questoes.count(), "assunto": _assunto(a.titulo)})
+    return render(request, "prototipo/prof_material.html", {"turmas": turmas, "criadas": criadas})
+
+
+@papel_requerido("professor")
+def prof_publicar(request):
+    """Publica de uma vez as fases do material (só as que têm questões; aula sem questão não vira fase)."""
+    from django.contrib import messages
+    from django.shortcuts import redirect
+
+    from apps.aulas.models import Aula
+
+    if request.method == "POST":
+        ids = request.session.get("material_criado", [])
+        prontas = [a for a in Aula.objects.filter(pk__in=ids, turma__professor=request.user) if a.questoes.exists()]
+        for a in prontas:
+            a.publicada = True
+            a.save(update_fields=["publicada"])
+        faltam = len(ids) - len(prontas)
+        messages.success(request, f"{len(prontas)} fase(s) publicadas na trilha dos alunos." + (f" {faltam} ainda sem questões." if faltam else ""))
+    return redirect("prototipo:prof_material")
+
+
+# ===========================================================================
+# FAMÍLIA (real, ligada ao backend)
+# ===========================================================================
+DICAS_CASA = {
+    "Atenção e foco": ["Estudem em blocos de 10 a 15 minutos, com uma pausa curta entre eles.",
+                       "Deixe só o material da tarefa na mesa; celular longe.",
+                       "Peça uma coisa de cada vez e confira antes de passar para a próxima."],
+    "Acessibilidade textual": ["Leiam juntos em voz alta ou usem o botão Ouvir.",
+                               "Troque palavras difíceis por palavras do dia a dia ao explicar.",
+                               "Prefira frases curtas e diretas; evite ironia e duplo sentido."],
+    "Interativo e concreto": ["Use objetos de casa: frações com pizza, dinheiro, receitas.",
+                              "Desenhem juntos o problema antes de resolver.",
+                              "Ligue o conteúdo a algo que a criança goste (jogo, esporte, culinária)."],
+}
+
+
+@papel_requerido("familia")
+def familia(request):
+    from django.contrib import messages
+    from django.shortcuts import redirect
+
+    from apps.perfis.models import RespostaQuestionario
+    from apps.turmas.models import Aluno
+
+    filhos = list(Aluno.objects.filter(responsavel=request.user).select_related("usuario", "turma", "perfil", "turma__professor"))
+    if not filhos:
+        return render(request, "prototipo/familia_inicio.html", {"sem_filho": True})
+    aluno = next((a for a in filhos if str(a.pk) == request.GET.get("aluno")), filhos[0])
+    if request.method == "POST":
+        try:
+            from .models import ConfigFamilia
+
+            c, _ = ConfigFamilia.objects.get_or_create(aluno=aluno)
+            c.limite_diario_min = max(15, min(120, int(request.POST.get("limite", 40))))
+            c.meta_semanal = max(1, min(7, int(request.POST.get("meta", 2))))
+            c.mostrar_ofensiva = request.POST.get("ofensiva") == "on"
+            c.resumo_semanal = request.POST.get("resumo") == "on"
+            c.save()
+            messages.success(request, "Combinados salvos. A área do aluno já usa os novos valores.")
+        except Exception:
+            messages.error(request, "Não consegui salvar: rode o rodar_prototipo.bat de novo para atualizar o banco (migrate).")
+        return redirect(f"{request.path}?aluno={aluno.pk}")
+    r = _resumo_aluno(aluno)
+    d = r["d"]
+    cfg = combinados(aluno)
+    por_mat = {}
+    for i in d["feitas"]:
+        por_mat.setdefault(i["materia"], []).append(i["nota"])
+    medias = {m: round(sum(v[:3]) / len(v[:3]), 1) for m, v in por_mat.items()}
+    reforco = min(medias, key=medias.get) if medias else None
+    ultima_reforco = next((i for i in d["feitas"] if i["materia"] == reforco), None)
+    questionario = RespostaQuestionario.objects.filter(aluno=aluno).order_by("-pk").first()
+    dicas = [(ap, DICAS_CASA.get(ap, [])) for ap in r["apoios"]] or [("Sem apoio especial", ["Combine um horário fixo de estudo.", "Pergunte o que aprendeu hoje e peça para explicar com as palavras dele."])]
+    return render(request, "prototipo/familia_inicio.html", {
+        "filhos": filhos, "aluno": aluno, "r": r, "d": d, "cfg": cfg, "medias": sorted(medias.items()), "reforco": reforco,
+        "ultima_reforco": ultima_reforco, "questionario": questionario, "dicas": dicas,
+        "pct_hoje": min(100, int(100 * d["min_hoje"] / max(1, cfg["limite"]))),
+    })

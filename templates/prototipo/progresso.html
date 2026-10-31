@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Progresso de {{ aluno.usuario.first_name }} · NextLearn</title>
+  <title>Progresso de {{ aluno.usuario.first_name }} · Chamilion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
@@ -12,9 +12,9 @@
 <body data-perfil-dev="{{ perfil_dev }}" data-modo="{{ modo }}" class="pg-progresso modo-{{ modo }} tema-{{ tema }}{% if foco %} apoio-foco{% endif %}{% if limpo %} modo-limpo{% endif %}{% if letras %} letras-espacadas{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
-    <a href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn</a>
+    <a href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>Chamilion</a>
     <nav class="topo-direita" aria-label="Navegação">
-      <a class="btn-contorno" href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}">Voltar à trilha</a>
+      {% if quem_ve == "familia" %}<a class="btn-contorno" href="{% url 'prototipo:familia' %}?aluno={{ aluno.pk }}">Voltar</a>{% elif quem_ve == "professor" %}<a class="btn-contorno" href="{% url 'prototipo:professor' %}">Voltar à turma</a>{% else %}<a class="btn-contorno" href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}">Voltar à trilha</a>{% endif %}
       <button type="button" class="btn-contorno" onclick="window.print()">Imprimir / PDF</button>
     </nav>
   </header>
@@ -70,7 +70,7 @@
         </div>
       </article>
       <article class="cartao-pg">
-        <header><h2>Meta semanal</h2><span class="pg-tag">2 aulas (combinada)</span></header>
+        <header><h2>Meta semanal</h2><span class="pg-tag">{{ meta_semanal }} aula(s) (combinada)</span></header>
         <ol class="semanas">{% for r, ok, n in metas %}<li class="{% if ok %}ok{% endif %}"><span class="sem-quadro">{% if ok %}✓{% else %}{{ n }}{% endif %}</span><span class="mini">{{ r }}</span></li>{% endfor %}</ol>
         <p class="pg-nota">✓ meta cumprida. Semana parada só pausa, não zera (sem punição).</p>
       </article>

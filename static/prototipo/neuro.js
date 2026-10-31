@@ -1,4 +1,4 @@
-// Protótipo NextLearn: preferências (salvas no navegador), leitura em voz alta, passos e questões.
+// Protótipo Chamilion: preferências (salvas no navegador), leitura em voz alta, passos e questões.
 (function () {
   var body = document.body;
   var aviso = document.getElementById("aviso");

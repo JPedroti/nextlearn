@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ titulo }} · NextLearn</title>
+  <title>{{ titulo }} · Chamilion</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
@@ -11,7 +11,7 @@
 <body class="tema-{% if foco %}foco{% else %}base{% endif %}{% if foco %} apoio-foco{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
-    <a href="{% url 'prototipo:painel_aluno' %}" class="marca">NextLearn</a>
+    <a href="{% url 'prototipo:painel_aluno' %}" class="marca">Chamilion</a>
     <div class="topo-direita">
       <a href="{% url 'prototipo:painel_aluno' %}#calendario" class="btn-contorno"><svg class="ico" aria-hidden="true"><use href="#i-calendario"/></svg>Calendário</a>
       <a href="{% url 'prototipo:painel_aluno' %}" class="btn-link">Voltar para minha área</a>

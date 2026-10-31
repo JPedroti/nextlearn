@@ -44,3 +44,26 @@
 .pg-sinais.um { grid-template-columns: 1fr; }
 .pg-resumo ol { margin: 10px 0 0; padding-left: 22px; display: grid; gap: 6px; }
 @media (max-width: 860px) { .player { grid-template-columns: 1fr; } .tabela-aulas { font-size: .9rem; } }
+
+/* Professor e família */
+.msgs { display: grid; gap: 8px; } .msgs p { margin: 0; padding: 12px 16px; border-radius: 14px; background: #EEF2FF; color: #312E81; font-weight: 700; }
+.msgs .msg-success { background: #DCFCE7; color: #14532D; } .msgs .msg-error { background: #FEE2E2; color: #7F1D1D; } .msgs .msg-info { background: #FEF3C7; color: #78350F; }
+.sel-turma { min-height: 44px; border-radius: 12px; padding: 0 12px; font: inherit; }
+.destaque-upload { background: linear-gradient(135deg, #EEF2FF, #ECFEFF); border: 1px solid #C7D2FE; }
+.destaque-upload .btn-missao, .form-material .btn-missao, .combinados .btn-missao, .cartao-pg header .btn-missao { background: #4F46E5; color: #FFFFFF; margin-top: 12px; }
+.sug { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid #EEF2F6; } .sug > div { flex: 1; } .sug p { margin: 2px 0 0; } .sug form { margin: 0; }
+.estado-mini { display: inline-flex; align-items: center; gap: 8px; font-size: .9rem; }
+.acoes-linha { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.form-material, .combinados { display: grid; gap: 12px; }
+.form-material label, .combinados label { display: grid; gap: 6px; font-weight: 700; color: #1E293B; }
+.form-material input, .form-material select, .form-material textarea { min-height: 46px; padding: 8px 12px; border: 2px solid #E2E8F0; border-radius: 12px; font: inherit; font-weight: 400; }
+.form-material textarea { min-height: 140px; }
+.passos-mat { display: grid; gap: 10px; padding-left: 20px; }
+.combinados .val { color: #4F46E5; } .combinados input[type=range] { width: 100%; accent-color: #4F46E5; }
+.combinados .check { display: flex; gap: 10px; align-items: center; font-weight: 400; } .combinados .check input { width: 22px; height: 22px; }
+.mini-barra { display: block; width: 90px; height: 8px; border-radius: 999px; background: #E2E8F0; overflow: hidden; } .mini-barra span { display: block; height: 100%; background: #10B981; }
+.dicas-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 10px; }
+.dica { padding: 14px; border-radius: 16px; background: #F8FAFC; border: 1px solid #E2E8F0; } .dica h3 { margin: 0 0 6px; font-size: 1rem; color: #4338CA; } .dica ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.atividade-casa { background: linear-gradient(135deg, #FFFFFF, #FFF7ED); border: 1px solid #FED7AA; } .atividade-casa ol { padding-left: 20px; }
+.lista-simples { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; } .sub-h { margin: 16px 0 4px; font-size: 1rem; }
+.topo .btn-contorno.ativo { border-color: #4F46E5; color: #4F46E5; }
