@@ -4,26 +4,99 @@
 
 {% block conteudo %}
 <a href="{% url 'perfis:inicio' %}" class="voltar">← Início</a>
-<h1 class="text-2xl font-semibold mt-3 mb-1">Como é o dia a dia de {{ aluno.usuario.first_name|default:aluno.usuario.username }}?</h1>
-<p class="text-slate-600 mb-6">
-  Responda pensando no que você observa em casa, nos estudos e nas tarefas. Não existe resposta certa.
-  Não pedimos laudo nem diagnóstico: as respostas só sugerem apoios ao professor, que decide.
-  {% if anterior %}As respostas de {{ anterior.criado_em|date:"d/m" }} já vêm marcadas; mude o que for preciso.{% endif %}
+
+<h1 class="text-2xl font-semibold mt-3 mb-1">Conte um pouco sobre {{ aluno.usuario.first_name|default:aluno.usuario.username }}</h1>
+<p class="text-slate-600 mb-2">
+  Este questionário ajuda o professor a conhecer melhor como seu filho(a) aprende.
+  Não existe resposta certa ou errada — cada pessoa tem seu jeito, e a escola pode se adaptar a isso.
+</p>
+<p class="text-sm text-slate-500 mb-6">
+  Não pedimos laudo nem diagnóstico. As respostas apenas sugerem apoios ao professor, que decide o que funciona melhor.
+  {% if anterior %}As respostas de {{ anterior.criado_em|date:"d/m" }} já vêm marcadas — é só ajustar o que mudou.{% endif %}
 </p>
 
 <form method="post">
   {% csrf_token %}
-  {% for campo in form %}
-    <fieldset class="cartao mb-4">
-      <legend class="float-left w-full font-medium mb-3">{{ forloop.counter }}. {{ campo.label }}</legend>
-      <div class="clear-both flex flex-wrap gap-x-6 gap-y-2">
-        {% for opcao in campo %}
-          <label class="inline-flex items-center gap-2 cursor-pointer">{{ opcao.tag }} {{ opcao.choice_label }}</label>
-        {% endfor %}
-      </div>
-      {{ campo.errors }}
-    </fieldset>
-  {% endfor %}
-  <button type="submit" class="btn">Enviar respostas</button>
+
+  <!-- Nome do aluno -->
+  <fieldset class="cartao mb-6 border-l-4 border-indigo-300">
+    <legend class="float-left w-full font-medium mb-1 text-lg">{{ form.nome_aluno.label }}</legend>
+    <p class="clear-both text-sm text-slate-500 mb-3">{{ form.nome_aluno.help_text }}</p>
+    {{ form.nome_aluno }}
+    {{ form.nome_aluno.errors }}
+  </fieldset>
+
+  <!-- Atenção e foco -->
+  <section class="mb-6">
+    <h2 class="text-lg font-semibold mb-1">Atenção e foco</h2>
+    <p class="text-sm text-slate-500 mb-4">Como é a relação dele(a) com tarefas que exigem concentração?</p>
+    {% for campo in form %}
+      {% if campo.name != "nome_aluno" and campo.name != "observacoes" %}
+        {% if campo.name == "foco_tarefas_longas" or campo.name == "foco_distracoes" or campo.name == "foco_organizacao" %}
+          <fieldset class="cartao mb-4">
+            <legend class="float-left w-full font-medium mb-3">{{ campo.label }}</legend>
+            <div class="clear-both flex flex-wrap gap-x-6 gap-y-2">
+              {% for opcao in campo %}
+                <label class="inline-flex items-center gap-2 cursor-pointer">{{ opcao.tag }} {{ opcao.choice_label }}</label>
+              {% endfor %}
+            </div>
+            {{ campo.errors }}
+          </fieldset>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </section>
+
+  <!-- Leitura e compreensão -->
+  <section class="mb-6">
+    <h2 class="text-lg font-semibold mb-1">Leitura e compreensão</h2>
+    <p class="text-sm text-slate-500 mb-4">Como ele(a) lida com textos, palavras e expressões?</p>
+    {% for campo in form %}
+      {% if campo.name != "nome_aluno" and campo.name != "observacoes" %}
+        {% if campo.name == "textual_textos_longos" or campo.name == "textual_sentido_literal" or campo.name == "textual_palavras_dificeis" %}
+          <fieldset class="cartao mb-4">
+            <legend class="float-left w-full font-medium mb-3">{{ campo.label }}</legend>
+            <div class="clear-both flex flex-wrap gap-x-6 gap-y-2">
+              {% for opcao in campo %}
+                <label class="inline-flex items-center gap-2 cursor-pointer">{{ opcao.tag }} {{ opcao.choice_label }}</label>
+              {% endfor %}
+            </div>
+            {{ campo.errors }}
+          </fieldset>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </section>
+
+  <!-- Exemplos e visualização -->
+  <section class="mb-6">
+    <h2 class="text-lg font-semibold mb-1">Exemplos e visualização</h2>
+    <p class="text-sm text-slate-500 mb-4">Como ele(a) entende melhor conceitos novos ou abstratos?</p>
+    {% for campo in form %}
+      {% if campo.name != "nome_aluno" and campo.name != "observacoes" %}
+        {% if campo.name == "concreto_ideias_abstratas" or campo.name == "concreto_exemplos" or campo.name == "concreto_visualizacao" %}
+          <fieldset class="cartao mb-4">
+            <legend class="float-left w-full font-medium mb-3">{{ campo.label }}</legend>
+            <div class="clear-both flex flex-wrap gap-x-6 gap-y-2">
+              {% for opcao in campo %}
+                <label class="inline-flex items-center gap-2 cursor-pointer">{{ opcao.tag }} {{ opcao.choice_label }}</label>
+              {% endfor %}
+            </div>
+            {{ campo.errors }}
+          </fieldset>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </section>
+
+  <!-- Observações -->
+  <fieldset class="cartao mb-6 border-l-4 border-indigo-300">
+    <legend class="float-left w-full font-medium mb-1 text-lg">{{ form.observacoes.label }}</legend>
+    <p class="clear-both text-sm text-slate-500 mb-3">{{ form.observacoes.help_text }}</p>
+    {{ form.observacoes }}
+    {{ form.observacoes.errors }}
+  </fieldset>
+
+  <button type="submit" class="btn text-lg px-8 py-3">Enviar respostas</button>
 </form>
 {% endblock %}

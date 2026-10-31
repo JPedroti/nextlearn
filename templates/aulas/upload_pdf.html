@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block titulo %}Nova aula via PDF · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'turmas:detalhe' turma.pk %}" class="voltar">← {{ turma.nome }}</a>
+
+<h1 class="text-2xl font-semibold mt-3 mb-1">Criar aula a partir de um PDF</h1>
+<p class="text-slate-600 mb-6">
+  Faça upload de um arquivo PDF com o conteúdo da aula. O sistema extrai o texto automaticamente
+  e pré-preenche o formulário. Depois é só adicionar as questões de múltipla escolha com o gabarito.
+</p>
+
+<div class="cartao max-w-xl">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label class="block mb-3">
+      <span class="font-medium">Arquivo PDF</span>
+      <input type="file" name="pdf" accept=".pdf,application/pdf" required
+             class="mt-1 block w-full text-sm text-slate-600
+                    file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+                    file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700
+                    hover:file:bg-indigo-100">
+    </label>
+    <p class="text-sm text-slate-500 mb-4">
+      Funciona com PDF que tem texto (não com PDF escaneado ou só de imagens), até 10 MB.
+      O texto extraído pode ser editado antes de salvar. O arquivo não fica guardado.
+    </p>
+    <button type="submit" class="btn">Extrair texto e continuar</button>
+  </form>
+</div>
+
+<div class="cartao max-w-xl mt-4">
+  <p class="text-sm text-slate-600">
+    <strong>Prefere escrever a aula diretamente?</strong>
+    <a href="{% url 'aulas:nova' turma.pk %}" class="text-indigo-700 hover:underline">Criar aula manualmente</a>.
+  </p>
+</div>
+{% endblock %}

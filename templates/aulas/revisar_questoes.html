@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block titulo %}Revisar questões · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'aulas:gerar_questoes_via_pdf' turma.pk %}" class="voltar">← Gerar de novo</a>
+
+<h1 class="text-2xl font-semibold mt-3 mb-1">Revise e aprove as questões</h1>
+<p class="text-slate-600 mb-6">
+  A IA <strong>sugeriu</strong> estas questões. Confira, corrija o que quiser e aprove.
+  O gabarito final é sempre o seu. Questões com o enunciado em branco são ignoradas.
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="mb-4 text-red-700">{{ form.non_field_errors }}</div>{% endif %}
+
+  <div class="cartao mb-6">
+    <label class="block mb-3">
+      <span class="font-medium">Título da aula</span>
+      <input type="text" name="titulo" value="{{ titulo }}" class="mt-1">
+      {% if form.titulo_errors %}{% endif %}
+    </label>
+    <label class="block">
+      <span class="font-medium">Texto da aula (versão original do professor)</span>
+      <textarea name="conteudo" rows="8" class="mt-1">{{ conteudo }}</textarea>
+    </label>
+  </div>
+
+  {% for item in form.questoes_campos %}
+    <fieldset class="cartao mb-4">
+      <legend class="float-left w-full font-medium mb-2">Questão {{ forloop.counter }}</legend>
+      <div class="clear-both space-y-3">
+
+        <div>
+          <span class="block text-sm font-medium mb-1">Formato</span>
+          {{ item.tipo }}
+          {{ item.tipo.errors }}
+        </div>
+
+        <div>
+          <span class="block text-sm font-medium mb-1">Enunciado (ou frente do flashcard)</span>
+          {{ item.enunciado }}
+          {{ item.enunciado.errors }}
+        </div>
+
+        <div class="grid gap-3 sm:grid-cols-2">
+          {% for alt in item.alternativas %}
+            <div>
+              <label for="{{ alt.id_for_label }}" class="block text-sm font-medium mb-1">Alternativa {{ alt.label }}</label>
+              {{ alt }}
+              {{ alt.errors }}
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 text-sm">
+          <span class="font-medium">Alternativa correta:</span>
+          <div class="inline-flex items-center gap-2">
+            {% for opcao in item.correta %}
+              <label class="inline-flex items-center gap-1">{{ opcao.tag }}{{ opcao.choice_label }}</label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div>
+          <span class="block text-sm font-medium mb-1">Resposta de referência (escrever) ou verso (flashcard)</span>
+          {{ item.resposta }}
+          {{ item.resposta.errors }}
+        </div>
+
+      </div>
+    </fieldset>
+  {% endfor %}
+
+  <button type="submit" class="btn">Aprovar e salvar aula</button>
+</form>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block titulo %}Gerar questões com IA · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'turmas:detalhe' turma.pk %}" class="voltar">← {{ turma.nome }}</a>
+
+<h1 class="text-2xl font-semibold mt-3 mb-1">Criar aula e questões com IA</h1>
+<p class="text-slate-600 mb-6">
+  Envie o PDF do conteúdo (ou cole o texto). A IA <strong>sugere</strong> as questões — múltipla escolha,
+  escrever ou flashcards — e você revisa, corrige e aprova antes de publicar. O gabarito final é sempre o seu.
+</p>
+
+<div class="cartao max-w-xl">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label class="block mb-3">
+      <span class="font-medium">Arquivo PDF (opcional)</span>
+      <input type="file" name="pdf" accept=".pdf,application/pdf"
+             class="mt-1 block w-full text-sm text-slate-600
+                    file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+                    file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700
+                    hover:file:bg-indigo-100">
+    </label>
+
+    <label class="block mb-3">
+      <span class="font-medium">…ou cole o texto da aula</span>
+      <textarea name="texto" rows="8" class="mt-1" placeholder="Cole aqui o conteúdo da aula."></textarea>
+    </label>
+
+    <p class="text-sm text-slate-500 mb-4">
+      Envie <strong>um PDF</strong> ou cole o texto — não precisa dos dois. O arquivo não fica guardado e
+      nenhum dado de aluno vai para a IA.
+    </p>
+
+    <button type="submit" class="btn">Gerar questões com IA</button>
+  </form>
+</div>
+
+<div class="cartao max-w-xl mt-4">
+  <p class="text-sm text-slate-600">
+    <strong>Prefere escrever as questões você mesmo?</strong>
+    <a href="{% url 'aulas:nova' turma.pk %}" class="text-indigo-700 hover:underline">Criar aula manualmente</a>
+    ou <a href="{% url 'aulas:nova_via_pdf' turma.pk %}" class="text-indigo-700 hover:underline">via PDF</a>.
+  </p>
+</div>
+{% endblock %}
