@@ -7,6 +7,7 @@ A lista completa está em `.env.example`.
 """
 
 import os
+import sys
 from pathlib import Path
 
 import dj_database_url
@@ -119,6 +120,11 @@ AUTH_USER_MODEL = "contas.Usuario"
 LOGIN_URL = "contas:entrar"
 LOGIN_REDIRECT_URL = "contas:inicio"
 LOGOUT_REDIRECT_URL = "contas:entrar"
+
+# Nos testes automáticos, um hash de senha rápido (e inseguro) deixa a suíte bem mais rápida.
+# Nunca vale para o site de verdade: só quando o comando é `manage.py test`.
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

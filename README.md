@@ -58,20 +58,23 @@ Abra http://127.0.0.1:8000 e entre com o usuário criado.
 
 ### Como usar (o que já funciona)
 
-1. **Contas de professor e de família** são criadas em http://127.0.0.1:8000/admin/, em **Usuários → Adicionar**,
-   escolhendo o **papel**.
+1. **Contas de professor** são criadas em http://127.0.0.1:8000/admin/, em **Usuários → Adicionar**,
+   escolhendo o **papel**. As contas de aluno e de família o próprio professor cria nas telas da turma.
 2. O **professor** entra e, em **Minhas turmas**, cria uma turma. Dentro dela:
    - **Cadastrar aluno**: cria o usuário e a senha de primeiro acesso do aluno;
    - **Nova aula**: escreve o texto da aula e as questões de múltipla escolha (2 a 4 alternativas, com a correta marcada).
      A aula nasce como rascunho; o botão **Publicar para a turma** libera para os alunos.
-3. Na lista de alunos da turma, o professor clica em **Ajustar apoios** e marca o que ajuda cada aluno:
+3. Na lista de alunos da turma, **Cadastrar família** cria o login do responsável. A família entra e responde
+   6 perguntas sobre o dia a dia do aluno (sem laudo e sem diagnóstico). As respostas viram **sugestões de apoio**,
+   que o professor aceita ou recusa em **Ajustar apoios**: a família não muda o perfil sozinha.
+4. Em **Ajustar apoios**, o professor também marca direto o que ajuda cada aluno:
    **Atenção e foco**, **Acessibilidade textual** e/ou **Interativo e concreto**. Cada combinação vira uma máscara
    de 3 bits (F×4 + S×2 + C×1, de 0 a 7); 0 é a aula original.
-4. Na página da aula, em **Versões adaptadas**, aparece uma linha para cada combinação presente na turma.
+5. Na página da aula, em **Versões adaptadas**, aparece uma linha para cada combinação presente na turma.
    **Gerar com IA** cria a versão (o texto e os enunciados reescritos pelo Gemini). O professor revisa, pode corrigir
    e clica em **Aprovar versão**. Cada versão é gerada uma vez e fica guardada (cache); **Gerar de novo** refaz.
    Se o professor editar a aula, as versões são apagadas e precisam ser geradas de novo.
-5. O **aluno** entra, vê as aulas publicadas da turma na versão aprovada da sua combinação (ou a original, enquanto
+6. O **aluno** entra, vê as aulas publicadas da turma na versão aprovada da sua combinação (ou a original, enquanto
    não houver versão aprovada), responde e vê na hora quantas acertou.
    A correção usa sempre o gabarito do professor: a IA nunca mexe em alternativas nem na resposta certa.
 
