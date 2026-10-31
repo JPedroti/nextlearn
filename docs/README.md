@@ -10,6 +10,8 @@
 | [cronograma.md](cronograma.md) | Status das entregas e do trabalho de cada integrante |
 | [historico_prompts/](historico_prompts/README.md) | Todos os prompts que a equipe mandou para ferramentas de IA, um arquivo por integrante |
 | [aula_exemplo.md](aula_exemplo.md) | Aula usada na demonstração (o professor cola o texto no app) |
+| [roteiro_demo.md](roteiro_demo.md) | Rascunho do roteiro de telas do vídeo de até 5 minutos |
+| [plano_negocio.md](plano_negocio.md) | Base do plano de negócio, com números de fonte conferida e hipóteses marcadas |
 
 ## Pesquisa e brainstorm (antes da versão final)
 

@@ -20,8 +20,8 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 | Entrega | Responsável | Status | Observação |
 |---|---|---|---|
 | Deploy da aplicação para a banca testar | João | ⚠️ | O grupo cogitou deixar o app só local, mas o deploy é entrega obrigatória e o pilar Tech avalia se a solução funciona. Configuração pronta (`render.yaml`, `build.sh`); banco criado no Neon; o Blueprint do Render parou na tela de variáveis. Dá para publicar **sem chave de IA**: o app funciona inteiro e o botão "Gerar com IA" fica desligado, com aviso. Depois: testar no ar e pôr o link no README |
-| Vídeo de demo (até 5 min) | Cauã (roteiro e narração), Gabriel (edição) | ⏳ | Aula para colar na demo em `docs/aula_exemplo.md`. Roteiro de telas: ver o registro de atualizações |
-| Plano de negócio em PDF | Gabriel | ❔ | |
+| Vídeo de demo (até 5 min) | Cauã (roteiro e narração), Gabriel (edição) | 🔄 | Rascunho do roteiro de telas em `docs/roteiro_demo.md` e aula para colar em `docs/aula_exemplo.md`. Falta gravar, narrar e editar |
+| Plano de negócio em PDF | Gabriel | 🔄 | Base em `docs/plano_negocio.md` (números conferidos com link, hipóteses marcadas, preço a definir). Falta o Gabriel fechar o texto e gerar o PDF (PDFs não vão para o repositório) |
 | Repositório público ou com acesso para a banca | João | ⏳ | Fazer antes das 12h: o agente que avalia o pilar Tech precisa ler o código |
 | **Decisão: provedor de IA** | Equipe (João decide) | 🔄 | Desde 06h46 (Cauã) o código aceita o Gemini ou qualquer API compatível com a da OpenAI (DeepSeek, Groq, OpenAI…), escolhidos pela variável `IA_PROVEDOR`. Falta escolher um provedor cujos termos permitam o uso em educação básica (os da Gemini API proíbem apps voltados a menores de 18 anos) e colocar a chave no Render |
 
