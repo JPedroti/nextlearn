@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/entrada.css' %}">
 </head>
-<body data-cena="deserto">
+<body data-cor="laranja">
 
   <header class="topo">
     <a href="{% url 'prototipo:entrada' %}" class="marca">NextLearn</a>
@@ -22,12 +22,7 @@
   <section class="historia" aria-label="Apresentação do Next">
     <div class="palco">
       <div class="ceu"></div>
-      <div class="decor" aria-hidden="true">
-        <div class="decor-deserto"><span class="sol"></span></div>
-        <div class="decor-gelo"><span class="lua-fria"></span></div>
-        <div class="decor-agua"><span class="sol sol-claro"></span></div>
-        <div class="decor-espaco"><span class="planeta"></span><span class="estrelas"></span></div>
-      </div>
+      <div class="decor" aria-hidden="true"><span class="sol"></span><span class="duna-longe"></span></div>
 
       <div class="mundo" aria-hidden="true">
         <svg class="terreno" viewBox="0 0 1600 1000" preserveAspectRatio="none">
@@ -35,12 +30,7 @@
           <path class="chao" d="M0 120 C400 90 900 140 1440 110 L1520 112 L1530 1000 H0Z"/>
           <path class="borda" d="M1520 112 L1530 1000" stroke-width="8"/>
         </svg>
-        <div class="enfeites">
-          <span class="enf enf-deserto e1"></span><span class="enf enf-deserto e2"></span>
-          <span class="enf enf-gelo e1"></span><span class="enf enf-gelo e2"></span>
-          <span class="enf enf-agua e1"></span><span class="enf enf-agua e2"></span>
-          <span class="enf enf-espaco e1"></span><span class="enf enf-espaco e2"></span>
-        </div>
+        <div class="enfeites"><span class="cacto c1"></span><span class="cacto c2"></span><span class="pedra"></span></div>
         <div class="mar"><span class="onda"></span></div>
         <div class="respingo"><span></span><span></span><span></span></div>
       </div>
@@ -67,7 +57,7 @@
         <p class="dica-rolar">Role para saber mais ↓</p>
       </div>
 
-      <p class="frase-mar">Um mar de<br>conhecimento</p>
+      <p class="frase-mar">Um mundo de<br>conhecimento</p>
     </div>
   </section>
 
@@ -76,32 +66,68 @@
     <div class="saiba-grade">
       <div class="saiba-texto">
         <h2 id="saiba-titulo">Saiba mais</h2>
-        <p class="saiba-lead">O professor prepara a aula uma vez. Cada aluno recebe a mesma aula no formato em que aprende melhor.</p>
+        <p class="saiba-lead">O professor prepara a aula uma vez. Cada aluno recebe a mesma aula no formato em que aprende melhor, junto com a turma.</p>
 
-        <article class="etapa">
-          <span class="etapa-num">1</span>
-          <h3>O professor escreve a aula</h3>
-          <p>Texto e questões de múltipla escolha, uma única vez, para a turma inteira.</p>
+        <div class="numeros revelar">
+          <div class="numero"><strong>96%</strong><span>dos alunos da educação especial estão em classes comuns</span></div>
+          <div class="numero"><strong>6,4%</strong><span>dos professores têm formação continuada em educação especial</span></div>
+          <div class="numero"><strong>4,4×</strong><span>mais matrículas de alunos autistas desde 2021</span></div>
+          <p class="fonte">Fonte: Inep, Censo Escolar 2024 e 2025.</p>
+        </div>
+
+        <article class="etapa revelar">
+          <div class="etapa-fig">{% include "prototipo/_professor.html" %}</div>
+          <div class="etapa-corpo">
+            <span class="etapa-num">1</span>
+            <h3>O professor escreve a aula</h3>
+            <p>Texto e questões de múltipla escolha, uma única vez, para a turma inteira. Sem refazer a mesma aula para cada aluno.</p>
+          </div>
         </article>
-        <article class="etapa">
-          <span class="etapa-num">2</span>
-          <h3>A família conta como é o dia a dia</h3>
-          <p>Seis perguntas simples, sem laudo e sem diagnóstico. As respostas viram sugestões de apoio.</p>
+
+        <article class="etapa revelar">
+          <div class="etapa-fig">{% include "prototipo/_vovo.html" %}</div>
+          <div class="etapa-corpo">
+            <span class="etapa-num">2</span>
+            <h3>A família conta como é o dia a dia</h3>
+            <p>Seis perguntas simples, como "se perde em textos longos?". Sem laudo e sem diagnóstico. As respostas viram sugestões para o professor.</p>
+          </div>
         </article>
-        <article class="etapa">
-          <span class="etapa-num">3</span>
-          <h3>O professor escolhe os apoios</h3>
-          <p>Atenção e foco, linguagem simples, exemplos concretos. Nada muda sem a aprovação dele.</p>
+
+        <article class="etapa etapa-apoios revelar" data-mosca-alvo>
+          <div class="mosca" data-mosca aria-hidden="true">
+            <svg viewBox="0 0 60 44"><ellipse class="asa a1" cx="24" cy="12" rx="12" ry="8" fill="rgba(220,240,255,.85)"/><ellipse class="asa a2" cx="36" cy="12" rx="12" ry="8" fill="rgba(220,240,255,.85)"/><ellipse cx="30" cy="26" rx="14" ry="11" fill="#2A2F3A"/><circle cx="20" cy="24" r="5" fill="#C8443A"/><circle cx="40" cy="24" r="5" fill="#C8443A"/></svg>
+          </div>
+          <div class="etapa-corpo">
+            <span class="etapa-num">3</span>
+            <h3>O professor escolhe os apoios</h3>
+            <p>Três apoios de conteúdo que podem ser combinados. O professor tem a palavra final; nada muda sozinho.</p>
+            <div class="painel-apoios">
+              <div class="apoio"><span class="apoio-icone"><svg viewBox="0 0 40 40"><rect x="4" y="26" width="10" height="10" rx="2"/><rect x="15" y="16" width="10" height="20" rx="2"/><rect x="26" y="6" width="10" height="30" rx="2"/></svg></span><span class="apoio-txt"><strong>Atenção e foco</strong><small>Passos curtos, um de cada vez</small></span><span class="chave" data-chave="1"></span></div>
+              <div class="apoio"><span class="apoio-icone"><svg viewBox="0 0 40 40"><text x="20" y="27" text-anchor="middle" font-size="20" font-weight="700">Aa</text></svg></span><span class="apoio-txt"><strong>Acessibilidade textual</strong><small>Frases curtas e literais</small></span><span class="chave" data-chave="2"></span></div>
+              <div class="apoio"><span class="apoio-icone"><svg viewBox="0 0 40 40"><path d="M6 10 L34 18 L22 34Z"/><circle cx="22" cy="20" r="3" fill="#0B2545"/></svg></span><span class="apoio-txt"><strong>Interativo e concreto</strong><small>Exemplos do dia a dia</small></span><span class="chave" data-chave="3"></span></div>
+              <p class="combinacao">3 apoios → até 7 versões por aula, geradas uma vez e guardadas.</p>
+              <div class="prefs"><span>Letras espaçadas</span><span>Ouvir em voz alta</span><span>Modo limpo</span></div>
+              <p class="prefs-nota">Preferências de tela que o próprio aluno liga e desliga.</p>
+            </div>
+          </div>
         </article>
-        <article class="etapa">
-          <span class="etapa-num">4</span>
-          <h3>A IA adapta, o professor aprova</h3>
-          <p>Uma versão para cada combinação de apoios da turma. As alternativas e o gabarito continuam os do professor.</p>
+
+        <article class="etapa revelar">
+          <div class="etapa-fig etapa-fig-icone" aria-hidden="true"><svg viewBox="0 0 120 120"><rect x="14" y="20" width="56" height="72" rx="8" fill="#5DB8CC"/><rect x="50" y="34" width="56" height="72" rx="8" fill="#EAF6FF"/><path d="M62 56 h32 M62 68 h32 M62 80 h20" stroke="#0B2545" stroke-width="5" stroke-linecap="round"/><path d="M28 104 l8 8 l14 -16" stroke="#7BE0A6" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="etapa-corpo">
+            <span class="etapa-num">4</span>
+            <h3>A IA adapta, o professor aprova</h3>
+            <p>Uma versão para cada combinação de apoios da turma. Alternativas e gabarito continuam os do professor, e nenhum dado do aluno vai para a IA.</p>
+          </div>
         </article>
-        <article class="etapa">
-          <span class="etapa-num">5</span>
-          <h3>Cada aluno aprende do seu jeito</h3>
-          <p>Passos curtos, letras espaçadas, leitura em voz alta. Ninguém fica à parte da turma.</p>
+
+        <article class="etapa revelar">
+          <div class="etapa-fig etapa-fig-icone" aria-hidden="true"><svg viewBox="0 0 120 120"><circle cx="34" cy="60" r="16" fill="#E08A35"/><circle cx="60" cy="52" r="16" fill="#6FAAD3"/><circle cx="86" cy="60" r="16" fill="#2FA38F"/><path d="M14 104 q20 -26 40 0 M40 98 q20 -30 40 0 M66 104 q20 -26 40 0" fill="none" stroke="#EAF6FF" stroke-width="5" stroke-linecap="round"/></svg></div>
+          <div class="etapa-corpo">
+            <span class="etapa-num">5</span>
+            <h3>Cada aluno aprende do seu jeito</h3>
+            <p>A mesma aula, na mesma sala, com a mesma turma. Ninguém fica à parte.</p>
+          </div>
         </article>
 
         <button type="button" class="btn-cheio btn-grande" data-abrir="entrar">Entrar no NextLearn</button>
@@ -110,6 +136,7 @@
         <div class="nadador" data-pose="nadar">{% include "prototipo/_next.html" %}</div>
       </div>
     </div>
+    <div class="lingua" data-lingua aria-hidden="true"><span class="mosca-presa"><svg viewBox="0 0 60 44"><ellipse cx="24" cy="12" rx="12" ry="8" fill="rgba(220,240,255,.85)"/><ellipse cx="36" cy="12" rx="12" ry="8" fill="rgba(220,240,255,.85)"/><ellipse cx="30" cy="26" rx="14" ry="11" fill="#2A2F3A"/><circle cx="20" cy="24" r="5" fill="#C8443A"/><circle cx="40" cy="24" r="5" fill="#C8443A"/></svg></span></div>
   </section>
 
   <dialog class="janela" data-janela aria-labelledby="janela-titulo">

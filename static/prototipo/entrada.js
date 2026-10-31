@@ -1,5 +1,5 @@
-// Tela de entrada do NextLearn: o Next troca de pose e de cor (hero) e, com o scroll,
-// anda até a beirada, salta, mergulha e nada pelo "Saiba mais".
+// Tela de entrada do NextLearn (deserto): o Next troca de cor e de pose; com o scroll ele anda até a
+// beirada, salta no lago, a tela fica submersa e o "Saiba mais" desce com ele nadando à direita.
 (function () {
   var body = document.body;
   var cenas = JSON.parse(document.getElementById("dados-cenas").textContent);
@@ -12,24 +12,23 @@
   var frase = document.querySelector(".frase-mar");
   var respingo = document.querySelector(".respingo");
   var nadador = document.querySelector(".nadador");
+  var mosca = document.querySelector("[data-mosca]");
+  var lingua = document.querySelector("[data-lingua]");
   var fala = document.querySelector("[data-fala]");
   var pontos = document.querySelectorAll("[data-ir]");
   var botaoPausa = document.querySelector("[data-pausa]");
   var reduzir = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // ---------- Hero: pose + cor + fala ----------
+  // ---------- Hero: cor + pose + fala ----------
   var atual = 0, timer = null, pausado = reduzir, progresso = 0;
   function mostrar(i) {
     atual = (i + cenas.length) % cenas.length;
-    body.dataset.cena = cenas[atual].id;
+    body.dataset.cor = cenas[atual].id;
     if (progresso < 0.03) ator.dataset.pose = cenas[atual].pose;
     fala.textContent = cenas[atual].fala;
     pontos.forEach(function (p, j) { if (j === atual) p.setAttribute("aria-current", "true"); else p.removeAttribute("aria-current"); });
   }
-  function tocar() {
-    clearInterval(timer);
-    if (!pausado) timer = setInterval(function () { if (progresso < 0.02) mostrar(atual + 1); }, 5000);
-  }
+  function tocar() { clearInterval(timer); if (!pausado) timer = setInterval(function () { if (progresso < 0.02) mostrar(atual + 1); }, 5000); }
   function rotuloPausa() { botaoPausa.textContent = pausado ? "Continuar" : "Pausar"; botaoPausa.setAttribute("aria-pressed", pausado ? "true" : "false"); }
   pontos.forEach(function (p) { p.addEventListener("click", function () { mostrar(Number(p.dataset.ir)); tocar(); }); });
   botaoPausa.addEventListener("click", function () { pausado = !pausado; rotuloPausa(); tocar(); });
@@ -37,56 +36,43 @@
 
   // ---------- Utilidades ----------
   function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
-  function faixa(p, a, b) { return clamp((p - a) / (b - a), 0, 1); }      // 0..1 dentro do trecho [a, b]
+  function faixa(p, a, b) { return clamp((p - a) / (b - a), 0, 1); }
   function suave(t) { return t * t * (3 - 2 * t); }
   function lerp(a, b, t) { return a + (b - a) * t; }
 
-  // ---------- Cena guiada pelo scroll ----------
   var W, H, A, AH;
   function medir() { W = innerWidth; H = innerHeight; A = ator.offsetWidth; AH = A * 260 / 340; }
 
-  function quadro() {
-    var y = scrollY;
+  // ---------- Cena guiada pelo scroll ----------
+  function cena(y) {
     var total = historia.offsetHeight - H;
     var p = clamp((y - historia.offsetTop) / total, 0, 1);
     progresso = p;
-
-    var chaoTopo = 0.748 * H;          // topo do chão (ver .terreno no CSS)
-    var beirada = 1.52 * W;            // x da beirada do penhasco
-    var superficie = 0.92 * H;         // linha d'água
-    var emPe = chaoTopo - AH * 0.79;   // y do Next em pé (pés no chão)
-    var x0 = W * (W < 760 ? 0.30 : 0.50) - A * 0.25;
+    var chaoTopo = 0.748 * H, beirada = 1.14 * W, superficie = 0.90 * H;
+    var emPe = chaoTopo - AH * 0.79;
+    var x0 = W * (W < 760 ? 0.30 : 0.52) - A * 0.25;
     var xBeira = beirada - A * 0.66;
-
+    var andar = faixa(p, 0.04, 0.22), salto = faixa(p, 0.22, 0.52), nado = faixa(p, 0.52, 1);
     var x, yy, rot = 0, camX = 0, camY = 0, pf = 0, pt = 0, pose;
 
-    var andar = faixa(p, 0.06, 0.42);
-    var salto = faixa(p, 0.42, 0.80);
-    var nado = faixa(p, 0.80, 1);
-
     if (salto === 0) {
-      // Fase 1: anda até a beirada; o cenário passa por trás
       var t = suave(andar);
       x = lerp(x0, xBeira, t);
-      yy = emPe - (andar > 0 && andar < 1 ? Math.abs(Math.sin(p * 140)) * 6 : 0);
-      var telaX = lerp(x0, W * 0.80 - A * 0.66, t);
-      camX = Math.max(0, x - telaX);
-      if (andar > 0 && andar < 1) { pf = Math.sin(p * 140) * 24; pt = -pf; }
+      yy = emPe - (andar > 0 && andar < 1 ? Math.abs(Math.sin(p * 220)) * 6 : 0);
+      camX = Math.max(0, x - lerp(x0, W * 0.80 - A * 0.66, t));
+      if (andar > 0 && andar < 1) { pf = Math.sin(p * 220) * 24; pt = -pf; }
       pose = andar > 0 ? "andar" : cenas[atual].pose;
     } else {
-      // Fase 2: salta da beirada e cai na água; a câmera desce junto
       var s = salto;
-      x = xBeira + W * 0.30 * (1 - Math.pow(1 - s, 2));
+      x = xBeira + W * 0.24 * (1 - Math.pow(1 - s, 2));
       if (s < 0.3) yy = emPe - 0.16 * H * Math.sin((s / 0.3) * Math.PI / 2);
-      else yy = emPe - 0.16 * H + Math.pow((s - 0.3) / 0.7, 1.6) * (superficie - emPe + 0.16 * H + 0.75 * H);
+      else yy = emPe - 0.16 * H + Math.pow((s - 0.3) / 0.7, 1.5) * (superficie - emPe + 0.16 * H + 0.7 * H);
       rot = 85 * suave(faixa(s, 0.15, 0.55));
       pf = -40; pt = 40;
-      var telaX2 = lerp(W * 0.80 - A * 0.66, W * 0.72 - A * 0.5, s);
-      camX = x - telaX2;
+      camX = x - lerp(W * 0.80 - A * 0.66, W * 0.72 - A * 0.5, s);
       camY = Math.max(0, yy - 0.40 * H);
-      pose = s > 0.62 ? "nadar" : "pular";
+      pose = s > 0.6 ? "nadar" : "pular";
       if (nado > 0) {
-        // Fase 3: nada para baixo pelo canto direito
         yy += nado * 0.45 * H;
         camY = Math.max(0, yy - 0.40 * H);
         rot = 85 - 15 * nado + Math.sin(p * 90) * 4;
@@ -94,51 +80,74 @@
         pose = "nadar";
       }
     }
-
-    // Aplica posições
     mundo.style.transform = "translate(" + (-camX) + "px," + (-camY) + "px)";
-    decor.style.transform = "translate(" + (-camX * 0.12) + "px," + (-camY * 0.5) + "px)";
+    decor.style.transform = "translate(" + (-camX * 0.15) + "px," + (-camY * 0.5) + "px)";
     ator.style.transform = "translate(" + (x - camX) + "px," + (yy - camY) + "px) rotate(" + rot + "deg)";
-    ator.style.setProperty("--pf", pf + "deg");
-    ator.style.setProperty("--pt", pt + "deg");
+    ator.style.setProperty("--pf", pf + "deg"); ator.style.setProperty("--pt", pt + "deg");
     if (ator.dataset.pose !== pose) ator.dataset.pose = pose;
 
-    // Respingo ao tocar a água
-    var centroY = yy + AH * 0.55;
-    var perto = 1 - clamp(Math.abs(centroY - superficie) / (0.14 * H), 0, 1);
+    var perto = 1 - clamp(Math.abs(yy + AH * 0.55 - superficie) / (0.14 * H), 0, 1);
     respingo.style.left = (x + A * 0.55) + "px";
     respingo.style.opacity = salto > 0.3 ? perto : 0;
     respingo.style.transform = "scale(" + (0.6 + perto) + ")";
 
-    // Fica submerso e aparece a frase
-    var sub = clamp((camY - (superficie - 0.55 * H)) / (0.45 * H), 0, 1);
+    var sub = clamp((camY - (superficie - 0.55 * H)) / (0.4 * H), 0, 1);
     submerso.style.opacity = sub;
-    body.classList.toggle("no-mar", sub > 0.5);
-    var f = suave(faixa(p, 0.80, 0.88));
+    body.classList.toggle("no-mar", sub > 0.5 || y > historia.offsetTop + total);
+    var f = suave(faixa(p, 0.50, 0.60));
     frase.style.opacity = f;
     frase.style.transform = "translateY(" + ((1 - f) * 40 - nado * 60) + "px)";
-
-    // Texto do hero some ao começar a rolar
-    var h = 1 - faixa(p, 0.02, 0.08);
-    hero.style.opacity = h;
-    hero.style.visibility = h < 0.02 ? "hidden" : "visible";
-
-    // Nadador do "Saiba mais"
-    var onda = Math.sin(y / 140);
-    nadador.style.transform = "translateY(" + (onda * 18) + "px) rotate(" + (72 + onda * 5) + "deg)";
-    nadador.style.setProperty("--pf", (-40 + Math.sin(y / 60) * 25) + "deg");
-    nadador.style.setProperty("--pt", (40 - Math.sin(y / 60) * 25) + "deg");
+    var h = 1 - faixa(p, 0.02, 0.07);
+    hero.style.opacity = h; hero.style.visibility = h < 0.02 ? "hidden" : "visible";
   }
 
+  // ---------- Nadador + língua que pega a mosca ----------
+  function saiba(y) {
+    var onda = Math.sin(y / 140);
+    var ang = 72 + onda * 5;
+    nadador.style.transform = "translateY(" + (onda * 18) + "px) rotate(" + ang + "deg)";
+    nadador.style.setProperty("--pf", (-40 + Math.sin(y / 60) * 25) + "deg");
+    nadador.style.setProperty("--pt", (40 - Math.sin(y / 60) * 25) + "deg");
+    if (W < 760) return;
+
+    var rM = mosca.getBoundingClientRect();
+    var cy = rM.top + rM.height / 2;
+    var t = faixa(cy, H * 0.75, H * 0.30);              // 0 quando a mosca entra embaixo, 1 quando sobe
+    if (t <= 0 || t >= 1) { lingua.style.display = "none"; mosca.style.visibility = t >= 1 ? "hidden" : "visible"; return; }
+
+    // Boca do Next: centro do nadador + vetor da boca girado (ponto 265,135 do desenho de 340x260)
+    var rN = nadador.getBoundingClientRect();
+    var k = nadador.offsetWidth / 340, a = ang * Math.PI / 180;
+    var vx = 95 * k, vy = 5 * k;
+    var bx = rN.left + rN.width / 2 + vx * Math.cos(a) - vy * Math.sin(a);
+    var by = rN.top + rN.height / 2 + vx * Math.sin(a) + vy * Math.cos(a);
+    var mx = rM.left + rM.width / 2, my = cy;
+    var dist = Math.hypot(mx - bx, my - by);
+    var estica = t < 0.5 ? suave(t / 0.5) : 1 - suave((t - 0.5) / 0.5);   // vai e volta
+    lingua.style.display = "block";
+    lingua.style.left = bx + "px"; lingua.style.top = (by - 6) + "px";
+    lingua.style.width = (dist * estica) + "px";
+    lingua.style.transform = "rotate(" + Math.atan2(my - by, mx - bx) + "rad)";
+    var pegou = t >= 0.5;
+    lingua.classList.toggle("pegou", pegou);
+    mosca.style.visibility = pegou ? "hidden" : "visible";
+  }
+
+  function quadro() { var y = scrollY; cena(y); saiba(y); }
   var pedido = false;
   function agendar() { if (!pedido) { pedido = true; requestAnimationFrame(function () { pedido = false; quadro(); }); } }
 
+  // Revelar blocos do "Saiba mais"
+  var blocos = document.querySelectorAll(".revelar");
+  if ("IntersectionObserver" in window && !reduzir) {
+    var obs = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) e.target.classList.add("visivel"); }); }, { threshold: 0.25 });
+    blocos.forEach(function (b) { obs.observe(b); });
+  } else { blocos.forEach(function (b) { b.classList.add("visivel"); }); }
+
   if (reduzir) {
-    // Versão estática: sem história no scroll
     document.documentElement.classList.add("estatico");
     medir();
-    var chao = 0.748 * innerHeight;
-    ator.style.transform = "translate(" + (innerWidth * 0.5) + "px," + (chao - ator.offsetWidth * 260 / 340 * 0.79) + "px)";
+    ator.style.transform = "translate(" + (innerWidth * 0.52 - A * 0.25) + "px," + (0.748 * innerHeight - AH * 0.79) + "px)";
     nadador.style.transform = "rotate(72deg)";
   } else {
     medir(); quadro();
