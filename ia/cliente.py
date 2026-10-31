@@ -23,6 +23,11 @@ from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
+# Parâmetros da IA — ajustáveis conforme o modelo e o uso
+TEMPERATURA = 0.4     # Mais determinístico que 0.7 — adaptações precisam de consistência
+MAX_TOKENS = 8192      # Suficiente para aulas longas com várias questões
+MAX_CARACTERES = 28000  # ~7K tokens — seguro para DeepSeek (64K), Gemini (128K), Groq (8K)
+
 
 class SaidaVersao(BaseModel):
     """Formato que a IA é obrigada a devolver (saída estruturada em JSON)."""
@@ -86,8 +91,8 @@ def _gerar_via_openai(system_prompt, mensagem):
                 },
             },
         },
-        temperature=0.7,
-        max_tokens=4096,
+        temperature=TEMPERATURA,
+        max_tokens=MAX_TOKENS,
     )
 
     conteudo_bruto = resposta.choices[0].message.content or ""
@@ -99,9 +104,24 @@ def _gerar_via_openai(system_prompt, mensagem):
 
 
 def gerar(system_prompt, mensagem):
-    """Envia o prompt ao provedor escolhido e devolve um SaidaVersao. Erros sobem como exceção para quem chamou."""
+    """Envia o prompt ao provedor escolhido e devolve um SaidaVersao. Erros sobem como exceção para quem chamou.
+
+    Verifica o tamanho do contexto antes de chamar a IA e avisa se estiver muito grande.
+    """
     if not configurado():
         raise RuntimeError("A chave do provedor de IA não está configurada.")
+
+    total = len(system_prompt) + len(mensagem)
+    if total > MAX_CARACTERES:
+        logger.warning(
+            "Contexto grande: %s caracteres (limite: %s). Cortando mensagem para caber.",
+            total, MAX_CARACTERES,
+        )
+        # Corta a aula (mensagem) para caber; o system prompt é preservado
+        limite_mensagem = MAX_CARACTERES - len(system_prompt) - 500
+        if limite_mensagem > 0:
+            mensagem = mensagem[:limite_mensagem] + "\n\n[Texto truncado por limite de contexto.]"
+
     if _usa_openai():
         return _gerar_via_openai(system_prompt, mensagem)
     return _gerar_via_gemini(system_prompt, mensagem)

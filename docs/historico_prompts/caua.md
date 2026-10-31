@@ -84,3 +84,11 @@ Registro cronológico e literal dos prompts que Cauã enviou à IA durante o hac
 > @nextlearn/CLAUDE.md adcionou o historico das conversas nossas lá?
 
 **Resumo da resposta da IA:** Histórico conferido e complementado — prompts 01 a 10 registrados com resumos. Commits `4cbd62a` em diante. 119 testes passando.
+
+---
+
+## Prompt 11 — 31/10/2026, 07:49 (BRT) — autor: Cauã — ferramenta: Qwen
+
+> ERROS E ACERTOS, AVALIAÇÕES ETC. SISTEMA DE RETROALIMENTAÇÃO OS MD DOS AGENTES DEVEM SER CONSTANTEMENTE ESCRITOS E REESCRITOS COM BASE NAS EXPERIÊNCIAS, ERROS, ACERTOS E NOTAS DOS PROFESSORES E ALUNOS. A ESTURURA DEVE SER ADAPTADO NO ARQUIVO MD, VERIFIQUE SE A IA NÃO VAI ESTOURAR CONTEXTO, SE POSSÍVEL, AJUSTE A TEMPERATURA, MAX CONTEXTO. VERIFIQUE ERROS NESSE CONTEXTO E CORRIJA-OS
+
+**Resumo da resposta da IA:** Sistema de retroalimentação: modelo FeedbackVersao (nota 1-5 + comentário), ia/metricas.py (eficácia por máscara via respostas reais), métricas incluídas no system prompt, temperatura 0.4, max_tokens 8192, verificação de contexto com truncagem. 119 testes OK. Commit fc59fe3.

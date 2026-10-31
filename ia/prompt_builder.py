@@ -17,7 +17,11 @@ def ler_bloco(nome):
 
 
 def montar_system_prompt(foco, textual, concreto):
-    """base.md + o bloco de cada apoio ligado + conflitos.md quando houver 2 ou mais apoios."""
+    """base.md + o bloco de cada apoio ligado + conflitos.md quando houver 2 ou mais apoios.
+
+    Inclui métricas de eficácia dos apoios (calculadas a partir de respostas reais)
+    para a IA ajustar sua abordagem com base no que está funcionando.
+    """
     blocos = ["base.md"]
     if foco:
         blocos.append("foco.md")
@@ -27,7 +31,16 @@ def montar_system_prompt(foco, textual, concreto):
         blocos.append("concreto.md")
     if sum([bool(foco), bool(textual), bool(concreto)]) >= 2:
         blocos.append("conflitos.md")
-    return "\n\n".join(ler_bloco(nome) for nome in blocos)
+
+    prompt = "\n\n".join(ler_bloco(nome) for nome in blocos)
+
+    # Inclui métricas de eficácia como contexto adicional
+    from .metricas import compilar_bloco_metricas
+    metricas = compilar_bloco_metricas()
+    if metricas:
+        prompt += "\n\n" + metricas + "\n\nUse esses dados para calibrar sua abordagem: "
+
+    return prompt
 
 
 def montar_mensagem(aula):
