@@ -58,7 +58,7 @@
 
     <section id="aprende" class="secao-familia">
       <h2 class="secao-tit">2 · Como {{ aluno.usuario.first_name }} aprende: principais desafios</h2>
-      <p class="mini">O mesmo resumo que o professor vê. Vem dos apoios que ele escolheu, do questionário de vocês e das aulas.</p>
+      <p class="mini">O mesmo resumo que o professor vê. Vem dos apoios que o professor escolheu, do questionário de vocês e das aulas.</p>
       <div class="demandas-grade">
         {% for i in dem.itens %}
           <article class="demanda"><p class="demanda-tag">{{ i.apoio }}</p><h3>{{ i.barreira }}</h3>
@@ -98,7 +98,7 @@
           <h3>Mandar uma sugestão ou observação</h3>
           <div class="tipos-recado">{% for v, n in tipos_recado %}<label class="chip-radio"><input type="radio" name="tipo" value="{{ v }}" {% if forloop.first %}checked{% endif %}> {{ n }}</label>{% endfor %}</div>
           <label class="sr-only" for="txt-recado">Mensagem</label>
-          <textarea id="txt-recado" name="texto" rows="4" maxlength="1500" required placeholder="Ex.: Em casa ele entende melhor quando lemos juntos em voz alta."></textarea>
+          <textarea id="txt-recado" name="texto" rows="4" maxlength="1500" required placeholder="Ex.: Em casa, entende melhor quando lemos juntos em voz alta."></textarea>
           <button class="btn-missao" type="submit">Enviar ao professor</button>
           {% if recados %}<h3 class="sub-h">Enviados</h3>{% for rc in recados %}<p class="mini">{{ rc.criado_em|date:"d/m" }} · {{ rc.get_tipo_display }} · {% if rc.lido %}<span class="chip ok">o professor viu</span>{% else %}<span class="chip">aguardando</span>{% endif %}</p>{% endfor %}{% endif %}
         </form>
@@ -124,7 +124,7 @@
         <p class="mini">Valem na hora para a área do aluno.</p>
         <label>Limite de estudo por dia <span class="val" data-val-limite>{{ cfg.limite }} min</span><input type="range" name="limite" min="15" max="120" step="5" value="{{ cfg.limite }}" oninput="this.form.querySelector('[data-val-limite]').textContent=this.value+' min'"></label>
         <label>Meta de aulas por semana <span class="val" data-val-meta>{{ cfg.meta }}</span><input type="range" name="meta" min="1" max="7" value="{{ cfg.meta }}" oninput="this.form.querySelector('[data-val-meta]').textContent=this.value"></label>
-        <label class="check"><input type="checkbox" name="ofensiva" {% if cfg.ofensiva %}checked{% endif %}> Mostrar a ofensiva semanal para ele <span class="mini">(desligue se contadores deixam ansioso)</span></label>
+        <label class="check"><input type="checkbox" name="ofensiva" {% if cfg.ofensiva %}checked{% endif %}> Mostrar a ofensiva semanal para {{ aluno.usuario.first_name|default:"o aluno" }} <span class="mini">(desligue se contadores deixam ansioso)</span></label>
         <label class="check"><input type="checkbox" name="resumo" {% if not cfg.obj or cfg.obj.resumo_semanal %}checked{% endif %}> Quero o resumo semanal</label>
         <button class="btn-missao" type="submit">Salvar combinados</button>
       </form>

@@ -13,7 +13,7 @@ CATALOGO = {
         "escola": ["Divida a tarefa em passos numerados (Passo 1 de 4).", "Uma instrução por vez, por escrito.", "Pausas curtas a cada 10–15 min."],
         "casa": ["Mesa só com o material da tarefa; celular e TV desligados, fora da vista.",
                  "Blocos de 10–15 min com timer visível e pausa de 3–5 min.",
-                 "Lista de passos colada na parede; ele risca cada passo feito.",
+                 "Lista de passos colada na parede, riscando cada passo feito.",
                  "Sempre o mesmo lugar e horário de estudo."],
         "evidencia": "Treino de memória de trabalho e tarefas em passos (Kofler et al., 2020).",
     },
@@ -45,9 +45,9 @@ PREFERENCIA = {
     "Modo limpo": "Se sente melhor com a tela sem enfeites (sensibilidade a estímulos).",
 }
 
-AMBIENTE_BASE = ["Horário fixo de estudo, combinado com ele.",
+AMBIENTE_BASE = ["Horário fixo de estudo, combinado junto.",
                  "Lugar calmo, bem iluminado e sempre o mesmo.",
-                 "Pergunte o que aprendeu hoje e peça para explicar com as palavras dele.",
+                 "Pergunte o que aprendeu hoje e peça para explicar com as próprias palavras.",
                  "Elogie o esforço e o progresso, não só a nota."]
 
 

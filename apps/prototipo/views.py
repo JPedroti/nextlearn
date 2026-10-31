@@ -1212,7 +1212,7 @@ def familia(request):
     reforco = min(medias, key=medias.get) if medias else None
     ultima_reforco = next((i for i in d["feitas"] if i["materia"] == reforco), None)
     questionario = RespostaQuestionario.objects.filter(aluno=aluno).order_by("-pk").first()
-    dicas = [(ap, DICAS_CASA.get(ap, [])) for ap in r["apoios"]] or [("Sem apoio especial", ["Combine um horário fixo de estudo.", "Pergunte o que aprendeu hoje e peça para explicar com as palavras dele."])]
+    dicas = [(ap, DICAS_CASA.get(ap, [])) for ap in r["apoios"]] or [("Sem apoio especial", ["Combine um horário fixo de estudo.", "Pergunte o que aprendeu hoje e peça para explicar com as próprias palavras."])]
     from .demandas import demandas_do_aluno
     from .models import RecadoFamilia
 
