@@ -4,9 +4,12 @@
 
 {% block conteudo %}
 <a href="{% url 'aulas:inicio' %}" class="voltar">← Minhas aulas</a>
-<h1 class="text-2xl font-semibold mt-3 mb-4">{{ aula.titulo }}</h1>
+<div class="flex flex-wrap items-center justify-between gap-3 mt-3 mb-4">
+  <h1 id="titulo-aula" class="text-2xl font-semibold">{{ aula.titulo }}</h1>
+  <button type="button" class="botao-ouvir" data-ouvir="titulo-aula texto-aula">Ouvir o texto</button>
+</div>
 
-<article class="cartao mb-8 text-lg leading-relaxed space-y-4">{{ conteudo|linebreaks }}</article>
+<article id="texto-aula" class="cartao mb-8 text-lg leading-relaxed space-y-4">{{ conteudo|linebreaks }}</article>
 
 <h2 class="text-xl font-semibold mb-3">Questões</h2>
 
@@ -14,8 +17,8 @@
   <p class="mb-4 font-medium">Você acertou {{ acertos }} de {{ itens|length }}.</p>
   {% for item in itens %}
     <div class="cartao mb-4">
-      <p class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</p>
-      <ul class="space-y-1">
+      <p id="questao-{{ forloop.counter }}-enunciado" class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</p>
+      <ul id="questao-{{ forloop.counter }}-alternativas" class="space-y-1">
         {% for alternativa in item.questao.alternativas %}
           {% with escolhida=item.resposta.indice_escolhido correta=item.questao.indice_correto %}
             <li class="rounded px-2 py-1 {% if forloop.counter0 == correta %}bg-green-50 text-green-900{% elif forloop.counter0 == escolhida %}bg-red-50 text-red-900{% endif %}">
@@ -26,6 +29,7 @@
           {% endwith %}
         {% endfor %}
       </ul>
+      <button type="button" class="botao-ouvir mt-3" data-ouvir="questao-{{ forloop.counter }}-enunciado questao-{{ forloop.counter }}-alternativas">Ouvir a questão</button>
     </div>
   {% endfor %}
 {% else %}
@@ -33,13 +37,16 @@
     {% csrf_token %}
     {% for item in itens %}
       <fieldset class="cartao mb-4">
-        <legend class="float-left w-full font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</legend>
-        {% for alternativa in item.questao.alternativas %}
-          <label class="flex items-start gap-2 rounded px-2 py-1 hover:bg-slate-50">
-            <input type="radio" name="questao_{{ item.questao.pk }}" value="{{ forloop.counter0 }}" required class="mt-1.5">
-            <span>{{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}</span>
-          </label>
-        {% endfor %}
+        <legend id="questao-{{ forloop.counter }}-enunciado" class="float-left w-full font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</legend>
+        <div id="questao-{{ forloop.counter }}-alternativas" class="clear-both">
+          {% for alternativa in item.questao.alternativas %}
+            <label class="flex items-start gap-2 rounded px-2 py-1 hover:bg-slate-50">
+              <input type="radio" name="questao_{{ item.questao.pk }}" value="{{ forloop.counter0 }}" required class="mt-1.5">
+              <span>{{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        <button type="button" class="botao-ouvir mt-3" data-ouvir="questao-{{ forloop.counter }}-enunciado questao-{{ forloop.counter }}-alternativas">Ouvir a questão</button>
       </fieldset>
     {% endfor %}
     <button type="submit" class="btn">Enviar respostas</button>

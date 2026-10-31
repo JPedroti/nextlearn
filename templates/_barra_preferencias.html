@@ -1,0 +1,16 @@
+{# Barra de apoios de leitura, só para alunos. Qualquer aluno pode ligar e desligar. #}
+<nav class="barra-preferencias bg-white border-b border-slate-200" aria-label="Apoios de leitura">
+  <div class="max-w-4xl mx-auto px-4 py-2 flex flex-wrap items-center gap-2 text-sm">
+    <span class="text-slate-600 mr-1">Apoios de leitura:</span>
+    {% for item in barra_preferencias %}
+      <form method="post" action="{% url 'perfis:alternar_preferencia' %}" data-preferencia>
+        {% csrf_token %}
+        <input type="hidden" name="campo" value="{{ item.campo }}">
+        <input type="hidden" name="valor" value="{% if item.ligado %}0{% else %}1{% endif %}">
+        <input type="hidden" name="aula" value="{{ aula.pk|default:'' }}">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="pref-botao" aria-pressed="{% if item.ligado %}true{% else %}false{% endif %}">{{ item.rotulo }}</button>
+      </form>
+    {% endfor %}
+  </div>
+</nav>

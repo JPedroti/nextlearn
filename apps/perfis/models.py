@@ -11,6 +11,10 @@ APOIOS = [
 ]
 
 
+# Preferências de interface (sem IA), na ordem em que aparecem na barra do aluno.
+PREFERENCIAS = ["fonte_dislexia", "leitura_voz", "modo_limpo"]
+
+
 def calcular_mascara(foco, textual, concreto):
     """F*4 + S*2 + C*1 → número de 0 a 7. Zero é a aula original do professor."""
     return int(foco) * 4 + int(textual) * 2 + int(concreto)
@@ -69,6 +73,9 @@ class Perfil(models.Model):
 
     def nomes_apoios(self):
         return nomes_da_mascara(self.mascara)
+
+    def nomes_preferencias(self):
+        return [self._meta.get_field(campo).verbose_name for campo in PREFERENCIAS if getattr(self, campo)]
 
 
 class RespostaQuestionario(models.Model):

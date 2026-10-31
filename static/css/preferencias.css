@@ -1,0 +1,58 @@
+/* Preferências de tela do aluno. Cada uma é uma classe no <body>: fonte-dislexia, leitura-voz, modo-limpo. */
+
+/* OpenDyslexic (licença SIL OFL), pelo pacote Fontsource no jsDelivr. Inclui os acentos do português. */
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5.3.0/files/opendyslexic-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "OpenDyslexic";
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5.3.0/files/opendyslexic-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fonte para dislexia: fonte própria, mais espaço entre letras, palavras e linhas */
+body.fonte-dislexia main,
+body.fonte-dislexia main input,
+body.fonte-dislexia main textarea,
+body.fonte-dislexia main button {
+  font-family: "OpenDyslexic", Verdana, sans-serif;
+  letter-spacing: 0.03em;
+  word-spacing: 0.15em;
+  line-height: 1.8;
+}
+
+/* Leitura em voz alta: os botões "Ouvir" só aparecem com a preferência ligada */
+.botao-ouvir {
+  display: none;
+}
+body.leitura-voz .botao-ouvir {
+  display: inline-flex;
+}
+
+/* Modo limpo: fundo branco, sem sombras nem destaques coloridos, letra maior e coluna mais estreita */
+body.modo-limpo {
+  background: #ffffff;
+}
+body.modo-limpo main {
+  max-width: 44rem;
+  font-size: 1.15rem;
+  line-height: 1.9;
+}
+body.modo-limpo .cartao {
+  box-shadow: none;
+  border: 1px solid #cbd5e1;
+}
+body.modo-limpo .cartao:hover {
+  --tw-ring-shadow: 0 0 #0000;
+}
+body.modo-limpo .etiqueta {
+  background: transparent;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}

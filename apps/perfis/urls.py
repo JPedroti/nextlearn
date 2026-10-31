@@ -5,6 +5,8 @@ from . import views
 app_name = "perfis"
 
 urlpatterns = [
+    # Aluno
+    path("aluno/preferencias/", views.alternar_preferencia, name="alternar_preferencia"),
     # Família
     path("familia/", views.inicio, name="inicio"),
     path("familia/alunos/<int:aluno_pk>/questionario/", views.questionario, name="questionario"),

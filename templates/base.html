@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
@@ -16,9 +16,14 @@
     .btn-sec { @apply inline-block rounded border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 hover:bg-slate-100; }
     .cartao { @apply rounded-lg bg-white p-6 shadow; }
     .voltar { @apply text-sm text-indigo-700 hover:underline; }
+    .etiqueta { @apply rounded-full px-2 py-1 text-xs; }
+    .pref-botao { @apply rounded-full border border-slate-300 bg-white px-3 py-1 text-slate-700 hover:bg-slate-100; }
+    .pref-botao[aria-pressed="true"] { @apply border-indigo-700 bg-indigo-700 text-white hover:bg-indigo-800; }
+    .botao-ouvir { @apply items-center gap-1 rounded border border-indigo-300 bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-800 hover:bg-indigo-100; }
   </style>
+  <link rel="stylesheet" href="{% static 'css/preferencias.css' %}">
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800">
+<body class="min-h-screen bg-slate-50 text-slate-800{% if preferencias.fonte_dislexia %} fonte-dislexia{% endif %}{% if preferencias.leitura_voz %} leitura-voz{% endif %}{% if preferencias.modo_limpo %} modo-limpo{% endif %}">
   <header class="bg-white border-b border-slate-200">
     <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
       <a href="{% url 'contas:inicio' %}" class="text-xl font-bold text-indigo-700">NextLearn</a>
@@ -36,6 +41,10 @@
       {% endif %}
     </div>
   </header>
+
+  {% if barra_preferencias %}
+    {% include "_barra_preferencias.html" %}
+  {% endif %}
 
   <main class="max-w-4xl mx-auto px-4 py-8">
     {% if messages %}
@@ -56,5 +65,9 @@
       });
     });
   </script>
+  {% if barra_preferencias %}
+    <script src="{% static 'js/preferencias.js' %}"></script>
+    <script src="{% static 'js/leitura_voz.js' %}"></script>
+  {% endif %}
 </body>
 </html>
