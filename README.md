@@ -77,6 +77,11 @@ Abra http://127.0.0.1:8000 e entre com o usuário criado.
 6. O **aluno** entra, vê as aulas publicadas da turma na versão aprovada da sua combinação (ou a original, enquanto
    não houver versão aprovada), responde e vê na hora quantas acertou.
    A correção usa sempre o gabarito do professor: a IA nunca mexe em alternativas nem na resposta certa.
+7. Nas telas do aluno há a barra **Apoios de leitura**, sem IA, que qualquer aluno pode ligar e desligar:
+   **Fonte para dislexia** (OpenDyslexic), **Leitura em voz alta** (botões "Ouvir", com a voz do próprio navegador)
+   e **Modo limpo** (menos cores e enfeites, letra maior). O professor escolhe em **Ajustar apoios** quais já vêm
+   ligados; a escolha do aluno vale até ele sair. Cada vez que o aluno liga um apoio, o sistema registra um
+   evento de uso, que o painel do professor usa.
 
 Para testar a geração no seu computador, coloque a sua chave do Google AI Studio em `GEMINI_API_KEY` no `.env`.
 A IA recebe só os apoios ligados e o conteúdo da aula, nunca dados do aluno.
@@ -112,6 +117,11 @@ Ficam no `.env` (local, fora do Git) ou no painel do Render (produção). Modelo
 O arquivo [render.yaml](render.yaml) descreve o serviço. A cada push na `main`, o Render roda
 [build.sh](build.sh) (instala dependências, `collectstatic`, `migrate` e cria o administrador se ainda não existir)
 e inicia o site com `gunicorn`.
+
+## Créditos
+
+- Fonte [OpenDyslexic](https://opendyslexic.org/) (licença SIL Open Font License), carregada pelo pacote
+  [Fontsource](https://fontsource.org/fonts/opendyslexic) no jsDelivr.
 
 ## Estrutura
 

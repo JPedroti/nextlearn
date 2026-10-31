@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 01:28 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 01:33 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -32,7 +32,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 | 0. Esqueleto (login com 3 papéis, deploy) | 23h–00h | João | ✅ código · ⚠️ deploy | Criar o serviço no Render e testar no ar |
 | 1. Aula base (turma, aluno, aula, aluno responde a versão 000) | 00h–02h | João | ✅ (adiantada) | Testar no ar |
 | 2. Motor de IA (apoios, geração com cache, aprovação, aluno vê a sua versão) | 02h–04h | Thiago (feita pelo João com Claude Code) | ✅ código (adiantada) · ⚠️ | Decidir o provedor de IA (ver Entregas) e testar a geração real; trocar os blocos provisórios de `ia/blocos/` pelo texto do Cauã |
-| 3. Interface (OpenDyslexic, leitura em voz alta, modo limpo, registro de EventoUso) | 04h–06h | Thiago | ⏳ | Tudo. O João pediu à IA para fazer, se o Thiago não tiver começado (sem commits dele às 01h18) |
+| 3. Interface (OpenDyslexic, leitura em voz alta, modo limpo, registro de EventoUso) | 04h–06h | Thiago (feita pelo João com Claude Code) | ✅ código (adiantada) | Testar a leitura em voz alta num celular e no navegador da banca; testar no ar |
 | 4. Família (questionário → apoios sugeridos → revisão do professor) | 08h–09h15 | João | ✅ código (adiantada) | Trocar as 6 perguntas provisórias (`apps/perfis/questionario.py`) pelas do Cauã; testar no ar |
 | 5. Painel (acertos, adaptações usadas, sugestões de ajuste de perfil) | 09h15–10h30 | João | ⏳ | Tudo. Na fila, depois das Fatias 4 e 3 |
 | Docs finais | até 10h30 | João | ⏳ | Link do deploy no README; `docs/arquitetura.md`, `docs/decisoes.md` e `docs/contexto.md` |
@@ -50,14 +50,14 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 - ✅ Projeto criado no Neon
 - ⚠️ Deploy no Render: pausado no Blueprint; falta escolher o provedor de IA (ou publicar com a chave `pendente`)
 - ✅ Fatia 4 (família), com perguntas provisórias
+- ✅ Fatia 3 (interface), no lugar do Thiago, que não tinha começado
 - ⏳ Fatia 5 (painel)
 - ⏳ Docs finais e repositório público antes das 12h
 
 ### Thiago (Produto: motor de IA, tela do aluno, preferências de interface)
 
 - ❔ Ainda não há prompts dele no histórico nem commits no repositório
-- ℹ️ A Fatia 2 (motor de IA e tela do aluno) já foi feita pelo João, então a próxima parte do Thiago é a Fatia 3
-- ⏳ Fatia 3 (interface)
+- ℹ️ As Fatias 2 e 3 (motor de IA, tela do aluno e interface) já foram feitas pelo João com Claude Code. Sugestão: o Thiago testa o app (celular, leitura em voz alta) e ajuda no vídeo
 
 ### Cauã (Conteúdo: aula de exemplo, questionário, blocos pedagógicos, roteiro e narração do vídeo)
 
@@ -73,6 +73,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 01:33 — Fatia 3 concluída no código (barra de apoios de leitura, OpenDyslexic, voz, modo limpo, EventoUso); 70 testes passando.
 - 31/10, 01:28 — Fatia 4 concluída no código (família, questionário, sugestões aceitas ou recusadas pelo professor); 60 testes passando.
 - 31/10, 01:20 — Neon criado; deploy pausado pela questão dos termos da IA. O João pediu à IA as Fatias 4, 3 e 5 e a documentação final, em sequência.
 - 31/10, 00:50 — Teste do deploy pedido; o serviço no Render ainda não existe. Passo a passo reenviado ao João.
