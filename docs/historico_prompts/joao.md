@@ -583,3 +583,11 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** não fez mais elementos gráficos; deixou o servidor local rodando para o João testar e lembrou de deixar o repositório público antes das 12h.
 
 ---
+
+## Prompt 47 — 31/10/2026, 11:09 (BRT) — autor: João — ferramenta: Claude Code
+
+> como eu entro se eu nao tenho login e senha?
+
+**Resumo da resposta da IA:** mostrou onde está a conta de professor de teste (arquivo `contas_locais.txt`, só no computador do João, fora do Git), enviou o arquivo e explicou como criar as contas de aluno e família pelo próprio app e como criar outra conta com `createsuperuser`, se preferir.
+
+---
