@@ -615,3 +615,11 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** tirou do PDF (plano de negócio, fora do repositório) as duas logos, nextlearn e Chamaleon; recortou as sobras brancas e deixou o fundo transparente (`static/img/`). Pôs a logo do nextlearn no topo de todas as páginas e as duas na tela de entrar, com texto alternativo para leitor de tela. Corrigiu um defeito da edição anterior (`<h1class=` sem espaço no título da tela de entrar). 132 testes passando.
 
 ---
+
+## Prompt 50 — 31/10/2026, 11:18 (BRT) — autor: João — ferramenta: Claude Code
+
+> voce nao está trabalhando na main, correto? está trabalhando na branch do thiago como eu havia falado?
+
+**Resumo da resposta da IA:** respondeu que não: todo o trabalho desta conversa foi feito e publicado na `main`, e não achou na conversa um pedido para trabalhar na branch do Thiago. Listou o que foi para a `main` desde a skill do Thiago e explicou as opções (manter na `main`, levar para a branch do Thiago ou desfazer na `main` com commits de reversão, sem reescrever histórico).
+
+---
