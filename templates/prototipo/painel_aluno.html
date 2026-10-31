@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Minha área · NextLearn</title>
+  <title>Minha trilha · NextLearn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
 </head>
-<body class="{% if foco %}apoio-foco{% endif %}{% if perfil.modo_limpo %} modo-limpo{% endif %}">
+<body class="tema-{{ tema|default:'base' }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}{% if concreto %} apoio-concreto{% endif %}{% if limpo %} modo-limpo{% endif %}{% if voz %} com-voz{% endif %}" data-padrao-movimento="{% if foco or limpo %}0{% else %}1{% endif %}">
+  {% include "prototipo/_icones.html" %}
   <header class="topo">
-    <a href="{% url 'prototipo:painel_aluno' %}" class="marca">NextLearn</a>
+    <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn</a>
     <div class="topo-direita">
       <span class="quem">{{ aluno.usuario.first_name|default:aluno.usuario.username }} · {{ aluno.turma.nome }}</span>
-      {% if not sem_turma %}<button type="button" class="btn-contorno" data-abrir-calendario>
-        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Calendário</button>{% endif %}
+      {% if not sem_turma %}<button type="button" class="btn-contorno" data-abrir-calendario><svg class="ico" aria-hidden="true"><use href="#i-calendario"/></svg>Calendário</button>{% endif %}
       <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form>
     </div>
   </header>
@@ -22,153 +22,179 @@
   {% if sem_turma %}
   <main class="pagina"><p class="cartao">Seu usuário ainda não está em uma turma. Fale com o seu professor.</p></main>
   {% else %}
-  <main class="pagina">
+  <main class="pagina layout">
 
-    <!-- 1. Missão do dia + dia do mês (abre o calendário) -->
-    <section class="hoje cartao" aria-labelledby="hoje-titulo">
-      <div class="hoje-next" aria-hidden="true" data-pose="livro">{% include "prototipo/_next.html" %}</div>
-      <div class="hoje-texto">
-        <p class="rotulo">Missão de hoje</p>
-        {% if proxima %}
-          <h1 id="hoje-titulo">Oi, {{ aluno.usuario.first_name }}! Hoje é só uma coisa: <span class="destaque">{{ proxima.assunto }}</span></h1>
-          <p class="suave">{{ proxima.materia }} · {{ proxima.n_questoes }} questões{% if foco %} · em passos curtos, um de cada vez{% endif %}
-            · prazo {% if proxima.dias_para_prazo == 0 %}hoje{% elif proxima.dias_para_prazo == 1 %}amanhã{% else %}em {{ proxima.dias_para_prazo }} dias{% endif %}</p>
-          <a class="btn-principal" href="{% url 'aulas:ver' proxima.aula.pk %}">Começar</a>
-        {% else %}
-          <h1 id="hoje-titulo">Oi, {{ aluno.usuario.first_name }}! Você está em dia.</h1>
-          <a class="btn-principal" href="{% url 'prototipo:treino' 'rapido' %}">Treinar 3 minutos</a>
-        {% endif %}
-      </div>
-      <button type="button" class="dia-grande" data-abrir-calendario data-dia-hoje aria-label="Hoje, {{ hoje|date:'l, j \d\e F' }}. Abrir meu calendário">
-        <span class="dg-semana">{{ hoje|date:"l"|cut:"-feira" }}</span>
-        <span class="dg-numero">{{ hoje|date:"j" }}</span>
-        <span class="dg-mes">{{ hoje|date:"F" }}</span>
-        <span class="dg-dica">Ver calendário</span>
-      </button>
-    </section>
-
-    <!-- 2. Números (só comparado com ele mesmo) -->
-    <section class="numeros" aria-label="Meus números">
-      <article class="cartao numero tema-notas">
-        <p class="rotulo">Minha média</p>
-        <p class="valor">{{ media_geral|default:"–" }}<span class="de"> /10</span></p>
-        {% if delta is not None %}<p class="suave">{% if delta > 0 %}▲ subiu {{ delta }} desde o mês passado{% elif delta < 0 %}▼ caiu {{ delta_abs }} desde o mês passado{% else %}igual ao mês passado{% endif %}</p>{% endif %}
-      </article>
-      <article class="cartao numero tema-ritmo">
-        <p class="rotulo">Ofensiva semanal</p>
-        <p class="valor">{{ ofensiva }}<span class="de"> semana{{ ofensiva|pluralize }}</span></p>
-        <p class="suave">Esta semana: {{ feitas_semana }} de {{ meta_semanal }} aulas
-          <span class="bolinhas" aria-hidden="true">{% for b in meta_bolinhas %}<i class="{% if b %}cheia{% endif %}"></i>{% endfor %}</span></p>
-        <button type="button" class="btn-link mini-link" data-abrir-calendario>Ver semanas no calendário</button>
-      </article>
-      <article class="cartao numero tema-tempo">
-        <p class="rotulo">Tempo de estudo</p>
-        <p class="valor">{{ min_semana }}<span class="de"> min na semana</span></p>
-        <div class="barra" role="img" aria-label="Hoje: {{ min_hoje }} de {{ limite_diario }} minutos"><span style="width: {{ pct_hoje }}%"></span></div>
-        <p class="mini">Hoje {{ min_hoje }} de {{ limite_diario }} min (combinado com a família)</p>
-      </article>
-    </section>
-
-    <div class="colunas">
-      <div class="principal">
-        <!-- 3. Painel de notas (interativo) -->
-        <section class="cartao bloco tema-notas" aria-labelledby="notas-titulo">
-          <header class="bloco-topo">
-            <h2 id="notas-titulo"><span class="marcador" aria-hidden="true"></span>Minhas notas</h2>
-            <div class="abas" role="tablist" aria-label="Filtrar por matéria" data-filtro-notas>
-              <button type="button" role="tab" aria-selected="true" data-materia="">Todas</button>
-              {% for m in materias %}<button type="button" role="tab" aria-selected="false" data-materia="{{ m }}">{{ m }}</button>{% endfor %}
-            </div>
-          </header>
-          <div class="notas-resumo">
-            <p><span class="valor-medio" data-media-filtro>{{ media_geral }}</span><span class="de"> média</span></p>
-            <p class="suave" data-texto-filtro>{{ dominadas|length }} assuntos dominados · {{ revisar|length }} para revisar</p>
-          </div>
-          <div class="grafico" data-grafico-notas role="img" aria-label="Notas por aula"></div>
-          <p class="mini" data-detalhe-nota>Toque numa barra para ver a aula.</p>
-        </section>
-
-        <!-- 4. Tempo de estudo (interativo) -->
-        <section class="cartao bloco tema-tempo" aria-labelledby="tempo-titulo">
-          <header class="bloco-topo">
-            <h2 id="tempo-titulo"><span class="marcador" aria-hidden="true"></span>Meu tempo de estudo</h2>
-            <div class="abas" role="tablist" aria-label="Período" data-filtro-tempo>
-              <button type="button" role="tab" aria-selected="true" data-periodo="semana">Esta semana</button>
-              <button type="button" role="tab" aria-selected="false" data-periodo="mes">4 semanas</button>
-            </div>
-          </header>
-          <div class="grafico grafico-tempo" data-grafico-tempo role="img" aria-label="Minutos de estudo"></div>
-          <p class="mini">A linha tracejada é o limite diário combinado com a família ({{ limite_diario }} min). Estudar mais não dá ponto extra.</p>
-        </section>
-
-        <!-- 5. Tarefas (interativo) -->
-        <section class="cartao bloco tema-tarefas" aria-labelledby="tarefas-titulo">
-          <header class="bloco-topo">
-            <h2 id="tarefas-titulo"><span class="marcador" aria-hidden="true"></span>Minhas tarefas</h2>
-            <div class="abas" role="tablist" aria-label="Tarefas" data-filtro-tarefas>
-              <button type="button" role="tab" aria-selected="true" data-lista="pendentes">Para fazer ({{ pendentes|length }})</button>
-              <button type="button" role="tab" aria-selected="false" data-lista="feitas">Feitas ({{ feitas|length }})</button>
-            </div>
-          </header>
-          <ul class="tarefas" data-lista-tarefas></ul>
-          {% if foco %}<button type="button" class="btn-link" data-mostrar-todas hidden>Mostrar todas</button>{% endif %}
-        </section>
-
-        <!-- 6. Treinar -->
-        <section class="bloco-solto tema-treino" aria-labelledby="treinar-titulo">
-          <h2 id="treinar-titulo" class="titulo-solto"><span class="marcador" aria-hidden="true"></span>Treinar</h2>
-          <div class="treinos">
-            <a class="cartao treino" href="{% url 'prototipo:treino' 'erros' %}">
-              <svg class="t-icone" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4"/></svg>
-              <span class="t-nome">Revisar o que errei</span>
-              <span class="suave">{{ n_erradas }} quest{{ n_erradas|pluralize:"ão,ões" }}, uma de cada vez</span>
-            </a>
-            <a class="cartao treino" href="{% url 'prototipo:treino' 'rapido' %}">
-              <svg class="t-icone" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M10 3h4"/></svg>
-              <span class="t-nome">Treino rápido</span>
-              <span class="suave">3 questões, uns 3 minutos</span>
-            </a>
-            <a class="cartao treino" href="{% url 'prototipo:treino' 'revisao' %}">
-              <svg class="t-icone" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 14h3"/></svg>
-              <span class="t-nome">Revisão da semana passada</span>
-              <span class="suave">Para não esquecer ({{ n_revisao }} assunto{{ n_revisao|pluralize }})</span>
-            </a>
-          </div>
-          <p class="mini">Treino não vale nota. Errar aqui é parte do aprender.</p>
-        </section>
+    <!-- ===== Bloco grande: missão + trilha (estilo fase de jogo) ===== -->
+    <section class="cartao trilha-bloco" aria-labelledby="hoje-titulo">
+      <div class="missao">
+        <div class="missao-texto">
+          <p class="rotulo-claro">Missão de hoje</p>
+          {% if proxima %}
+            <h1 id="hoje-titulo">Oi, {{ aluno.usuario.first_name }}! Próxima fase: <span>{{ proxima.assunto }}</span></h1>
+            <p class="missao-meta">{{ proxima.materia }} · {{ proxima.n_questoes }} questões{% if foco %} · um passo de cada vez{% endif %} ·
+              prazo {% if proxima.dias_para_prazo == 0 %}hoje{% elif proxima.dias_para_prazo == 1 %}amanhã{% else %}em {{ proxima.dias_para_prazo }} dias{% endif %}</p>
+            <a class="btn-missao" href="{% url 'aulas:ver' proxima.aula.pk %}">Começar fase</a>
+          {% else %}
+            <h1 id="hoje-titulo">Oi, {{ aluno.usuario.first_name }}! Trilha em dia.</h1>
+            <a class="btn-missao" href="{% url 'prototipo:treino' 'rapido' %}">Treinar 3 minutos</a>
+          {% endif %}
+        </div>
+        <button type="button" class="dia-grande" data-abrir-calendario data-dia-hoje aria-label="Hoje, {{ hoje|date:'l, j \d\e F' }}. Abrir meu calendário">
+          <span class="dg-semana">{{ hoje|date:"l"|cut:"-feira" }}</span>
+          <span class="dg-numero">{{ hoje|date:"j" }}</span>
+          <span class="dg-mes">{{ hoje|date:"F" }}</span>
+          <span class="dg-dica"><svg class="ico" aria-hidden="true"><use href="#i-calendario"/></svg> calendário</span>
+        </button>
       </div>
 
-      <aside class="lateral">
-        <section class="cartao" aria-labelledby="apoios-titulo">
-          <h2 id="apoios-titulo">Meus apoios</h2>
-          {% if apoios %}<ul class="apoios">{% for a in apoios %}<li>{{ a }}</li>{% endfor %}</ul>
-          {% else %}<p class="suave">Você vê a aula original.</p>{% endif %}
-          <p class="mini">Escolhidos pelo seu professor. A aula é a mesma da turma, só muda o jeito.</p>
-        </section>
+      <div class="trilha" aria-label="Minha trilha">
+        {% for u in trilha %}
+          <details class="unidade" {% if u.aberta %}open{% endif %}>
+            <summary class="unidade-faixa u{{ forloop.counter }}">
+              <span class="u-icone" aria-hidden="true"><svg><use href="#i-{{ u.icone }}"/></svg></span>
+              <span class="u-texto"><span class="u-num">Unidade {{ u.numero }}</span><strong>{{ u.materia }}</strong></span>
+              <span class="u-prog" role="img" aria-label="{{ u.feitas }} de {{ u.total }} fases feitas"><span style="width: {{ u.pct }}%"></span></span>
+              <span class="u-conta">{{ u.feitas }}/{{ u.total }}</span>
+            </summary>
+            <ol class="caminho">
+              {% for no in u.nos %}{% if not no.oculta %}
+                <li class="no no-{{ no.estado }}" style="--x: {{ no.deslocamento }}px">
+                  {% if no.estado == "feita" %}
+                    <a class="no-bt {{ no.faixa.classe }}" href="{{ no.url }}" aria-label="{{ no.titulo }}: {{ no.detalhe }}, {{ no.faixa.rotulo }}">
+                      <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}check{% endif %}"/></svg>
+                    </a>
+                    <span class="no-estrelas" aria-hidden="true">{% for e in no.estrelas %}<i class="cheia">★</i>{% endfor %}{% for e in no.vazias %}<i>★</i>{% endfor %}</span>
+                    {% if textual or not foco %}<span class="no-nome">{{ no.titulo }}</span>{% endif %}
+                  {% elif no.estado == "atual" %}
+                    <span class="balao-fase">Começar!</span>
+                    <a class="no-bt" href="{{ no.url }}" aria-label="Fase atual: {{ no.titulo }}. Começar">
+                      <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}estrela{% endif %}"/></svg>
+                    </a>
+                    <span class="no-nome forte">{{ no.titulo }}</span>
+                    <span class="next-trilha" aria-hidden="true" data-pose="livro">{% include "prototipo/_next.html" %}</span>
+                  {% elif no.estado == "revisao" %}
+                    <a class="no-bt" href="{{ no.url }}" aria-label="Revisão: treino para não esquecer"><svg aria-hidden="true"><use href="#i-revisao"/></svg></a>
+                    <span class="no-nome">Revisão</span>
+                  {% else %}
+                    <span class="no-bt" role="img" aria-label="{{ no.titulo }}: fase bloqueada, vem depois"><svg aria-hidden="true"><use href="#i-cadeado"/></svg></span>
+                    {% if textual or not foco %}<span class="no-nome">{{ no.titulo }}</span>{% endif %}
+                  {% endif %}
+                </li>
+              {% endif %}{% endfor %}
+              {% if u.n_ocultas %}<li class="no no-mais" style="--x: 0px"><span>+{{ u.n_ocultas }} fase{{ u.n_ocultas|pluralize }} depois</span></li>{% endif %}
+            </ol>
+          </details>
+        {% endfor %}
+      </div>
+    </section>
 
-        <section class="cartao" aria-labelledby="pref-titulo">
-          <h2 id="pref-titulo">Como prefiro ver</h2>
-          <p class="mini">Só muda para você. Liga e desliga quando quiser.</p>
-          <div class="prefs">
-            <button type="button" class="interruptor" data-pref="letras" aria-pressed="false">Letras espaçadas</button>
-            <button type="button" class="interruptor" data-pref="voz" aria-pressed="{% if perfil.leitura_voz %}true{% else %}false{% endif %}">Botões de ouvir</button>
-            <button type="button" class="interruptor" data-pref="limpo" aria-pressed="{% if perfil.modo_limpo %}true{% else %}false{% endif %}">Modo limpo</button>
-            <button type="button" class="interruptor" data-pref="movimento" aria-pressed="{% if foco %}false{% else %}true{% endif %}">Animações suaves</button>
-          </div>
-        </section>
+    <!-- ===== Coluna lateral ===== -->
+    <div class="lado">
+      <section class="numeros" aria-label="Meus números">
+        <article class="numero n-media"><svg class="n-ico" aria-hidden="true"><use href="#i-estrela"/></svg>
+          <p class="valor">{{ media_geral|default:"–" }}</p><p class="n-rot">média{% if delta is not None and delta > 0 %} · ▲ {{ delta }}{% endif %}</p></article>
+        <article class="numero n-ofensiva"><svg class="n-ico" aria-hidden="true"><use href="#i-chama"/></svg>
+          <p class="valor">{{ ofensiva }}</p><p class="n-rot">semana{{ ofensiva|pluralize }} seguida{{ ofensiva|pluralize }}</p></article>
+        <article class="numero n-tempo"><svg class="n-ico" aria-hidden="true"><use href="#i-relogio"/></svg>
+          <p class="valor">{{ min_semana }}</p><p class="n-rot">min na semana</p></article>
+      </section>
+      <p class="mini meta-linha">Meta da semana: {{ feitas_semana }} de {{ meta_semanal }} aulas <span class="bolinhas" aria-hidden="true">{% for b in meta_bolinhas %}<i class="{% if b %}cheia{% endif %}"></i>{% endfor %}</span> · semana parada só pausa · <button type="button" class="btn-link mini-link" data-abrir-calendario>ver no calendário</button></p>
 
-        <section class="cartao" aria-labelledby="como-titulo">
-          <h2 id="como-titulo">Como foi hoje?</h2>
-          <div class="humor" role="group" aria-label="Como foi hoje">
-            <button type="button" data-humor="bem" aria-pressed="false">Bem</button>
-            <button type="button" data-humor="mais-ou-menos" aria-pressed="false">Mais ou menos</button>
-            <button type="button" data-humor="dificil" aria-pressed="false">Difícil</button>
+      <!-- Notas em carrossel -->
+      <section class="cartao bloco" aria-labelledby="notas-titulo" data-carrossel>
+        <header class="bloco-topo">
+          <h2 id="notas-titulo"><span class="marcador m-notas" aria-hidden="true"></span>Minhas notas</h2>
+          <div class="car-nav">
+            <button type="button" class="car-bt" data-car-ant aria-label="Notas anteriores">‹</button>
+            <button type="button" class="car-bt" data-car-prox aria-label="Próximas notas">›</button>
           </div>
-          <p class="mini" data-humor-msg>Opcional. Ajuda o seu professor a ajustar as aulas.</p>
-        </section>
-      </aside>
+        </header>
+        <div class="abas" role="tablist" aria-label="Filtrar por matéria" data-filtro-notas>
+          <button type="button" role="tab" aria-selected="true" data-materia="">Todas</button>
+          {% for m in materias %}<button type="button" role="tab" aria-selected="false" data-materia="{{ m }}">{{ m }}</button>{% endfor %}
+        </div>
+        <div class="carrossel" data-car-trilho tabindex="0" aria-label="Notas, da mais recente para a mais antiga">
+          {% for c in cartoes %}
+            <article class="nota-cartao {{ c.faixa.classe }}" data-materia="{{ c.materia }}" aria-label="{{ c.assunto }}, {{ c.materia }}: nota {{ c.nota }}, {{ c.faixa.rotulo }}">
+              <p class="nc-materia">{% if concreto %}<svg class="ico" aria-hidden="true"><use href="#i-{% if c.materia == 'Matemática' %}fracao{% elif c.materia == 'Português' %}livro{% else %}gota{% endif %}"/></svg>{% endif %}{{ c.materia }}</p>
+              <p class="nc-nota">{{ c.nota }}</p>
+              <p class="nc-faixa"><span aria-hidden="true">{{ c.faixa.simbolo }}</span> {{ c.faixa.rotulo }}</p>
+              <p class="nc-assunto">{{ c.assunto }}</p>
+              <p class="nc-data">{{ c.quando|date:"d/m" }} · {{ c.acertos }} de {{ c.total }} certas</p>
+            </article>
+          {% endfor %}
+        </div>
+        <div class="car-pontos" data-car-pontos aria-hidden="true"></div>
+        <ul class="escala" aria-label="Como ler as cores">
+          {% for f in faixas %}<li class="{{ f.classe }}"><span aria-hidden="true">{{ f.simbolo }}</span> {{ f.rotulo }}</li>{% endfor %}
+        </ul>
+      </section>
+
+      <!-- Tempo -->
+      <section class="cartao bloco" aria-labelledby="tempo-titulo">
+        <header class="bloco-topo">
+          <h2 id="tempo-titulo"><span class="marcador m-tempo" aria-hidden="true"></span>Meu tempo</h2>
+          <div class="abas" role="tablist" aria-label="Período" data-filtro-tempo>
+            <button type="button" role="tab" aria-selected="true" data-periodo="semana">Semana</button>
+            <button type="button" role="tab" aria-selected="false" data-periodo="mes">4 semanas</button>
+          </div>
+        </header>
+        <div class="grafico grafico-tempo" data-grafico-tempo role="img" aria-label="Minutos de estudo"></div>
+        <p class="mini">Tracejado: limite combinado com a família ({{ limite_diario }} min por dia). Mais tempo não dá ponto extra.</p>
+      </section>
+
+      <!-- Tarefas -->
+      <section class="cartao bloco" aria-labelledby="tarefas-titulo">
+        <header class="bloco-topo">
+          <h2 id="tarefas-titulo"><span class="marcador m-tarefas" aria-hidden="true"></span>Tarefas</h2>
+          <div class="abas" role="tablist" aria-label="Tarefas" data-filtro-tarefas>
+            <button type="button" role="tab" aria-selected="true" data-lista="pendentes">Fazer ({{ pendentes|length }})</button>
+            <button type="button" role="tab" aria-selected="false" data-lista="feitas">Feitas ({{ feitas|length }})</button>
+          </div>
+        </header>
+        <ul class="tarefas" data-lista-tarefas></ul>
+        {% if foco %}<button type="button" class="btn-link" data-mostrar-todas hidden>Mostrar todas</button>{% endif %}
+      </section>
+
+      <!-- Treinar -->
+      <section class="cartao bloco" aria-labelledby="treinar-titulo">
+        <h2 id="treinar-titulo"><span class="marcador m-treino" aria-hidden="true"></span>Treinar</h2>
+        <div class="treinos">
+          <a class="treino t1" href="{% url 'prototipo:treino' 'erros' %}"><svg class="t-icone" aria-hidden="true"><use href="#i-revisao"/></svg>
+            <span><span class="t-nome">Revisar o que errei</span><span class="t-sub">{{ n_erradas }} quest{{ n_erradas|pluralize:"ão,ões" }}</span></span></a>
+          <a class="treino t2" href="{% url 'prototipo:treino' 'rapido' %}"><svg class="t-icone" aria-hidden="true"><use href="#i-relogio"/></svg>
+            <span><span class="t-nome">Treino rápido</span><span class="t-sub">3 questões, 3 min</span></span></a>
+          <a class="treino t3" href="{% url 'prototipo:treino' 'revisao' %}"><svg class="t-icone" aria-hidden="true"><use href="#i-calendario"/></svg>
+            <span><span class="t-nome">Revisão da semana</span><span class="t-sub">{{ n_revisao }} assunto{{ n_revisao|pluralize }}</span></span></a>
+        </div>
+        <p class="mini">Treino não vale nota. Errar aqui é parte do aprender.</p>
+      </section>
+
+      <section class="cartao bloco" aria-labelledby="pref-titulo">
+        <h2 id="pref-titulo">Do meu jeito</h2>
+        <p class="mini">Apoios do professor: {% for x in apoios %}{{ x }}{% if not forloop.last %}, {% endif %}{% empty %}nenhum (aula original){% endfor %}.</p>
+        <div class="prefs">
+          <button type="button" class="interruptor" data-pref="letras" aria-pressed="false">Letras espaçadas</button>
+          <button type="button" class="interruptor" data-pref="voz" aria-pressed="{% if voz %}true{% else %}false{% endif %}">Botões de ouvir</button>
+          <button type="button" class="interruptor" data-pref="limpo" aria-pressed="{% if limpo %}true{% else %}false{% endif %}">Modo limpo</button>
+          <button type="button" class="interruptor" data-pref="movimento" aria-pressed="{% if foco or limpo %}false{% else %}true{% endif %}">Animações</button>
+        </div>
+        <div class="humor" role="group" aria-label="Como foi hoje">
+          <span class="mini">Como foi hoje?</span>
+          <button type="button" data-humor="bem" aria-pressed="false">Bem</button>
+          <button type="button" data-humor="mais-ou-menos" aria-pressed="false">Mais ou menos</button>
+          <button type="button" data-humor="dificil" aria-pressed="false">Difícil</button>
+        </div>
+        <p class="mini" data-humor-msg></p>
+      </section>
     </div>
   </main>
+
+  <aside class="ver-como" aria-label="Pré-visualizar outro perfil (protótipo)">
+    <span>Protótipo · ver como:</span>
+    {% for chave, nome in ver_como %}<a href="?ver={{ chave }}" {% if chave == ver %}aria-current="page"{% endif %}>{{ nome }}</a>{% endfor %}
+    <span class="tema-nome">Tema: {{ tema_nome }}</span>
+  </aside>
 
   {% include "prototipo/_calendario.html" %}
   <script id="dados-painel" type="application/json">{{ dados_json|safe }}</script>

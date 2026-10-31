@@ -16,7 +16,7 @@
     aplicar();
     bt.addEventListener("click", function () { ligado = !ligado; gravar(k, ligado ? "1" : "0"); aplicar(); });
   });
-  if (!$("[data-pref='movimento']") && ler("movimento") === "1") b.classList.add("com-movimento");
+  if (!$("[data-pref='movimento']")) { var mv = ler("movimento"); if (mv === "1" || (mv === null && b.dataset.padraoMovimento === "1")) b.classList.add("com-movimento"); }
   function podeAnimar() { return b.classList.contains("com-movimento") && !matchMedia("(prefers-reduced-motion: reduce)").matches; }
 
   var msg = $("[data-humor-msg]");
@@ -47,33 +47,35 @@
     });
   }
 
-  // ---------- Notas ----------
-  var gNotas = $("[data-grafico-notas]"), detalhe = $("[data-detalhe-nota]");
-  function desenharNotas(materia) {
-    var lista = D.notas.filter(function (n) { return !materia || n.materia === materia; }).slice(-8);
-    gNotas.innerHTML = "";
-    lista.forEach(function (n) {
-      var col = el("button", "barra-col");
-      col.type = "button";
-      col.setAttribute("aria-label", n.assunto + ", " + n.materia + ", nota " + n.nota + " em " + curta(n.data));
-      col.appendChild(el("span", "bc-valor", String(n.nota).replace(".", ",")));
-      var barra = el("span", "bc-barra"); barra.style.height = Math.max(6, n.nota * 12) + "px"; col.appendChild(barra);
-      col.appendChild(el("span", "bc-rot", curta(n.data)));
-      col.addEventListener("click", function () {
-        $$(".barra-col", gNotas).forEach(function (o) { o.classList.toggle("ativa", o === col); });
-        detalhe.textContent = n.assunto + " (" + n.materia + ") · nota " + String(n.nota).replace(".", ",") + " · " + curta(n.data);
-      });
-      gNotas.appendChild(col);
+  // ---------- Notas em carrossel ----------
+  var car = $("[data-carrossel]");
+  if (car) {
+    var trilho = $("[data-car-trilho]", car), pontos = $("[data-car-pontos]", car);
+    var cartoesN = $$(".nota-cartao", trilho);
+    function visiveis() { return cartoesN.filter(function (c) { return !c.hidden; }); }
+    function passo() { var c = visiveis()[0]; return c ? c.getBoundingClientRect().width + 12 : 200; }
+    function comportamento() { return podeAnimar() ? "smooth" : "auto"; }
+    function atualizaPontos() {
+      var v = visiveis(), porTela = Math.max(1, Math.round(trilho.clientWidth / passo()));
+      var n = Math.max(1, Math.ceil(v.length / porTela)), atual = Math.round(trilho.scrollLeft / (passo() * porTela));
+      pontos.innerHTML = "";
+      for (var i = 0; i < n; i++) pontos.appendChild(el("i", i === Math.min(atual, n - 1) ? "ativo" : ""));
+    }
+    $("[data-car-ant]", car).addEventListener("click", function () { trilho.scrollBy({ left: -passo() * 2, behavior: comportamento() }); });
+    $("[data-car-prox]", car).addEventListener("click", function () { trilho.scrollBy({ left: passo() * 2, behavior: comportamento() }); });
+    trilho.addEventListener("scroll", function () { requestAnimationFrame(atualizaPontos); });
+    trilho.addEventListener("keydown", function (e) {
+      if (e.key === "ArrowRight") { e.preventDefault(); trilho.scrollBy({ left: passo(), behavior: comportamento() }); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); trilho.scrollBy({ left: -passo(), behavior: comportamento() }); }
     });
-    gNotas.setAttribute("aria-label", "Notas: " + lista.map(function (n) { return n.assunto + " " + n.nota; }).join(", "));
-    var todas = D.notas.filter(function (n) { return !materia || n.materia === materia; });
-    var media = todas.reduce(function (s, n) { return s + n.nota; }, 0) / (todas.length || 1);
-    $("[data-media-filtro]").textContent = todas.length ? media.toFixed(1).replace(".", ",") : "–";
-    var dom = todas.filter(function (n) { return n.nota >= 10; }).length, rev = todas.filter(function (n) { return n.nota < 6; }).length;
-    $("[data-texto-filtro]").textContent = dom + " assunto" + (dom === 1 ? "" : "s") + " dominado" + (dom === 1 ? "" : "s") + " · " + rev + " para revisar";
-    detalhe.textContent = "Toque numa barra para ver a aula.";
+    abas($("[data-filtro-notas]"), function (bt) {
+      var m = bt.dataset.materia;
+      cartoesN.forEach(function (c) { c.hidden = !!m && c.dataset.materia !== m; });
+      trilho.scrollLeft = 0; atualizaPontos();
+    });
+    addEventListener("resize", atualizaPontos);
+    atualizaPontos();
   }
-  if (gNotas) { desenharNotas(""); abas($("[data-filtro-notas]"), function (bt) { desenharNotas(bt.dataset.materia); }); }
 
   // ---------- Tempo ----------
   var gTempo = $("[data-grafico-tempo]");
@@ -123,7 +125,7 @@
       li.appendChild(a);
       var cal = el("button", "btn-icone"); cal.type = "button";
       cal.setAttribute("aria-label", "Ver " + t.titulo + " no calendário");
-      cal.innerHTML = '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
+      cal.innerHTML = '<svg class="ico" aria-hidden="true"><use href="#i-calendario"/></svg>';
       cal.addEventListener("click", function () { abrirCalendario(cal, listaAtual === "pendentes" ? t.prazo : t.data); });
       li.appendChild(cal);
       listaT.appendChild(li);

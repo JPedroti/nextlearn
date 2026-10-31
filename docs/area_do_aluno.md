@@ -37,6 +37,17 @@ O login do aluno pelo `/prototipo/login/` cai aqui. Lê os dados reais do banco 
   de ver a resposta, certo/errado com texto e ícone; treino não vale nota.
 - **Lateral:** apoios escolhidos pelo professor, preferências (letras espaçadas, ouvir, modo limpo) e "Como foi hoje?" opcional.
 
+### Trilha, carrossel e temas (prompt 32)
+- **Trilha estilo jogo** no bloco grande: uma unidade por matéria; fase feita = estrelas (acertos) + cor da nota; fase
+  atual com o Next e "Começar!"; uma revisão a cada 3 fases (retenção); fases futuras bloqueadas.
+  Foco: só a unidade atual aberta, sem rótulos ao redor, no máximo 2 fases bloqueadas visíveis ("+N depois").
+- **Notas em carrossel** com escala vermelho → verde (Vamos revisar < 5 · Quase lá < 7 · Bom < 8,5 · Muito bom < 10 · Dominado! = 10),
+  sempre com símbolo e texto junto da cor (daltonismo). Faixas são valor de produto, a calibrar.
+- **Tema por apoio** (prioridade limpo > foco > textual > concreto > base): Aurora (sem apoios), Oceano (foco),
+  Pergaminho (leitura, letra maior), Parque (concreto, ícones por matéria), Limpo. Contraste de texto >= 4,5:1 conferido.
+- Animação (pulsar da fase atual, quique do balão) só com a preferência "Animações": desligada por padrão com foco e modo limpo.
+- Barra "Protótipo · ver como" (`?ver=base|foco|textual|concreto|limpo`) para comparar os temas com os mesmos dados.
+
 ## O que ainda falta (para o front)
 - Preferências do aluno na tela (`fonte_dislexia`, `leitura_voz`, `modo_limpo`) já existem no `Perfil`, mas os templates do time ainda não as aplicam.
 - Registro de uso (`EventoUso`: tempo por bloco, pediu dica, ouviu em voz alta) é da Fatia 3.

@@ -303,10 +303,113 @@ def painel_aluno(request):
     dados = {"hoje": hoje.date().isoformat(), "eventos": eventos, "minutos": minutos, "notas": notas,
              "pendentes": pendentes_js, "feitas": feitas_js, "limite": LIMITE_DIARIO_MIN, "meta": META_SEMANAL}
 
+    ver = request.GET.get("ver", "")
+    a, tema = _apoios_visuais(perfil, ver)
+    trilha = _trilha(contexto, a["foco"])
+    for u in trilha:
+        for no in u["nos"]:
+            if no["url"] == "treino:revisao":
+                no["url"] = reverse("prototipo:treino", args=["revisao"])
+    cartoes = [dict(i, faixa=faixa_nota(i["nota"])) for i in contexto["feitas"]]  # mais recentes primeiro
     contexto.update(aluno=aluno, perfil=perfil, apoios=perfil.nomes_apoios() if perfil else [],
-                    foco=bool(perfil and perfil.foco), hoje=hoje, materias=sorted({n["materia"] for n in notas}),
+                    foco=a["foco"], textual=a["textual"], concreto=a["concreto"], limpo=a["limpo"], voz=a["voz"],
+                    tema=tema, tema_nome=TEMAS_ALUNO[tema], ver=ver, ver_como=VER_COMO, trilha=trilha, cartoes=cartoes,
+                    faixas=[faixa_nota(n) for n in (10, 9, 7.5, 6, 3)],
+                    hoje=hoje, materias=sorted({n["materia"] for n in notas}),
                     dados_json=json.dumps(dados, ensure_ascii=False))
     return render(request, "prototipo/painel_aluno.html", contexto)
+
+
+# Escala de notas: vermelho → verde, SEMPRE com texto e forma junto (nunca só cor; daltonismo).
+FAIXAS_NOTA = [  # (nota mínima, classe, rótulo, símbolo)
+    (10, "g5", "Dominado!", "★"),
+    (8.5, "g4", "Muito bom", "▲"),
+    (7, "g3", "Bom", "●"),
+    (5, "g2", "Quase lá", "◆"),
+    (0, "g1", "Vamos revisar", "↺"),
+]
+
+
+def faixa_nota(nota):
+    for minimo, classe, rotulo, simbolo in FAIXAS_NOTA:
+        if nota >= minimo:
+            return {"classe": classe, "rotulo": rotulo, "simbolo": simbolo}
+
+
+# Tema visual por apoio (docs/design_neuro.md). Prioridade: limpo > foco > textual > concreto > base.
+TEMAS_ALUNO = {
+    "base": "Aurora", "foco": "Oceano", "textual": "Pergaminho", "concreto": "Parque", "limpo": "Limpo",
+}
+VER_COMO = [  # pré-visualização do protótipo: mesmo aluno, outro conjunto de apoios
+    ("", "Davi (perfil real do teste)"), ("base", "Sem apoios"), ("foco", "Foco"),
+    ("textual", "Leitura"), ("concreto", "Concreto"), ("limpo", "Modo limpo"),
+]
+
+
+def _apoios_visuais(perfil, ver):
+    a = {"foco": False, "textual": False, "concreto": False, "limpo": False, "voz": False}
+    if ver in ("base", "foco", "textual", "concreto", "limpo"):
+        if ver != "base":
+            a[ver] = True
+        a["voz"] = ver == "textual"
+    elif perfil:
+        a.update(foco=perfil.foco, textual=perfil.textual, concreto=perfil.concreto, limpo=perfil.modo_limpo, voz=perfil.leitura_voz)
+    tema = next((t for t in ("limpo", "foco", "textual", "concreto") if a[t]), "base")
+    return a, tema
+
+
+ICONE_MATERIA = {"Matemática": "fracao", "Português": "livro", "Ciências": "gota"}
+
+
+def _trilha(contexto, foco):
+    """Trilha estilo jogo: uma unidade por matéria; nós feitos (com estrelas e cor da nota), o atual e os próximos."""
+    proxima = contexto["proxima"]
+    unidades = {}
+    for i in sorted(contexto["feitas"], key=lambda x: x["quando"]):
+        unidades.setdefault(i["materia"], []).append(("feita", i))
+    for i in contexto["pendentes"]:
+        unidades.setdefault(i["materia"], []).append(("nova", i))
+    zigue = [0, 56, 84, 56, 0, -56, -84, -56]
+    saida = []
+    for n_unid, (materia, itens) in enumerate(sorted(unidades.items(), key=lambda kv: (proxima is None or kv[0] != proxima["materia"], kv[0]))):
+        nos, feitas_u = [], 0
+        for k, (estado, i) in enumerate(itens):
+            no = {"titulo": i["assunto"], "url": reverse_aula(i["aula"].pk), "icone": ICONE_MATERIA.get(materia, "estrela")}
+            if estado == "feita":
+                feitas_u += 1
+                no.update(estado="feita", nota=i["nota"], estrelas=range(i["acertos"]), vazias=range(i["total"] - i["acertos"]),
+                          faixa=faixa_nota(i["nota"]), detalhe=f"{i['acertos']} de {i['total']} certas")
+            elif proxima and i["aula"].pk == proxima["aula"].pk:
+                no.update(estado="atual")
+            else:
+                no.update(estado="bloqueada")
+            nos.append(no)
+            if estado == "feita" and feitas_u % 3 == 0:
+                nos.append({"estado": "revisao", "titulo": "Revisão", "url": "treino:revisao", "icone": "revisao"})
+        for k, no in enumerate(nos):
+            no["deslocamento"] = zigue[k % len(zigue)]
+        # Apoio de foco: mostra só os 2 próximos nós bloqueados; o resto vira "+N" (menos coisa na tela)
+        n_ocultas, vistas = 0, 0
+        if foco:
+            for no in nos:
+                if no["estado"] == "bloqueada":
+                    vistas += 1
+                    if vistas > 2:
+                        no["oculta"] = True
+                        n_ocultas += 1
+        atual = any(n["estado"] == "atual" for n in nos)
+        saida.append({
+            "materia": materia, "numero": n_unid + 1, "nos": nos, "feitas": feitas_u, "total": len(itens),
+            "pct": int(100 * feitas_u / len(itens)) if itens else 0, "atual": atual, "aberta": atual or not foco,
+            "icone": ICONE_MATERIA.get(materia, "estrela"), "n_ocultas": n_ocultas,
+        })
+    return saida
+
+
+def reverse_aula(pk):
+    from django.urls import reverse
+
+    return reverse("aulas:ver", args=[pk])
 
 
 TREINOS = {
