@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block titulo %}Família · NextLearn{% endblock %}
+
+{% block conteudo %}
+<h1 class="text-2xl font-semibold mb-1">Olá, {{ user.first_name|default:user.username }}!</h1>
+<p class="text-slate-600 mb-6">
+  Conte como é o dia a dia de estudo do seu filho ou filha. As respostas ajudam o professor a escolher apoios
+  para a mesma aula da turma. Não pedimos laudo nem diagnóstico.
+</p>
+
+{% for aluno in dependentes %}
+  <div class="cartao mb-4">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+      <div>
+        <h2 class="text-lg font-semibold">{{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</h2>
+        <p class="text-sm text-slate-600">Turma: {{ aluno.turma.nome }}</p>
+      </div>
+      <a href="{% url 'perfis:questionario' aluno.pk %}" class="{% if aluno.ultimo_questionario %}btn-sec{% else %}btn{% endif %}">
+        {% if aluno.ultimo_questionario %}Responder de novo{% else %}Responder o questionário{% endif %}
+      </a>
+    </div>
+    <p class="text-sm mt-3">
+      {% if aluno.ultimo_questionario %}
+        Questionário respondido em {{ aluno.ultimo_questionario|date:"d/m/Y, H:i" }}.
+      {% else %}
+        Questionário ainda não respondido.
+      {% endif %}
+    </p>
+    <p class="text-sm mt-1">
+      Apoios definidos pelo professor:
+      {% for apoio in aluno.perfil.nomes_apoios %}{{ apoio }}{% if not forloop.last %}, {% endif %}{% empty %}nenhum por enquanto (aula original){% endfor %}.
+    </p>
+  </div>
+{% empty %}
+  <p class="cartao text-slate-600">Ainda não há aluno ligado a esta conta. Fale com o professor.</p>
+{% endfor %}
+{% endblock %}

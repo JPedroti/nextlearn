@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .env
 .env.*
 !.env.example
@@ -7,3 +8,21 @@ __pycache__/
 venv/
 .vscode/
 .idea/
+=======
+# Segredos
+.env
+
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Django
+db.sqlite3
+staticfiles/
+
+# Material de referência (PDFs do evento; o deck da Teachy é confidencial)
+referencias/
+*.pdf
+>>>>>>> 87d341e8f5a30f199d1a5860e701ea53d6165bbe

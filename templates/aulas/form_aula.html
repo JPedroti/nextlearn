@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block titulo %}{% if aula %}Editar aula{% else %}Nova aula{% endif %} · NextLearn{% endblock %}
+
+{% block conteudo %}
+{% if aula %}
+  <a href="{% url 'aulas:detalhe_professor' aula.pk %}" class="voltar">← {{ aula.titulo }}</a>
+{% else %}
+  <a href="{% url 'turmas:detalhe' turma.pk %}" class="voltar">← {{ turma.nome }}</a>
+{% endif %}
+<h1 class="text-2xl font-semibold mt-3 mb-1">{% if aula %}Editar aula{% else %}Nova aula{% endif %}</h1>
+<p class="text-slate-600 mb-6">Turma: {{ turma.nome }}. Escreva a aula uma vez; as versões adaptadas partem deste texto.</p>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="cartao mb-6">
+    {{ form.non_field_errors }}
+    {% include "_campo.html" with campo=form.titulo %}
+    {% include "_campo.html" with campo=form.conteudo %}
+  </div>
+
+  <h2 class="text-xl font-semibold mb-1">Questões de múltipla escolha</h2>
+  <p class="text-sm text-slate-600 mb-4">Preencha quantas quiser (pelo menos 1). Questões deixadas em branco são ignoradas. As alternativas e o gabarito nunca são alterados pela IA.</p>
+  {{ formset.management_form }}
+  {% if formset.non_form_errors %}<div class="mb-4">{{ formset.non_form_errors }}</div>{% endif %}
+
+  {% for qform in formset %}
+    <fieldset class="cartao mb-4">
+      <legend class="float-left w-full font-medium mb-2">Questão {{ forloop.counter }}</legend>
+      {{ qform.id }}
+      {% if qform.non_field_errors %}<div class="mb-3">{{ qform.non_field_errors }}</div>{% endif %}
+      {% include "_campo.html" with campo=qform.enunciado %}
+      <div class="grid gap-3 sm:grid-cols-2 mb-3">
+        {% for alternativa in qform.campos_alternativas %}
+          <div>
+            <label for="{{ alternativa.id_for_label }}" class="block text-sm font-medium mb-1">Alternativa {{ alternativa.label }}</label>
+            {{ alternativa }}
+            {{ alternativa.errors }}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="flex flex-wrap items-center gap-4 text-sm">
+        <span class="font-medium">Alternativa correta:</span>
+        {% for opcao in qform.correta %}
+          <label class="inline-flex items-center gap-1">{{ opcao.tag }} {{ opcao.choice_label }}</label>
+        {% endfor %}
+        {% if qform.instance.pk %}
+          <label class="inline-flex items-center gap-1 ml-auto text-red-700">{{ qform.DELETE }} Excluir questão</label>
+        {% endif %}
+      </div>
+    </fieldset>
+  {% endfor %}
+
+  <button type="submit" class="btn">Salvar aula</button>
+</form>
+{% endblock %}

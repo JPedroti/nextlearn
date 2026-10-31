@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block titulo %}Questionário · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'perfis:inicio' %}" class="voltar">← Início</a>
+<h1 class="text-2xl font-semibold mt-3 mb-1">Como é o dia a dia de {{ aluno.usuario.first_name|default:aluno.usuario.username }}?</h1>
+<p class="text-slate-600 mb-6">
+  Responda pensando no que você observa em casa, nos estudos e nas tarefas. Não existe resposta certa.
+  Não pedimos laudo nem diagnóstico: as respostas só sugerem apoios ao professor, que decide.
+  {% if anterior %}As respostas de {{ anterior.criado_em|date:"d/m" }} já vêm marcadas; mude o que for preciso.{% endif %}
+</p>
+
+<form method="post">
+  {% csrf_token %}
+  {% for campo in form %}
+    <fieldset class="cartao mb-4">
+      <legend class="float-left w-full font-medium mb-3">{{ forloop.counter }}. {{ campo.label }}</legend>
+      <div class="clear-both flex flex-wrap gap-x-6 gap-y-2">
+        {% for opcao in campo %}
+          <label class="inline-flex items-center gap-2 cursor-pointer">{{ opcao.tag }} {{ opcao.choice_label }}</label>
+        {% endfor %}
+      </div>
+      {{ campo.errors }}
+    </fieldset>
+  {% endfor %}
+  <button type="submit" class="btn">Enviar respostas</button>
+</form>
+{% endblock %}

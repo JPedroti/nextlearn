@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block titulo %}{{ turma.nome }} · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'painel:inicio' %}" class="voltar">← Minhas turmas</a>
+<h1 class="text-2xl font-semibold mt-3 mb-6">{{ turma.nome }}</h1>
+
+<section class="mb-8">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-xl font-semibold">Aulas</h2>
+    <a href="{% url 'aulas:nova' turma.pk %}" class="btn">Nova aula</a>
+  </div>
+  {% if aulas %}
+    <ul class="cartao divide-y divide-slate-100 p-0">
+      {% for aula in aulas %}
+        <li>
+          <a href="{% url 'aulas:detalhe_professor' aula.pk %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50">
+            <span>{{ aula.titulo }}</span>
+            {% if aula.publicada %}
+              <span class="text-xs rounded-full bg-green-100 text-green-800 px-2 py-1">Publicada</span>
+            {% else %}
+              <span class="text-xs rounded-full bg-slate-100 text-slate-700 px-2 py-1">Rascunho</span>
+            {% endif %}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="cartao text-slate-600">Nenhuma aula ainda.</p>
+  {% endif %}
+</section>
+
+<section>
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-xl font-semibold">Alunos</h2>
+    <a href="{% url 'turmas:novo_aluno' turma.pk %}" class="btn-sec">Cadastrar aluno</a>
+  </div>
+  {% if alunos %}
+    <ul class="cartao divide-y divide-slate-100 p-0">
+      {% for aluno in alunos %}
+        <li class="px-6 py-3 flex flex-wrap items-center justify-between gap-2">
+          <span>
+            <span class="block">{{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</span>
+            <span class="block text-sm text-slate-500">usuário: {{ aluno.usuario.username }}</span>
+            <span class="block text-sm text-slate-500">
+              {% if aluno.responsavel %}
+                Família: {{ aluno.responsavel.get_full_name|default:aluno.responsavel.username }} (usuário: {{ aluno.responsavel.username }})
+                · {% if aluno.ultimo_questionario %}questionário respondido em {{ aluno.ultimo_questionario|date:"d/m H:i" }}{% else %}questionário ainda não respondido{% endif %}
+              {% else %}
+                <a href="{% url 'turmas:nova_familia' turma.pk aluno.pk %}" class="text-indigo-700 hover:underline">Cadastrar família</a>
+              {% endif %}
+            </span>
+          </span>
+          <span class="flex flex-wrap items-center gap-2 text-xs">
+            {% for apoio in aluno.perfil.nomes_apoios %}
+              <span class="rounded-full bg-amber-100 text-amber-900 px-2 py-1">{{ apoio }}</span>
+            {% empty %}
+              <span class="rounded-full bg-slate-100 text-slate-700 px-2 py-1">Aula original</span>
+            {% endfor %}
+            {% if aluno.sugestoes_pendentes %}
+              <span class="rounded-full bg-indigo-600 text-white px-2 py-1">{{ aluno.sugestoes_pendentes }} sugest{{ aluno.sugestoes_pendentes|pluralize:"ão,ões" }}</span>
+            {% endif %}
+            <a href="{% url 'perfis:editar_apoios' aluno.pk %}" class="text-sm text-indigo-700 hover:underline ml-2">Ajustar apoios</a>
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="cartao text-slate-600">Nenhum aluno cadastrado.</p>
+  {% endif %}
+</section>
+{% endblock %}

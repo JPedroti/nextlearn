@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block titulo %}Apoios de {{ aluno }} · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'turmas:detalhe' aluno.turma.pk %}" class="voltar">← {{ aluno.turma.nome }}</a>
+<div class="cartao max-w-xl mt-3">
+  <h1 class="text-2xl font-semibold mb-1">Apoios de {{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</h1>
+  <p class="text-sm text-slate-600 mb-6">
+    Marque o que ajuda este aluno a aprender. Cada combinação de apoios gera uma versão da mesma aula,
+    que você revisa antes de chegar ao aluno. Sem nenhum apoio marcado, ele vê a aula original.
+  </p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for campo in form %}
+      <label class="flex items-start gap-3 mb-4 cursor-pointer">
+        {{ campo }}
+        <span>
+          <span class="block font-medium">{{ campo.label }}</span>
+          <span class="block text-sm text-slate-600">{{ campo.help_text }}</span>
+        </span>
+      </label>
+    {% endfor %}
+    <button type="submit" class="btn">Salvar apoios</button>
+  </form>
+</div>
+
+{% if sugestoes %}
+  <section class="cartao max-w-xl mt-6">
+    <h2 class="text-xl font-semibold mb-1">Sugestões para revisar</h2>
+    <p class="text-sm text-slate-600">Aceitar muda o apoio na hora. Recusar mantém como está.</p>
+    {% include "perfis/_sugestoes.html" %}
+  </section>
+{% endif %}
+
+<section class="cartao max-w-xl mt-6">
+  <h2 class="text-xl font-semibold mb-1">Questionário da família</h2>
+  {% if ultimo_questionario %}
+    <p class="text-sm text-slate-600 mb-3">
+      Respondido por {{ ultimo_questionario.preenchido_por.get_full_name|default:ultimo_questionario.preenchido_por.username }}
+      em {{ ultimo_questionario.criado_em|date:"d/m/Y, H:i" }}.
+    </p>
+    <dl class="space-y-2 text-sm">
+      {% for pergunta, resposta in respostas_questionario %}
+        <div>
+          <dt class="text-slate-600">{{ pergunta }}</dt>
+          <dd class="font-medium">{{ resposta }}</dd>
+        </div>
+      {% endfor %}
+    </dl>
+  {% elif aluno.responsavel %}
+    <p class="text-sm text-slate-600">A família ainda não respondeu.</p>
+  {% else %}
+    <p class="text-sm text-slate-600">
+      Nenhuma família cadastrada.
+      <a href="{% url 'turmas:nova_familia' aluno.turma.pk aluno.pk %}" class="text-indigo-700 hover:underline">Cadastrar família</a>
+    </p>
+  {% endif %}
+</section>
+{% endblock %}
