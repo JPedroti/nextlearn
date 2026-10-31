@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 01:28 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 01:40 (BRT), por Thiago (Claude)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -55,9 +55,10 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ### Thiago (Produto: motor de IA, tela do aluno, preferências de interface)
 
-- ❔ Ainda não há prompts dele no histórico nem commits no repositório
+- ✅ Pesquisa de base (perfis, métricas, leis) em `docs/`; histórico de prompts 01–22 em `docs/historico_prompts/thiago.md`
+- ✅ Mapeamento da pesquisa para o app: `docs/mapeamento_pesquisa_app.md`
 - ℹ️ A Fatia 2 (motor de IA e tela do aluno) já foi feita pelo João, então a próxima parte do Thiago é a Fatia 3
-- ⏳ Fatia 3 (interface)
+- 🔄 Fatia 3 (interface): começando às 01h40; plano em `docs/mapeamento_pesquisa_app.md`, seção 4. Avisar o João para não duplicar
 
 ### Cauã (Conteúdo: aula de exemplo, questionário, blocos pedagógicos, roteiro e narração do vídeo)
 
@@ -73,6 +74,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 01:40 — Thiago: histórico local juntado ao repositório; pesquisa e mapeamento em `docs/`; começa a Fatia 3.
 - 31/10, 01:28 — Fatia 4 concluída no código (família, questionário, sugestões aceitas ou recusadas pelo professor); 60 testes passando.
 - 31/10, 01:20 — Neon criado; deploy pausado pela questão dos termos da IA. O João pediu à IA as Fatias 4, 3 e 5 e a documentação final, em sequência.
 - 31/10, 00:50 — Teste do deploy pedido; o serviço no Render ainda não existe. Passo a passo reenviado ao João.
