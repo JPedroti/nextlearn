@@ -4,80 +4,94 @@
 
 {% block conteudo %}
 <a href="{% url 'painel:inicio' %}" class="voltar">← Minhas turmas</a>
-<div class="flex flex-wrap items-center justify-between gap-3 mt-3 mb-6">
-  <h1 class="text-2xl font-semibold">{{ turma.nome }}</h1>
-  <a href="{% url 'painel:turma' turma.pk %}" class="btn-sec">Painel da turma</a>
+
+<div class="flex flex-wrap items-center justify-between gap-3 mt-3 mb-8">
+  <div>
+    <h1 class="text-2xl font-bold tracking-tight" style="color: var(--color-text);">{{ turma.nome }}</h1>
+    <p class="text-meta mt-1">{{ alunos|length }} aluno{{ alunos|length|pluralize }} · {{ aulas|length }} aula{{ aulas|length|pluralize }}</p>
+  </div>
+  <a href="{% url 'painel:turma' turma.pk %}" class="btn">Ver painel</a>
 </div>
 
-<section class="mb-8">
-  <div class="flex items-center justify-between mb-3">
-    <h2 class="text-xl font-semibold">Aulas</h2>
+<!-- Aulas -->
+<section class="mb-10">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold" style="color: var(--color-text);">Aulas</h2>
     <div class="flex gap-2">
-      <a href="{% url 'aulas:nova' turma.pk %}" class="btn">Nova aula</a>
-      <a href="{% url 'aulas:nova_via_pdf' turma.pk %}" class="btn-sec">Nova aula via PDF</a>
+      <a href="{% url 'aulas:nova' turma.pk %}" class="btn text-xs">Nova aula</a>
+      <a href="{% url 'aulas:nova_via_pdf' turma.pk %}" class="btn-secondary text-xs">Criar via PDF</a>
     </div>
   </div>
+
   {% if aulas %}
-    <ul class="cartao divide-y divide-slate-100 p-0">
+    <div class="grid gap-2">
       {% for aula in aulas %}
-        <li>
-          <a href="{% url 'aulas:detalhe_professor' aula.pk %}" class="flex items-center justify-between px-6 py-3 hover:bg-slate-50">
-            <span>{{ aula.titulo }}</span>
-            {% if aula.publicada %}
-              <span class="text-xs rounded-full bg-green-100 text-green-800 px-2 py-1">Publicada</span>
-            {% else %}
-              <span class="text-xs rounded-full bg-slate-100 text-slate-700 px-2 py-1">Rascunho</span>
-            {% endif %}
-          </a>
-        </li>
+        <a href="{% url 'aulas:detalhe_professor' aula.pk %}"
+           class="card-elevated flex items-center justify-between gap-3 hover:border-indigo-200 transition-colors duration-150"
+           style="text-decoration: none; padding: 1rem 1.25rem;">
+          <span class="text-small font-medium truncate" style="color: var(--color-text);">{{ aula.titulo }}</span>
+          <span class="shrink-0 text-xs tag {% if aula.publicada %}tag-green{% else %}tag-slate{% endif %}">
+            {{ aula.publicada|yesno:"Publicada,Rascunho" }}
+          </span>
+        </a>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
-    <p class="cartao text-slate-600">Nenhuma aula ainda.</p>
+    <div class="card text-center py-6">
+      <p class="text-meta">Nenhuma aula. Crie a primeira para começar.</p>
+    </div>
   {% endif %}
 </section>
 
+<!-- Alunos -->
 <section>
-  <div class="flex items-center justify-between mb-3">
-    <h2 class="text-xl font-semibold">Alunos</h2>
-    <a href="{% url 'turmas:novo_aluno' turma.pk %}" class="btn-sec">Cadastrar aluno</a>
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold" style="color: var(--color-text);">Alunos</h2>
+    <a href="{% url 'turmas:novo_aluno' turma.pk %}" class="btn-secondary text-xs">Cadastrar aluno</a>
   </div>
+
   {% if alunos %}
-    <ul class="cartao divide-y divide-slate-100 p-0">
+    <div class="grid gap-2">
       {% for aluno in alunos %}
-        <li class="px-6 py-3 flex flex-wrap items-center justify-between gap-2">
-          <span>
-            <span class="block">{{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</span>
-            <span class="block text-sm text-slate-500">usuário: {{ aluno.usuario.username }}</span>
-            <span class="block text-sm text-slate-500">
-              {% if aluno.responsavel %}
-                Família: {{ aluno.responsavel.get_full_name|default:aluno.responsavel.username }} (usuário: {{ aluno.responsavel.username }})
-                · {% if aluno.ultimo_questionario %}questionário respondido em {{ aluno.ultimo_questionario|date:"d/m H:i" }}{% else %}questionário ainda não respondido{% endif %}
-              {% else %}
-                <a href="{% url 'turmas:nova_familia' turma.pk aluno.pk %}" class="text-indigo-700 hover:underline">Cadastrar família</a>
+        <div class="card-elevated" style="padding: 1rem 1.25rem;">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="min-w-0">
+              <span class="block text-small font-medium" style="color: var(--color-text);">
+                {{ aluno.usuario.get_full_name|default:aluno.usuario.username }}
+              </span>
+              <span class="block text-meta mt-0.5">
+                {{ aluno.usuario.username }}
+                {% if aluno.responsavel %}
+                  · Família: {{ aluno.responsavel.get_full_name|default:aluno.responsavel.username }}
+                  {% if aluno.ultimo_questionario %}· questionário em {{ aluno.ultimo_questionario|date:"d/m" }}{% endif %}
+                {% else %}
+                  · <a href="{% url 'turmas:nova_familia' turma.pk aluno.pk %}" style="color: var(--color-primary);">Cadastrar família</a>
+                {% endif %}
+              </span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              {% for apoio in aluno.perfil.nomes_apoios %}
+                <span class="tag tag-amber">{{ apoio }}</span>
+              {% empty %}
+                <span class="tag tag-slate">Aula original</span>
+              {% endfor %}
+              {% for preferencia in aluno.perfil.nomes_preferencias %}
+                <span class="tag tag-sky">{{ preferencia }}</span>
+              {% endfor %}
+              {% if aluno.sugestoes_pendentes %}
+                <span class="tag tag-indigo">{{ aluno.sugestoes_pendentes }}</span>
               {% endif %}
-            </span>
-          </span>
-          <span class="flex flex-wrap items-center gap-2 text-xs">
-            {% for apoio in aluno.perfil.nomes_apoios %}
-              <span class="etiqueta bg-amber-100 text-amber-900">{{ apoio }}</span>
-            {% empty %}
-              <span class="etiqueta bg-slate-100 text-slate-700">Aula original</span>
-            {% endfor %}
-            {% for preferencia in aluno.perfil.nomes_preferencias %}
-              <span class="etiqueta bg-sky-100 text-sky-900">{{ preferencia }}</span>
-            {% endfor %}
-            {% if aluno.sugestoes_pendentes %}
-              <span class="rounded-full bg-indigo-600 text-white px-2 py-1">{{ aluno.sugestoes_pendentes }} sugest{{ aluno.sugestoes_pendentes|pluralize:"ão,ões" }}</span>
-            {% endif %}
-            <a href="{% url 'perfis:dashboard' aluno.pk %}" class="text-sm text-indigo-700 hover:underline ml-2">Dashboard</a>
-            <a href="{% url 'perfis:editar_apoios' aluno.pk %}" class="text-sm text-indigo-700 hover:underline ml-2">Ajustar apoios</a>
-          </span>
-        </li>
+              <a href="{% url 'perfis:dashboard' aluno.pk %}" style="color: var(--color-primary); font-size: 0.8125rem;" class="font-medium">Dashboard</a>
+              <a href="{% url 'perfis:editar_apoios' aluno.pk %}" style="color: var(--color-primary); font-size: 0.8125rem;">Apoios</a>
+            </div>
+          </div>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
-    <p class="cartao text-slate-600">Nenhum aluno cadastrado.</p>
+    <div class="card text-center py-6">
+      <p class="text-meta">Nenhum aluno. Cadastre o primeiro.</p>
+    </div>
   {% endif %}
 </section>
 {% endblock %}
