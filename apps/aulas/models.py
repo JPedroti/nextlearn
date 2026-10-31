@@ -74,3 +74,26 @@ class Resposta(models.Model):
 
     def __str__(self):
         return f"{self.aluno} — {self.questao}"
+
+
+class EventoUso(models.Model):
+    """Registro de quando o aluno liga um apoio de interface. Alimenta o painel e as sugestões de perfil."""
+
+    class Tipo(models.TextChoices):
+        ATIVOU_FONTE_DISLEXIA = "ativou_fonte_dislexia", "Ligou a fonte para dislexia"
+        ATIVOU_LEITURA_VOZ = "ativou_leitura_voz", "Ligou a leitura em voz alta"
+        ATIVOU_MODO_LIMPO = "ativou_modo_limpo", "Ligou o modo limpo"
+
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name="eventos")
+    aula = models.ForeignKey(
+        Aula, on_delete=models.SET_NULL, null=True, blank=True, related_name="eventos",
+        help_text="Aula aberta quando o apoio foi ligado (vazio se foi em outra tela).",
+    )
+    tipo = models.CharField(max_length=30, choices=Tipo.choices)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+
+    def __str__(self):
+        return f"{self.aluno} — {self.get_tipo_display()}"
