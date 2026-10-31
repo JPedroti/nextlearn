@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 01:33 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 01:39 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -34,7 +34,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 | 2. Motor de IA (apoios, geração com cache, aprovação, aluno vê a sua versão) | 02h–04h | Thiago (feita pelo João com Claude Code) | ✅ código (adiantada) · ⚠️ | Decidir o provedor de IA (ver Entregas) e testar a geração real; trocar os blocos provisórios de `ia/blocos/` pelo texto do Cauã |
 | 3. Interface (OpenDyslexic, leitura em voz alta, modo limpo, registro de EventoUso) | 04h–06h | Thiago (feita pelo João com Claude Code) | ✅ código (adiantada) | Testar a leitura em voz alta num celular e no navegador da banca; testar no ar |
 | 4. Família (questionário → apoios sugeridos → revisão do professor) | 08h–09h15 | João | ✅ código (adiantada) | Trocar as 6 perguntas provisórias (`apps/perfis/questionario.py`) pelas do Cauã; testar no ar |
-| 5. Painel (acertos, adaptações usadas, sugestões de ajuste de perfil) | 09h15–10h30 | João | ⏳ | Tudo. Na fila, depois das Fatias 4 e 3 |
+| 5. Painel (acertos, adaptações usadas, sugestões de ajuste de perfil) | 09h15–10h30 | João | ✅ código (adiantada) | Testar no ar com respostas reais da equipe |
 | Docs finais | até 10h30 | João | ⏳ | Link do deploy no README; `docs/arquitetura.md`, `docs/decisoes.md` e `docs/contexto.md` |
 
 **Ordem de corte se atrasar:** (1) sugestões do painel → (2) questionário da família (o professor marca os apoios) →
@@ -51,12 +51,15 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 - ⚠️ Deploy no Render: pausado no Blueprint; falta escolher o provedor de IA (ou publicar com a chave `pendente`)
 - ✅ Fatia 4 (família), com perguntas provisórias
 - ✅ Fatia 3 (interface), no lugar do Thiago, que não tinha começado
-- ⏳ Fatia 5 (painel)
+- ✅ Fatia 5 (painel)
 - ⏳ Docs finais e repositório público antes das 12h
 
 ### Thiago (Produto: motor de IA, tela do aluno, preferências de interface)
 
 - ❔ Ainda não há prompts dele no histórico nem commits no repositório
+- ✅ Pesquisas e materiais do repositório `learnext` juntados a este às 01h32 (`docs/*.md`, `db/`, `design/`, `prompts/0001–0020`)
+- ⚠️ Alinhar com a equipe: parte desse material descreve outra versão do produto (tabela de laudo, papel de AEE, perfis P1–P8, métricas em 6 camadas), diferente das decisões do `CLAUDE.md` (sem laudo, 3 apoios). A banca vai ler tudo; decidir se fica como pesquisa de apoio, com um aviso, ou se sai do repositório
+- ⚠️ O mockup em `design/` é uma tela estática: não pode aparecer no vídeo como se fosse o app funcionando (regra de demo de fachada)
 - ℹ️ As Fatias 2 e 3 (motor de IA, tela do aluno e interface) já foram feitas pelo João com Claude Code. Sugestão: o Thiago testa o app (celular, leitura em voz alta) e ajuda no vídeo
 
 ### Cauã (Conteúdo: aula de exemplo, questionário, blocos pedagógicos, roteiro e narração do vídeo)
@@ -73,6 +76,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 01:39 — Fatia 5 concluída no código (painel da turma e sugestões a partir do uso); 80 testes passando. Material do Thiago (repositório learnext) juntado à `main`, com as marcas de conflito resolvidas.
 - 31/10, 01:33 — Fatia 3 concluída no código (barra de apoios de leitura, OpenDyslexic, voz, modo limpo, EventoUso); 70 testes passando.
 - 31/10, 01:28 — Fatia 4 concluída no código (família, questionário, sugestões aceitas ou recusadas pelo professor); 60 testes passando.
 - 31/10, 01:20 — Neon criado; deploy pausado pela questão dos termos da IA. O João pediu à IA as Fatias 4, 3 e 5 e a documentação final, em sequência.

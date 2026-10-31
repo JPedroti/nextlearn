@@ -82,6 +82,11 @@ Abra http://127.0.0.1:8000 e entre com o usuário criado.
    e **Modo limpo** (menos cores e enfeites, letra maior). O professor escolhe em **Ajustar apoios** quais já vêm
    ligados; a escolha do aluno vale até ele sair. Cada vez que o aluno liga um apoio, o sistema registra um
    evento de uso, que o painel do professor usa.
+8. O **Painel** da turma (em **Minhas turmas** ou na página da turma) mostra, calculado na hora a partir do uso real:
+   acertos por aluno e por questão, quantas aulas cada aluno fez na versão adaptada, a comparação de acertos entre a
+   aula original e as versões adaptadas, e quantas vezes cada aluno ligou cada apoio de leitura. Lá também ficam as
+   **sugestões de ajuste de perfil**: as do questionário da família e as do uso (ex.: o aluno ligou a leitura em voz
+   alta 3 vezes → sugerir deixar ligada desde o início). Nada muda sem o professor aceitar.
 
 Para testar a geração no seu computador, coloque a sua chave do Google AI Studio em `GEMINI_API_KEY` no `.env`.
 A IA recebe só os apoios ligados e o conteúdo da aula, nunca dados do aluno.
