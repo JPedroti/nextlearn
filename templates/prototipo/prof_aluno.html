@@ -1,0 +1,59 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>{% include "prototipo/_cabeca.html" %}<title>{{ aluno.usuario.first_name }} · Chamilion</title></head>
+<body class="pg-progresso tema-base">
+  {% include "prototipo/_topo_prof.html" %}
+  <main class="pg">
+    {% include "prototipo/_msgs.html" %}
+    <p><a class="btn-link" href="{% url 'prototipo:professor' %}?turma={{ aluno.turma.pk }}">← Voltar à turma</a></p>
+    <section class="pg-hero">
+      <div><p class="pg-sobre">{{ aluno.turma.nome }} · ficha do aluno</p><h1>{{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</h1>
+        <p class="pg-sub">Principal demanda: <strong>{{ dem.principal }}</strong></p></div>
+      <div class="pg-estado estado-{{ r.estado.0 }}"><span class="pg-ponto"></span>{{ r.estado.1 }}</div>
+    </section>
+
+    <section class="pg-kpis">
+      <article class="kpi kpi-roxo"><p class="kpi-rot">Acerto recente</p><p class="kpi-val">{% if r.acerto is not None %}{{ r.acerto }}%{% else %}–{% endif %}</p><div class="kpi-pe"><span class="kpi-sub">últimas 4 aulas</span></div></article>
+      <article class="kpi kpi-verde"><p class="kpi-rot">Aulas feitas</p><p class="kpi-val">{{ d.feitas|length }}</p><div class="kpi-pe"><span class="kpi-sub">{{ d.pendentes|length }} pendentes</span></div></article>
+      <article class="kpi kpi-verde2"><p class="kpi-rot">Estudo na semana</p><p class="kpi-val">{{ d.min_semana }} min</p><div class="kpi-pe"><span class="kpi-sub">limite da família: {{ cfg.limite }} min/dia</span></div></article>
+      <article class="kpi kpi-laranja"><p class="kpi-rot">Recados da família</p><p class="kpi-val">{{ recados|length }}</p><div class="kpi-pe"><span class="kpi-sub">{% if aluno.responsavel %}família com acesso{% else %}sem acesso da família{% endif %}</span></div></article>
+    </section>
+
+    <section class="cartao-pg">
+      <header><h2>Principais demandas de aprendizagem</h2><a class="btn-contorno" href="{% url 'perfis:editar_apoios' aluno.pk %}">Mudar apoios</a></header>
+      <div class="demandas-grade">
+        {% for i in dem.itens %}
+          <article class="demanda">
+            <p class="demanda-tag">{{ i.apoio }} · <span class="mini">{{ i.origem }}</span></p>
+            <h3>{{ i.barreira }}</h3>
+            {% if i.sinais %}<p class="mini">Sinais comuns: {{ i.sinais|join:"; " }}.</p>{% endif %}
+            <p class="demanda-sub">O que fazer em aula</p><ul>{% for x in i.escola %}<li>{{ x }}</li>{% endfor %}</ul>
+            {% if i.evidencia %}<p class="pg-nota">{{ i.evidencia }}</p>{% endif %}
+          </article>
+        {% empty %}<p class="vazio">Nenhum apoio ligado: {{ aluno.usuario.first_name }} vê a aula original. Peça à família o questionário ou escolha os apoios.</p>{% endfor %}
+      </div>
+      {% if dem.prefs %}<p class="mini">Preferências de tela que ele ligou: {{ dem.prefs|join:" " }}</p>{% endif %}
+      <p class="pg-nota">Apoio não é diagnóstico. Não pedimos laudo (Decreto 12.686/2025).</p>
+    </section>
+
+    <section class="pg-grade">
+      <article class="cartao-pg">
+        <h2>O que a família contou</h2>
+        {% if questionario %}<p class="mini">Questionário respondido em {{ questionario.criado_em|date:"d/m/Y" }}.</p>{% if dem.obs_familia %}<blockquote>{{ dem.obs_familia }}</blockquote>{% endif %}{% else %}<p class="vazio">A família ainda não respondeu o questionário.</p>{% endif %}
+        <h3 class="sub-h">Recados</h3>
+        {% for rc in recados %}<div class="recado{% if rc.lido %} lido{% endif %}"><p><strong>{{ rc.get_tipo_display }}</strong> · <span class="mini">{{ rc.criado_em|date:"d/m H:i" }}{% if rc.lido %} · resolvido{% endif %}</span></p><p>{{ rc.texto|linebreaksbr }}</p>
+          {% if not rc.lido %}<form method="post" action="{% url 'prototipo:prof_recado_lido' rc.pk %}">{% csrf_token %}<input type="hidden" name="voltar" value="{{ request.path }}"><button class="btn-link">Marcar como resolvido</button></form>{% endif %}</div>
+        {% empty %}<p class="vazio">Nenhum recado.</p>{% endfor %}
+      </article>
+      <article class="cartao-pg">
+        <h2>Notas por matéria</h2>
+        {% for m, med in medias %}<div class="barra-q"><span class="bq-rot">{{ m }}</span><span class="bq-barra"><span style="width: {% widthratio med 10 100 %}%"></span></span><span class="bq-val">{{ med }}</span></div>{% empty %}<p class="vazio">Ainda sem aulas feitas.</p>{% endfor %}
+        <a class="btn-contorno" href="{% url 'prototipo:progresso' %}?aluno={{ aluno.pk }}">Relatório completo de progresso</a>
+        <h3 class="sub-h">Dicas que a família recebe para casa</h3>
+        <ul class="lista-simples">{% for x in dem.ambiente|slice:":4" %}<li>{{ x }}</li>{% endfor %}</ul>
+      </article>
+    </section>
+  </main>
+  <script src="{% static 'prototipo/brilho.js' %}"></script>
+</body>
+</html>

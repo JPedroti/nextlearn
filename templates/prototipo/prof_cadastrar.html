@@ -1,0 +1,24 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>{% include "prototipo/_cabeca.html" %}<title>Cadastrar alunos · Chamilion</title></head>
+<body class="pg-progresso tema-base">
+  {% include "prototipo/_topo_prof.html" %}
+  <main class="pg">
+    {% include "prototipo/_msgs.html" %}
+    <section class="pg-hero"><div><p class="pg-sobre">Professor(a)</p><h1>Cadastrar a turma inteira</h1>
+      <p class="pg-sub">Cole a lista de chamada: um aluno por linha. Se quiser, depois de um ponto e vírgula, o nome do responsável: criamos também o acesso da família.</p></div></section>
+    <form class="cartao-pg form-cadastro" method="post">
+      {% csrf_token %}
+      <div class="pg-grade">
+        <label>Turma
+          <select name="turma"><option value="">— nova turma —</option>{% for t in turmas %}<option value="{{ t.pk }}" {% if forloop.first %}selected{% endif %}>{{ t.nome }}</option>{% endfor %}</select></label>
+        <label>Ou crie uma turma nova <input type="text" name="nova_turma" placeholder="Ex.: 5º ano B" maxlength="100"></label>
+      </div>
+      <label>Lista de alunos (até 60)
+        <textarea name="lista" rows="12" required placeholder="Ana Souza; Carla Souza&#10;Bruno Lima&#10;Davi Rocha; Marcos Rocha"></textarea></label>
+      <p class="mini">Cada aluno recebe um usuário e uma senha. Os apoios começam desligados (aula original); você escolhe depois, ou a família responde o questionário e você aceita as sugestões. Não pedimos laudo.</p>
+      <button class="btn-missao" type="submit">Cadastrar e gerar os acessos</button>
+    </form>
+  </main>
+</body>
+</html>

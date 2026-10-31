@@ -17,55 +17,109 @@
     <section class="pg-hero">
       <div><p class="pg-sobre">{{ aluno.turma.nome }} · professor(a) {{ aluno.turma.professor.first_name|default:aluno.turma.professor.username }}</p>
         <h1>Como {{ aluno.usuario.first_name }} está indo</h1>
-        <p class="pg-sub">Tudo comparado só com ele mesmo. Sem nota de colegas, sem ranking.</p></div>
+        <p class="pg-sub">Tudo comparado só com {{ aluno.usuario.first_name }}. Sem nota de colegas, sem ranking.</p></div>
       <div class="pg-estado estado-{{ r.estado.0 }}"><span class="pg-ponto"></span>{{ r.estado.1 }}</div>
     </section>
 
-    <section class="pg-kpis">
-      <article class="kpi kpi-roxo"><p class="kpi-rot">Acerto recente</p><p class="kpi-val">{% if r.acerto is not None %}{{ r.acerto }}%{% else %}–{% endif %}</p><div class="kpi-pe"><span class="kpi-sub">últimas 4 aulas</span></div></article>
-      <article class="kpi kpi-verde"><p class="kpi-rot">Aulas feitas</p><p class="kpi-val">{{ d.feitas|length }}</p><div class="kpi-pe"><span class="kpi-sub">{{ d.pendentes|length }} para fazer</span></div></article>
-      <article class="kpi kpi-verde2"><p class="kpi-rot">Estudo hoje</p><p class="kpi-val">{{ d.min_hoje }} min</p><div class="kpi-pe"><span class="kpi-sub">de {{ cfg.limite }} combinados</span><span class="mini-barra"><span style="width: {{ pct_hoje }}%"></span></span></div></article>
-      <article class="kpi kpi-laranja"><p class="kpi-rot">Meta da semana</p><p class="kpi-val">{{ d.feitas_semana }} de {{ cfg.meta }}</p><div class="kpi-pe"><span class="kpi-sub">{% if cfg.ofensiva %}{{ d.ofensiva }} semana(s) seguidas{% else %}ofensiva escondida{% endif %}</span></div></article>
+    <nav class="abas-familia" aria-label="Seções">
+      <a href="#resumo">1 · Resumo</a><a href="#aprende">2 · Como aprende</a><a href="#casa">3 · Em casa</a><a href="#professor">4 · Falar com o professor{% if recados %} <span class="bolinha">{{ recados|length }}</span>{% endif %}</a><a href="#combinados">5 · Combinados</a>
+    </nav>
+
+    <section id="resumo" class="secao-familia">
+      <h2 class="secao-tit">1 · Resumo da semana</h2>
+      <div class="pg-kpis">
+        <article class="kpi kpi-roxo"><p class="kpi-rot">Acerto recente</p><p class="kpi-val">{% if r.acerto is not None %}{{ r.acerto }}%{% else %}–{% endif %}</p><div class="kpi-pe"><span class="kpi-sub">últimas 4 aulas</span></div></article>
+        <article class="kpi kpi-verde"><p class="kpi-rot">Aulas feitas</p><p class="kpi-val">{{ d.feitas|length }}</p><div class="kpi-pe"><span class="kpi-sub">{{ d.pendentes|length }} para fazer</span></div></article>
+        <article class="kpi kpi-verde2"><p class="kpi-rot">Estudo hoje</p><p class="kpi-val">{{ d.min_hoje }} min</p><div class="kpi-pe"><span class="kpi-sub">de {{ cfg.limite }} combinados</span><span class="mini-barra"><span style="width: {{ pct_hoje }}%"></span></span></div></article>
+        <article class="kpi kpi-laranja"><p class="kpi-rot">Meta da semana</p><p class="kpi-val">{{ d.feitas_semana }} de {{ cfg.meta }}</p><div class="kpi-pe"><span class="kpi-sub">{% if cfg.ofensiva %}{{ d.ofensiva }} semana(s) seguidas{% else %}ofensiva escondida{% endif %}</span></div></article>
+      </div>
+      <div class="pg-grade">
+        <article class="cartao-pg">
+          <header><h3>Notas das últimas aulas</h3>
+            <div class="filtro-mat" role="group" aria-label="Filtrar por matéria"><button type="button" class="chip ativo" data-mat="">Todas</button>{% for m in materias %}<button type="button" class="chip" data-mat="{{ m }}">{{ m }}</button>{% endfor %}</div></header>
+          <div class="grafico-notas" data-grafico aria-label="Notas por aula; passe o mouse ou toque numa barra para ver a aula"></div>
+          <p class="grafico-det mini" data-detalhe aria-live="polite">Passe o mouse ou toque numa barra para ver a aula.</p>
+          {% if not grafico %}<p class="vazio">Ainda sem aulas feitas.</p>{% endif %}
+        </article>
+        <article class="cartao-pg pg-resumo">
+          <h3>Em poucas palavras</h3>
+          <ul>
+            {% if d.proxima %}<li>Próxima fase: <strong>{{ d.proxima.assunto }}</strong> ({{ d.proxima.materia }}){% if d.proxima.dias_para_prazo is not None %}, prazo em {{ d.proxima.dias_para_prazo }} dia(s){% endif %}.</li>{% endif %}
+            {% if reforco %}<li>Onde vale um reforço em casa: <strong>{{ reforco }}</strong>.</li>{% endif %}
+            <li>Tempo de estudo na semana: {{ d.min_semana }} min.</li>
+          </ul>
+          <h3 class="sub-h">Notas por matéria</h3>
+          {% for m, med in medias %}<div class="barra-q"><span class="bq-rot">{{ m }}</span><span class="bq-barra"><span style="width: {% widthratio med 10 100 %}%"></span></span><span class="bq-val">{{ med }}</span></div>{% empty %}<p class="vazio">Ainda sem notas.</p>{% endfor %}
+          <a class="btn-contorno" href="{% url 'prototipo:progresso' %}?aluno={{ aluno.pk }}">Ver o relatório completo</a>
+        </article>
+      </div>
     </section>
 
-    <section class="pg-grade">
-      <article class="cartao-pg pg-resumo">
-        <h2>Esta semana, em poucas palavras</h2>
-        <ul>
-          {% if d.proxima %}<li>Próxima fase: <strong>{{ d.proxima.assunto }}</strong> ({{ d.proxima.materia }}){% if d.proxima.dias_para_prazo is not None %}, prazo em {{ d.proxima.dias_para_prazo }} dia(s){% endif %}.</li>{% endif %}
-          {% if reforco %}<li>Onde vale um reforço em casa: <strong>{{ reforco }}</strong>.</li>{% endif %}
-          <li>Meta combinada: {{ cfg.meta }} aula(s) por semana · já fez {{ d.feitas_semana }}.</li>
-          <li>Tempo de estudo na semana: {{ d.min_semana }} min.</li>
-        </ul>
-        <a class="btn-contorno" href="{% url 'prototipo:progresso' %}?aluno={{ aluno.pk }}">Ver o relatório completo</a>
-      </article>
-      <article class="cartao-pg atividade-casa">
-        <h2>Atividade de 10 minutos para casa</h2>
-        {% if ultima_reforco %}
-          <p>Peça para {{ aluno.usuario.first_name }} explicar com as próprias palavras: <strong>{{ ultima_reforco.assunto }}</strong>.</p>
-          <ol><li>Ele explica em 2 minutos (pode desenhar).</li><li>Vocês inventam juntos um exemplo da vida real.</li><li>Ele faz o "Treino rápido" na área do aluno.</li></ol>
-        {% else %}<p>Quando houver aulas feitas, sugerimos aqui uma atividade curta.</p>{% endif %}
-        <p class="pg-nota">Uma atividade curta por semana, sem cobrança de nota.</p>
-      </article>
-    </section>
-
-    <section class="cartao-pg">
-      <h2>Como {{ aluno.usuario.first_name }} aprende melhor (apoios escolhidos pelo professor)</h2>
-      <div class="dicas-grade">{% for ap, ds in dicas %}<div class="dica"><h3>{{ ap }}</h3><ul>{% for x in ds %}<li>{{ x }}</li>{% endfor %}</ul></div>{% endfor %}</div>
-      {% if r.prefs %}<p class="mini">Na tela, ele também usa: {{ r.prefs|join:", " }}.</p>{% endif %}
+    <section id="aprende" class="secao-familia">
+      <h2 class="secao-tit">2 · Como {{ aluno.usuario.first_name }} aprende: principais desafios</h2>
+      <p class="mini">O mesmo resumo que o professor vê. Vem dos apoios que ele escolheu, do questionário de vocês e das aulas.</p>
+      <div class="demandas-grade">
+        {% for i in dem.itens %}
+          <article class="demanda"><p class="demanda-tag">{{ i.apoio }}</p><h3>{{ i.barreira }}</h3>
+            {% if i.sinais %}<p class="mini">Vocês podem notar: {{ i.sinais|join:"; " }}.</p>{% endif %}
+            {% if i.escola %}<p class="demanda-sub">Na escola, o professor faz</p><ul>{% for x in i.escola %}<li>{{ x }}</li>{% endfor %}</ul>{% endif %}</article>
+        {% empty %}<p class="vazio">Nenhum apoio especial ligado: {{ aluno.usuario.first_name }} segue a aula original. Se vocês notam alguma dificuldade, respondam o questionário (seção 4).</p>{% endfor %}
+      </div>
+      {% if dem.prefs %}<p class="mini">Na tela, {{ aluno.usuario.first_name }} também escolheu: {{ dem.prefs|join:" " }}</p>{% endif %}
       <p class="pg-nota">Apoio não é diagnóstico. Não pedimos laudo (Decreto 12.686/2025).</p>
     </section>
 
-    <section class="pg-grade">
-      <article class="cartao-pg">
-        <h2>Notas por matéria</h2>
-        {% for m, med in medias %}<div class="barra-q"><span class="bq-rot">{{ m }}</span><span class="bq-barra"><span style="width: {% widthratio med 10 100 %}%"></span></span><span class="bq-val">{{ med }}</span></div>{% empty %}<p class="vazio">Ainda sem aulas feitas.</p>{% endfor %}
-        <h3 class="sub-h">Próximas tarefas</h3>
-        <ul class="lista-simples">{% for t in d.pendentes|slice:":4" %}<li><strong>{{ t.assunto }}</strong> · {{ t.materia }}</li>{% empty %}<li class="mini">Nada pendente.</li>{% endfor %}</ul>
-      </article>
+    <section id="casa" class="secao-familia">
+      <h2 class="secao-tit">3 · O ambiente de estudo em casa</h2>
+      <div class="pg-grade">
+        <article class="cartao-pg">
+          <h3>Lista para preparar o estudo</h3>
+          <p class="mini">Feita para os desafios de {{ aluno.usuario.first_name }}. Marque o que já fazem.</p>
+          <ul class="checklist" data-checklist="casa-{{ aluno.pk }}">{% for x in dem.ambiente %}<li><label><input type="checkbox"> {{ x }}</label></li>{% endfor %}</ul>
+          <p class="mini" data-check-total></p>
+        </article>
+        <article class="cartao-pg atividade-casa">
+          <h3>Atividade de 10 minutos</h3>
+          {% if ultima_reforco %}
+            <p>Peça para {{ aluno.usuario.first_name }} explicar com as próprias palavras: <strong>{{ ultima_reforco.assunto }}</strong>.</p>
+            <ol><li>Ele explica em 2 minutos (pode desenhar).</li><li>Vocês inventam juntos um exemplo da vida real.</li><li>Ele faz o "Treino rápido" na área do aluno.</li></ol>
+          {% else %}<p>Quando houver aulas feitas, sugerimos aqui uma atividade curta.</p>{% endif %}
+          <p class="pg-nota">Uma atividade curta por semana, sem cobrança de nota.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="professor" class="secao-familia">
+      <h2 class="secao-tit">4 · Falar com o professor</h2>
+      <div class="pg-grade">
+        <form class="cartao-pg form-recado" method="post">
+          {% csrf_token %}<input type="hidden" name="acao" value="recado">
+          <h3>Mandar uma sugestão ou observação</h3>
+          <div class="tipos-recado">{% for v, n in tipos_recado %}<label class="chip-radio"><input type="radio" name="tipo" value="{{ v }}" {% if forloop.first %}checked{% endif %}> {{ n }}</label>{% endfor %}</div>
+          <label class="sr-only" for="txt-recado">Mensagem</label>
+          <textarea id="txt-recado" name="texto" rows="4" maxlength="1500" required placeholder="Ex.: Em casa ele entende melhor quando lemos juntos em voz alta."></textarea>
+          <button class="btn-missao" type="submit">Enviar ao professor</button>
+          {% if recados %}<h3 class="sub-h">Enviados</h3>{% for rc in recados %}<p class="mini">{{ rc.criado_em|date:"d/m" }} · {{ rc.get_tipo_display }} · {% if rc.lido %}<span class="chip ok">o professor viu</span>{% else %}<span class="chip">aguardando</span>{% endif %}</p>{% endfor %}{% endif %}
+        </form>
+        <article class="cartao-pg">
+          <h3>Questionário do dia a dia</h3>
+          {% if questionario %}<p>Respondido. O professor recebeu as sugestões e decide os apoios.</p>{% else %}<p>Seis perguntas simples sobre como é o estudo em casa. Sem laudo e sem diagnóstico; viram sugestões para o professor.</p>{% endif %}
+          <a class="btn-contorno" href="{% url 'perfis:questionario' aluno.pk %}">{% if questionario %}Responder de novo{% else %}Responder agora{% endif %}</a>
+          <h3 class="sub-h">Transparência e dados</h3>
+          <ul class="lista-simples">
+            <li>A IA ajuda o professor a preparar as aulas; ele revisa e aprova tudo.</li>
+            <li>{{ aluno.usuario.first_name }} não conversa com IA: as dúvidas na plataforma têm respostas prontas.</li>
+            <li>Guardamos só as respostas das aulas (acerto, tempo e data). Nada de câmera, voz ou emoção.</li>
+            <li>Vocês podem pedir para ver ou apagar os dados a qualquer momento com a escola (LGPD).</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section id="combinados" class="secao-familia">
+      <h2 class="secao-tit">5 · Combinados da família</h2>
       <form class="cartao-pg combinados" method="post">
         {% csrf_token %}
-        <h2>Combinados da família</h2>
         <p class="mini">Valem na hora para a área do aluno.</p>
         <label>Limite de estudo por dia <span class="val" data-val-limite>{{ cfg.limite }} min</span><input type="range" name="limite" min="15" max="120" step="5" value="{{ cfg.limite }}" oninput="this.form.querySelector('[data-val-limite]').textContent=this.value+' min'"></label>
         <label>Meta de aulas por semana <span class="val" data-val-meta>{{ cfg.meta }}</span><input type="range" name="meta" min="1" max="7" value="{{ cfg.meta }}" oninput="this.form.querySelector('[data-val-meta]').textContent=this.value"></label>
@@ -74,25 +128,10 @@
         <button class="btn-missao" type="submit">Salvar combinados</button>
       </form>
     </section>
-
-    <section class="pg-grade">
-      <article class="cartao-pg">
-        <h2>Questionário do dia a dia</h2>
-        {% if questionario %}<p>Respondido. O professor recebeu as sugestões e decide os apoios.</p>{% else %}<p>Seis perguntas simples sobre como é o estudo em casa. Sem laudo e sem diagnóstico; viram sugestões para o professor.</p>{% endif %}
-        <a class="btn-contorno" href="{% url 'perfis:questionario' aluno.pk %}">{% if questionario %}Responder de novo{% else %}Responder agora{% endif %}</a>
-      </article>
-      <article class="cartao-pg">
-        <h2>Transparência e dados</h2>
-        <ul class="lista-simples">
-          <li>A IA só ajuda o professor a adaptar o texto da aula; ele revisa e aprova tudo.</li>
-          <li>{{ aluno.usuario.first_name }} não conversa com IA: as dúvidas na plataforma têm respostas prontas.</li>
-          <li>Guardamos só as respostas das aulas (acerto, tempo e data). Nada de câmera, voz ou emoção.</li>
-          <li>Vocês podem pedir para ver ou apagar os dados a qualquer momento com a escola (LGPD).</li>
-        </ul>
-      </article>
-    </section>
+    {{ grafico|json_script:"dados-grafico" }}
     {% endif %}
   </main>
   <script src="{% static 'prototipo/brilho.js' %}"></script>
+  <script src="{% static 'prototipo/familia.js' %}"></script>
 </body>
 </html>

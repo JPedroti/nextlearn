@@ -26,5 +26,8 @@ urlpatterns = [
     path("aluno/", views.aluno, name="aluno"),
     path("aluno/aula/", views.aula, name="aula"),
     path("professor/", views.professor, name="professor"),
+    path("professor/alunos/cadastrar/", views.prof_cadastrar, name="prof_cadastrar"),
+    path("professor/alunos/<int:pk>/", views.prof_aluno, name="prof_aluno"),
+    path("professor/recados/<int:pk>/lido/", views.prof_recado_lido, name="prof_recado_lido"),
     path("familia/", views.familia, name="familia"),
 ]

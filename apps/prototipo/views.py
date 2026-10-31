@@ -1110,12 +1110,19 @@ def professor(request):
         r = analisar(aula, list(aula.questoes.all()))
         linhas.append({"aula": aula, "indice": r["indice"], "n_q": len(aula.questoes.all()), "assunto": _assunto(aula.titulo), "materia": _materia(aula.titulo)})
     sugestoes = list(SugestaoPerfil.objects.filter(aluno__turma=turma, status="pendente").select_related("aluno__usuario")) if turma else []
+    from .demandas import demandas_do_aluno
+    from .models import RecadoFamilia
+
+    for x in alunos:
+        x["dem"] = demandas_do_aluno(x, _medias(x["d"]))
+    recados = list(RecadoFamilia.objects.filter(aluno__turma=turma, lido=False).select_related("aluno__usuario", "autor")[:6]) if turma else []
+    novos = request.session.pop("alunos_cadastrados", None)
     acertos = [x["acerto"] for x in alunos if x["acerto"] is not None]
     kpis = {"alunos": len(alunos), "publicadas": sum(1 for a in aulas if a.publicada), "rascunhos": sum(1 for a in aulas if not a.publicada),
             "acerto": round(sum(acertos) / len(acertos)) if acertos else None, "sugestoes": len(sugestoes),
             "atencao": sum(1 for x in alunos if x["estado"][0] != "ok"),
             "indice": round(sum(l["indice"] for l in linhas) / len(linhas)) if linhas else None}
-    return render(request, "prototipo/prof_inicio.html", {"turmas": turmas, "turma": turma, "alunos": alunos, "linhas": linhas[:12],
+    return render(request, "prototipo/prof_inicio.html", {"recados": recados, "novos": novos, "turmas": turmas, "turma": turma, "alunos": alunos, "linhas": linhas[:12],
                                                           "sugestoes": sugestoes, "kpis": kpis})
 
 
@@ -1296,6 +1303,17 @@ def familia(request):
     if not filhos:
         return render(request, "prototipo/familia_inicio.html", {"sem_filho": True})
     aluno = next((a for a in filhos if str(a.pk) == request.GET.get("aluno")), filhos[0])
+    if request.method == "POST" and request.POST.get("acao") == "recado":
+        from .models import RecadoFamilia
+
+        texto = (request.POST.get("texto") or "").strip()
+        if len(texto) < 5:
+            messages.error(request, "Escreva um pouco mais para o professor entender.")
+        else:
+            tipo = request.POST.get("tipo") if request.POST.get("tipo") in RecadoFamilia.Tipo.values else "sugestao"
+            RecadoFamilia.objects.create(aluno=aluno, autor=request.user, tipo=tipo, texto=texto[:1500])
+            messages.success(request, "Recado enviado. O professor vê na página da turma e na ficha do aluno.")
+        return redirect(f"{request.path}?aluno={aluno.pk}#professor")
     if request.method == "POST":
         try:
             from .models import ConfigFamilia
@@ -1321,8 +1339,135 @@ def familia(request):
     ultima_reforco = next((i for i in d["feitas"] if i["materia"] == reforco), None)
     questionario = RespostaQuestionario.objects.filter(aluno=aluno).order_by("-pk").first()
     dicas = [(ap, DICAS_CASA.get(ap, [])) for ap in r["apoios"]] or [("Sem apoio especial", ["Combine um horário fixo de estudo.", "Pergunte o que aprendeu hoje e peça para explicar com as palavras dele."])]
+    from .demandas import demandas_do_aluno
+    from .models import RecadoFamilia
+
+    grafico = [{"assunto": i["assunto"], "materia": i["materia"], "nota": i["nota"], "quando": i["quando"].strftime("%d/%m")}
+               for i in reversed(d["feitas"][:12])]
     return render(request, "prototipo/familia_inicio.html", {
+        "dem": demandas_do_aluno(r, medias, questionario), "grafico": grafico,
+        "materias": sorted({g["materia"] for g in grafico}),
+        "recados": RecadoFamilia.objects.filter(aluno=aluno).order_by("-criado_em")[:5], "tipos_recado": RecadoFamilia.Tipo.choices,
         "filhos": filhos, "aluno": aluno, "r": r, "d": d, "cfg": cfg, "medias": sorted(medias.items()), "reforco": reforco,
         "ultima_reforco": ultima_reforco, "questionario": questionario, "dicas": dicas,
         "pct_hoje": min(100, int(100 * d["min_hoje"] / max(1, cfg["limite"]))),
     })
+
+
+def _medias(d):
+    por = {}
+    for i in d["feitas"]:
+        por.setdefault(i["materia"], []).append(i["nota"])
+    return {m: round(sum(v[:3]) / len(v[:3]), 1) for m, v in por.items()}
+
+
+@papel_requerido("professor")
+def prof_aluno(request, pk):
+    """Ficha do aluno para o professor: principais demandas, o que fazer em aula, recados da família e números."""
+    from django.shortcuts import get_object_or_404
+
+    from apps.perfis.models import RespostaQuestionario
+    from apps.turmas.models import Aluno
+
+    from .demandas import demandas_do_aluno
+    from .models import RecadoFamilia
+
+    aluno = get_object_or_404(Aluno.objects.select_related("usuario", "turma", "perfil", "responsavel"), pk=pk, turma__professor=request.user)
+    r = _resumo_aluno(aluno)
+    medias = _medias(r["d"])
+    q = RespostaQuestionario.objects.filter(aluno=aluno).order_by("-pk").first()
+    return render(request, "prototipo/prof_aluno.html", {
+        "aluno": aluno, "r": r, "d": r["d"], "medias": sorted(medias.items()), "dem": demandas_do_aluno(r, medias, q), "questionario": q,
+        "recados": RecadoFamilia.objects.filter(aluno=aluno).select_related("autor")[:20], "cfg": combinados(aluno)})
+
+
+@papel_requerido("professor")
+def prof_recado_lido(request, pk):
+    from django.shortcuts import get_object_or_404, redirect
+
+    from .models import RecadoFamilia
+
+    rec = get_object_or_404(RecadoFamilia, pk=pk, aluno__turma__professor=request.user)
+    if request.method == "POST":
+        rec.lido = True
+        rec.save(update_fields=["lido"])
+    return redirect(request.POST.get("voltar") or "prototipo:professor")
+
+
+def _usuario_unico(base):
+    from django.utils.text import slugify
+
+    from apps.contas.models import Usuario
+
+    base = slugify(base).replace("-", ".")[:24] or "aluno"
+    nome, n = base, 1
+    while Usuario.objects.filter(username=nome).exists():
+        n += 1
+        nome = f"{base}{n}"
+    return nome
+
+
+def _senha():
+    import secrets
+
+    return "cham-" + "".join(secrets.choice("abcdefghjkmnpqrstuvwxyz23456789") for _ in range(6))
+
+
+@papel_requerido("professor")
+def prof_cadastrar(request):
+    """Cadastro de vários alunos de uma vez: uma linha por aluno, "Nome do aluno; Nome do responsável (opcional)".
+    Cria o login do aluno (e da família, se informada) e mostra usuário e senha UMA vez para o professor repassar."""
+    from django.contrib import messages
+    from django.db import transaction
+    from django.shortcuts import redirect
+
+    from apps.contas.models import Usuario
+    from apps.perfis.models import Perfil
+    from apps.turmas.models import Aluno, Turma
+
+    turmas = list(Turma.objects.filter(professor=request.user))
+    if request.method == "POST":
+        turma = next((t for t in turmas if str(t.pk) == request.POST.get("turma")), None)
+        nova = (request.POST.get("nova_turma") or "").strip()
+        if not turma and nova:
+            turma = Turma.objects.create(nome=nova[:100], professor=request.user)
+        linhas = [ln.strip() for ln in (request.POST.get("lista") or "").splitlines() if ln.strip()]
+        if not turma or not linhas:
+            messages.error(request, "Escolha (ou crie) a turma e escreva pelo menos um aluno, um por linha.")
+            return redirect("prototipo:prof_cadastrar")
+        criados = []
+        with transaction.atomic():
+            for ln in linhas[:60]:
+                partes = [x.strip() for x in ln.replace("\t", ";").split(";")]
+                nome = partes[0][:150]
+                if not nome:
+                    continue
+                prim, _, resto = nome.partition(" ")
+                senha = _senha()
+                u = Usuario(username=_usuario_unico(nome), first_name=prim[:150], last_name=resto[:150], papel=Usuario.Papel.ALUNO)
+                u.set_password(senha)
+                u.save()
+                aluno = Aluno.objects.create(usuario=u, turma=turma)
+                Perfil.objects.create(aluno=aluno)
+                linha = {"aluno": nome, "usuario": u.username, "senha": senha}
+                if len(partes) > 1 and partes[1]:
+                    resp = partes[1][:150]
+                    sf = _senha()
+                    rp, _, rr = resp.partition(" ")
+                    f = Usuario(username=_usuario_unico("fam." + prim), first_name=rp[:150], last_name=rr[:150], papel=Usuario.Papel.FAMILIA)
+                    f.set_password(sf)
+                    f.save()
+                    aluno.responsavel = f
+                    aluno.save(update_fields=["responsavel"])
+                    linha.update({"familia": resp, "usuario_f": f.username, "senha_f": sf})
+                criados.append(linha)
+        request.session["alunos_cadastrados"] = criados
+        messages.success(request, f"{len(criados)} aluno(s) cadastrados em {turma.nome}. Anote os acessos abaixo: as senhas só aparecem agora.")
+        return redirect(f"{reverse_prof()}?turma={turma.pk}#novos")
+    return render(request, "prototipo/prof_cadastrar.html", {"turmas": turmas})
+
+
+def reverse_prof():
+    from django.urls import reverse
+
+    return reverse("prototipo:professor")

@@ -6,7 +6,7 @@
   <main class="pg">
     {% include "prototipo/_msgs.html" %}
     {% if not turma %}
-      <section class="cartao-pg"><h2>Você ainda não tem turma</h2><p><a class="btn-contorno" href="{% url 'turmas:nova' %}">Criar turma</a></p></section>
+      <section class="cartao-pg"><h2>Você ainda não tem turma</h2><p><a class="btn-missao" href="{% url 'prototipo:prof_cadastrar' %}">Criar turma e cadastrar alunos</a> <a class="btn-contorno" href="{% url 'turmas:nova' %}">Só criar turma</a></p></section>
     {% else %}
     <section class="pg-hero">
       <div><p class="pg-sobre">Olá, {{ request.user.first_name|default:request.user.username }}</p><h1>{{ turma.nome }}</h1>
@@ -21,15 +21,53 @@
       <article class="kpi kpi-laranja"><p class="kpi-rot">Sugestões para decidir</p><p class="kpi-val">{{ kpis.sugestoes }}</p><div class="kpi-pe"><span class="kpi-sub">vindas da família e dos dados de uso</span></div></article>
     </section>
 
+    {% if novos %}
+    <section class="cartao-pg acessos-novos" id="novos">
+      <h2>Acessos criados agora (anote ou imprima: as senhas não aparecem de novo)</h2>
+      <table class="tabela-aulas"><thead><tr><th>Aluno</th><th>Usuário</th><th>Senha</th><th>Família</th><th>Usuário</th><th>Senha</th></tr></thead>
+        <tbody>{% for n in novos %}<tr><td>{{ n.aluno }}</td><td><code>{{ n.usuario }}</code></td><td><code>{{ n.senha }}</code></td><td>{{ n.familia|default:"–" }}</td><td>{% if n.usuario_f %}<code>{{ n.usuario_f }}</code>{% endif %}</td><td>{% if n.senha_f %}<code>{{ n.senha_f }}</code>{% endif %}</td></tr>{% endfor %}</tbody></table>
+      <button class="btn-contorno" type="button" onclick="window.print()">Imprimir</button>
+    </section>
+    {% endif %}
+
+    <section class="cartao-pg caixa-hoje">
+      <header><h2>1 · Precisa de você hoje</h2><span class="mini">{{ recados|length }} recado(s) novo(s) · {{ sugestoes|length }} sugestão(ões) · {{ kpis.atencao }} aluno(s) pedindo atenção</span></header>
+      <div class="hoje-grade">
+        <div><h3 class="sub-h">Recados das famílias</h3>
+          {% for rc in recados %}<div class="recado"><p><strong>{{ rc.aluno.usuario.first_name }}</strong> · {{ rc.get_tipo_display }} · <span class="mini">{{ rc.criado_em|date:"d/m H:i" }}</span></p><p>{{ rc.texto|linebreaksbr }}</p>
+            <form method="post" action="{% url 'prototipo:prof_recado_lido' rc.pk %}">{% csrf_token %}<button class="btn-link">Marcar como resolvido</button> <a class="btn-link" href="{% url 'prototipo:prof_aluno' rc.aluno.pk %}">Abrir ficha</a></form></div>
+          {% empty %}<p class="vazio">Nenhum recado novo.</p>{% endfor %}</div>
+        <div><h3 class="sub-h">Alunos pedindo atenção</h3>
+          {% for x in alunos %}{% if x.estado.0 == "atencao" or x.acerto is not None and x.acerto < 60 %}<p><a class="nome-aluno" href="{% url 'prototipo:prof_aluno' x.aluno.pk %}">{{ x.aluno.usuario.first_name }}</a> · {{ x.estado.1 }}{% if x.acerto is not None %} · acerto {{ x.acerto }}%{% endif %}</p>{% endif %}{% empty %}<p class="vazio">Ninguém.</p>{% endfor %}</div>
+      </div>
+    </section>
+
+    <section class="cartao-pg">
+      <header><h2>2 · Seus alunos e o que cada um precisa</h2><span class="acoes-cab"><a class="btn-missao" href="{% url 'prototipo:prof_cadastrar' %}">Cadastrar vários alunos</a><a class="btn-contorno" href="{% url 'turmas:novo_aluno' turma.pk %}">+ Um aluno</a></span></header>
+      <p class="mini">Clique no nome para abrir a ficha: principais demandas, o que fazer em aula e recados da família.</p>
+      <table class="tabela-aulas">
+        <thead><tr><th>Aluno</th><th>Principal demanda</th><th>Apoios (você escolhe)</th><th>Acerto recente</th><th>Situação</th><th>Família</th><th></th></tr></thead>
+        <tbody>{% for x in alunos %}
+          <tr><td><a class="nome-aluno" href="{% url 'prototipo:prof_aluno' x.aluno.pk %}">{{ x.aluno.usuario.first_name|default:x.aluno.usuario.username }} {{ x.aluno.usuario.last_name }}</a></td>
+            <td class="demanda-cel">{{ x.dem.principal }}{% if x.dem.itens|length > 1 %} <span class="mini">+{{ x.dem.itens|length|add:"-1" }}</span>{% endif %}</td>
+            <td>{% for ap in x.apoios %}<span class="chip">{{ ap }}</span>{% empty %}<span class="mini">aula original</span>{% endfor %}{% for p in x.prefs %}<span class="chip ok">{{ p }}</span>{% endfor %}</td>
+            <td>{% if x.acerto is not None %}<strong>{{ x.acerto }}%</strong>{% else %}–{% endif %}</td>
+            <td><span class="estado-mini estado-{{ x.estado.0 }}"><span class="pg-ponto"></span>{{ x.estado.1 }}</span></td>
+            <td>{% if x.aluno.responsavel %}<span class="chip ok">tem acesso</span>{% else %}<a href="{% url 'turmas:nova_familia' turma.pk x.aluno.pk %}">criar acesso</a>{% endif %}</td>
+            <td class="acoes-linha"><a class="btn-contorno" href="{% url 'prototipo:prof_aluno' x.aluno.pk %}">Ficha</a><a class="btn-link" href="{% url 'prototipo:progresso' %}?aluno={{ x.aluno.pk }}">Progresso</a><a class="btn-link" href="{% url 'perfis:editar_apoios' x.aluno.pk %}">Apoios</a></td></tr>
+        {% empty %}<tr><td colspan="7">Nenhum aluno ainda.</td></tr>{% endfor %}</tbody>
+      </table>
+    </section>
+
     <section class="pg-grade">
       <article class="cartao-pg destaque-upload">
-        <h2>Transformar material em trilha</h2>
-        <p>Envie um PDF ou texto. O Chamilion divide em fases curtas (até 10 por mundo), põe um roteiro no início de cada uma e mede a acessibilidade. Você revisa, adiciona as questões e publica.</p>
+        <h2>3 · Transformar material em trilha</h2>
+        <p>Envie um PDF ou texto. O Chamilion divide em fases curtas (até 10 por mundo), põe um roteiro no início de cada uma e mede a acessibilidade. A IA cria as questões; você revisa e publica.</p>
         <a class="btn-missao" href="{% url 'prototipo:prof_material' %}">Enviar PDF ou material</a>
         <a class="btn-contorno" href="{% url 'aulas:nova_via_pdf' turma.pk %}">Uma aula a partir de PDF (revisão questão a questão)</a>
       </article>
       <article class="cartao-pg">
-        <h2>Sugestões de apoio</h2>
+        <h2>Sugestões de apoio (aceite ou recuse)</h2>
         {% for s in sugestoes %}
           <div class="sug"><div><strong>{{ s.aluno.usuario.first_name|default:s.aluno }}</strong>: {{ s.get_campo_display }} → {% if s.valor_sugerido %}ligar{% else %}desligar{% endif %}<p class="mini">{{ s.motivo }} · origem: {{ s.get_origem_display }}</p></div>
             <form method="post" action="{% url 'perfis:aceitar_sugestao' s.pk %}">{% csrf_token %}<button class="btn-contorno">Aceitar</button></form>
@@ -38,20 +76,6 @@
       </article>
     </section>
 
-    <section class="cartao-pg">
-      <header><h2>Alunos</h2><a class="btn-contorno" href="{% url 'turmas:novo_aluno' turma.pk %}">+ Aluno</a></header>
-      <table class="tabela-aulas">
-        <thead><tr><th>Aluno</th><th>Apoios (você escolhe)</th><th>Acerto recente</th><th>Situação</th><th>Família</th><th></th></tr></thead>
-        <tbody>{% for x in alunos %}
-          <tr><td><strong>{{ x.aluno.usuario.first_name|default:x.aluno.usuario.username }}</strong></td>
-            <td>{% for ap in x.apoios %}<span class="chip">{{ ap }}</span>{% empty %}<span class="mini">aula original</span>{% endfor %}{% for p in x.prefs %}<span class="chip ok">{{ p }}</span>{% endfor %}</td>
-            <td>{% if x.acerto is not None %}<strong>{{ x.acerto }}%</strong>{% else %}–{% endif %}</td>
-            <td><span class="estado-mini estado-{{ x.estado.0 }}"><span class="pg-ponto"></span>{{ x.estado.1 }}</span></td>
-            <td>{% if x.aluno.responsavel %}<span class="chip ok">tem acesso</span>{% else %}<a href="{% url 'turmas:nova_familia' turma.pk x.aluno.pk %}">criar acesso</a>{% endif %}</td>
-            <td class="acoes-linha"><a class="btn-contorno" href="{% url 'prototipo:progresso' %}?aluno={{ x.aluno.pk }}">Progresso</a><a class="btn-link" href="{% url 'perfis:editar_apoios' x.aluno.pk %}">Apoios</a></td></tr>
-        {% empty %}<tr><td colspan="6">Nenhum aluno ainda.</td></tr>{% endfor %}</tbody>
-      </table>
-    </section>
 
     <section class="cartao-pg">
       <header><h2>Aulas</h2><a class="btn-contorno" href="{% url 'aulas:nova' turma.pk %}">+ Aula</a></header>
