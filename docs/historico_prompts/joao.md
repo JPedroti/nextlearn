@@ -634,6 +634,6 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 > Em qual branch do Thiago trabalhar? R: `thiago/prototipo-neuro`.
 > O que levar para a branch do Thiago? R: Camaleões e logos.
 
-**Resumo da resposta da IA:** _(preencher ao final)_
+**Resumo da resposta da IA:** voltou a `main` ao estado de 10h52 com um commit de reversão (sem reescrever o histórico), mantendo o histórico de prompts e a proteção do `contas_locais.txt`; 120 testes passando. Na branch `thiago/prototipo-neuro`, trocou o texto "Chamilion" do topo pela logo Chamaleon e pôs os camaleões professor e família nas áreas do professor e da família (74 testes da branch passando; páginas conferidas num banco temporário). Avisou que a `main` voltou a ter o comando do aluno fictício, que é risco de cartão vermelho.
 
 ---
