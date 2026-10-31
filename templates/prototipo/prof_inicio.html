@@ -38,7 +38,7 @@
             <form method="post" action="{% url 'prototipo:prof_recado_lido' rc.pk %}">{% csrf_token %}<button class="btn-link">Marcar como resolvido</button> <a class="btn-link" href="{% url 'prototipo:prof_aluno' rc.aluno.pk %}">Abrir ficha</a></form></div>
           {% empty %}<p class="vazio">Nenhum recado novo.</p>{% endfor %}</div>
         <div><h3 class="sub-h">Alunos pedindo atenção</h3>
-          {% for x in alunos %}{% if x.estado.0 == "atencao" or x.acerto is not None and x.acerto < 60 %}<p><a class="nome-aluno" href="{% url 'prototipo:prof_aluno' x.aluno.pk %}">{{ x.aluno.usuario.first_name }}</a> · {{ x.estado.1 }}{% if x.acerto is not None %} · acerto {{ x.acerto }}%{% endif %}</p>{% endif %}{% empty %}<p class="vazio">Ninguém.</p>{% endfor %}</div>
+          {% for x in alunos %}{% if x.estado.0 != "ok" or x.acerto is not None and x.acerto < 60 %}<p><a class="nome-aluno" href="{% url 'prototipo:prof_aluno' x.aluno.pk %}">{{ x.aluno.usuario.first_name }}</a> · {{ x.estado.1 }}{% if x.acerto is not None %} · acerto {{ x.acerto }}%{% endif %}</p>{% endif %}{% endfor %}{% if kpis.atencao == 0 %}<p class="vazio">Ninguém: todos estudando com regularidade.</p>{% endif %}</div>
       </div>
     </section>
 

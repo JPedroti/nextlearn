@@ -181,3 +181,28 @@ a.opcao-papel:hover { border-color: #2B59C3; background: #F5F8FF; }
 .estatico .frase-mar, .estatico .dica-rolar { display: none; }
 .estatico .revelar { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } .revelar { opacity: 1; transform: none; } }
+
+/* ===== O problema ===== */
+.problema { background: #0B2545; color: #EAF2FB; padding: 120px 6vw 72px; position: relative; z-index: 1; }
+.problema-grade { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 48px; align-items: center; max-width: 1200px; margin: 0 auto; }
+.problema-sobre { text-transform: uppercase; letter-spacing: .12em; font-weight: 700; color: #7BE0A6; margin: 0 0 8px; }
+.problema h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); line-height: 1.2; margin: 0 0 16px; color: #fff; }
+.problema-lead { font-size: 1.15rem; line-height: 1.7; max-width: 60ch; }
+.filtro-sala { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 8px; }
+.filtro-sala button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 2px solid #5DB8CC; background: transparent; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.filtro-sala button[aria-pressed="true"] { background: #F2B544; border-color: #F2B544; color: #0B2545; }
+.filtro-sala button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.problema-nota { color: #B9CBE0; min-height: 3em; }
+.sala { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 22px; background: #13335C; border-radius: 22px; }
+.carteira { aspect-ratio: 1; border-radius: 50%; background: #3E5F8A; transition: background .25s, transform .25s; }
+.sala.ver-tdah .g-tdah, .sala.ver-dis .g-dis, .sala.ver-tea .g-tea { background: #F2B544; transform: scale(1.15); box-shadow: 0 0 0 4px rgba(242,181,68,.35); }
+.sala-legenda { grid-column: 1 / -1; text-align: center; margin: 6px 0 0; color: #B9CBE0; font-size: .9rem; }
+.gargalos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; max-width: 1200px; margin: 40px auto 0; }
+.gargalos article { background: #13335C; border-radius: 18px; padding: 20px 22px; }
+.gargalos strong { font-size: 2rem; color: #F2B544; }
+.gargalos h3 { color: #fff; margin: 6px 0; font-size: 1.15rem; }
+.gargalos p { margin: 6px 0; line-height: 1.6; }
+.gargalos .solucao { color: #7BE0A6; font-weight: 700; }
+.problema .fonte { max-width: 1200px; margin: 22px auto 0; color: #93A9C4; font-size: .85rem; }
+@media (max-width: 800px) { .problema-grade { grid-template-columns: 1fr; } .problema { padding: 48px 16px; } }
+@media (prefers-reduced-motion: reduce) { .carteira { transition: none; } }

@@ -62,6 +62,30 @@
     </div>
   </section>
 
+  <!-- 1b. O problema: neurodivergência na sala comum -->
+  <section class="problema" id="o-problema" aria-labelledby="problema-titulo">
+    <div class="problema-grade">
+      <div>
+        <p class="problema-sobre">O problema</p>
+        <h2 id="problema-titulo">Em toda turma há quem aprenda de outro jeito. A aula, quase sempre, é uma só.</h2>
+        <p class="problema-lead">Numa sala de 30 alunos, os estudos estimam cerca de <strong>5 crianças</strong> com alguma barreira de aprendizagem ligada à neurodivergência. Muitas sem laudo, quase todas na classe comum, com um professor sozinho para dar conta de todas.</p>
+        <div class="filtro-sala" role="group" aria-label="Destacar na sala">
+          <button type="button" data-grupo="tdah" aria-pressed="false">Atenção (TDAH) · ~2</button>
+          <button type="button" data-grupo="dis" aria-pressed="false">Leitura (dislexia) · ~2</button>
+          <button type="button" data-grupo="tea" aria-pressed="false">Autismo (TEA) · ~1</button>
+        </div>
+        <p class="problema-nota" data-sala-txt aria-live="polite">Toque num grupo para ver na sala. É uma estimativa: uma criança pode ter mais de uma barreira.</p>
+      </div>
+      <div class="sala" aria-hidden="true">{% for i in "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" %}<span class="carteira{% if forloop.counter == 4 or forloop.counter == 17 %} g-tdah{% elif forloop.counter == 9 or forloop.counter == 23 %} g-dis{% elif forloop.counter == 28 %} g-tea{% endif %}"></span>{% endfor %}<p class="sala-legenda">Uma sala de 30 alunos</p></div>
+    </div>
+    <div class="gargalos">
+      <article><strong>6,4%</strong><h3>O professor não tem tempo nem formação</h3><p>Adaptar cada aula para cada aluno é inviável à mão.</p><p class="solucao">→ Ele envia o PDF que já usa; o Chamilion monta a trilha com questões e aponta o que tornar mais acessível.</p></article>
+      <article><strong>Sem laudo</strong><h3>A criança espera um diagnóstico que pode demorar anos</h3><p>Enquanto isso, fica sem apoio na sala.</p><p class="solucao">→ Apoios por barreira, não por rótulo: o professor liga foco, leitura ou exemplos concretos na hora (Decreto 12.686/2025).</p></article>
+      <article><strong>Em casa</strong><h3>A família não sabe como ajudar</h3><p>E o professor não sabe o que acontece em casa.</p><p class="solucao">→ A família vê os desafios do filho, recebe dicas de ambiente de estudo e manda recados ao professor.</p></article>
+    </div>
+    <p class="fonte">Fontes: TDAH 7,6% (Salari et al., 2023); dislexia 7,1% (Yang et al., 2022); TEA 1 em 31 (CDC, 2025); 6,4% dos professores com formação continuada em educação especial e 2,46 milhões de matrículas na educação especial (Inep, Censo Escolar).</p>
+  </section>
+
   <!-- 2. Saiba mais: o Next nada pelo canto direito -->
   <section class="saiba" id="saiba-mais" aria-labelledby="saiba-titulo">
     <div class="saiba-grade">
@@ -165,6 +189,21 @@
 
   <script id="dados-cenas" type="application/json">[{% for c in cenas %}{"id":"{{ c.id }}","pose":"{{ c.pose }}","fala":"{{ c.fala|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]</script>
   <script src="{% static 'prototipo/entrada.js' %}"></script>
+  <script>
+    (function () {
+      var txt = { tdah: "Cerca de 2 em 30: dificuldade de manter a atenção e guardar vários passos.", dis: "Cerca de 2 em 30: leitura lenta e cansativa, mesmo entendendo bem quando ouvem.", tea: "Cerca de 1 em 30: linguagem literal, rotina previsível, sensibilidade a estímulos." };
+      var sala = document.querySelector(".sala"), nota = document.querySelector("[data-sala-txt]");
+      document.querySelectorAll("[data-grupo]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var ligado = b.getAttribute("aria-pressed") !== "true";
+          document.querySelectorAll("[data-grupo]").forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+          sala.className = "sala" + (ligado ? " ver-" + b.dataset.grupo : "");
+          b.setAttribute("aria-pressed", ligado ? "true" : "false");
+          nota.textContent = ligado ? txt[b.dataset.grupo] : "Toque num grupo para ver na sala.";
+        });
+      });
+    })();
+  </script>
 <script src="{% static 'prototipo/ao_vivo.js' %}"></script>
 </body>
 </html>

@@ -1454,7 +1454,7 @@ def prof_cadastrar(request):
                     resp = partes[1][:150]
                     sf = _senha()
                     rp, _, rr = resp.partition(" ")
-                    f = Usuario(username=_usuario_unico("fam." + prim), first_name=rp[:150], last_name=rr[:150], papel=Usuario.Papel.FAMILIA)
+                    f = Usuario(username=_usuario_unico("familia " + prim), first_name=rp[:150], last_name=rr[:150], papel=Usuario.Papel.FAMILIA)
                     f.set_password(sf)
                     f.save()
                     aluno.responsavel = f
