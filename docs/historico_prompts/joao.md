@@ -207,3 +207,11 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** Fatia 2 feita. Modelos `Perfil` (3 bits → máscara 0–7) e `VersaoAdaptada` (cache único por aula e máscara). Pacote `ia/` com blocos provisórios (aguardando o Cauã), `prompt_builder`, `cliente` (Gemini com saída JSON validada por Pydantic) e `gerar_versao` (cache, validação do número de enunciados, erro amigável). Telas: o professor marca os apoios do aluno, gera, revisa/corrige e aprova cada versão; o aluno vê a versão aprovada da sua máscara, e a correção continua usando o gabarito do professor. Editar a aula apaga as versões. 45 testes passando (IA simulada); telas conferidas no navegador local. A geração real com o Gemini ainda não foi testada (falta a chave).
 
 ---
+
+## Prompt 18 — 30/10/2026, 23:52 (BRT) — autor: João — ferramenta: Claude Code
+
+> Antes de qualquer coisa, quero que voce atualize o cronograma conforme as atividades vao sendo feitas, com as atividades completas, imcompletas, a fazer etc. Quando alguem criar uma conversar e abrir nessa pasta com alguma ia, este integrante do grupo deve primeiramente ser questionado quem ele é (João, Thiago, Cauã ou Gabriel) e, depois, deve ser oferecido um breve resumo da situação do projeto e das entregas.
+
+**Resumo da resposta da IA:** criado `docs/cronograma.md` (prazos, entregas da Fase 1, fatias e tarefas por integrante, com status concluída/em andamento/a fazer/pendência/sem informação e registro de atualizações). Nova seção 0 do CLAUDE.md: em toda conversa nova, a IA pergunta quem é o integrante, registra o prompt, resume o status a partir do cronograma e o mantém atualizado. `AGENTS.md` aponta outras ferramentas de IA para o CLAUDE.md.
+
+---

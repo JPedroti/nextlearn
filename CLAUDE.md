@@ -6,6 +6,24 @@
 
 ---
 
+## 0. Início de toda conversa (obrigatório)
+
+Quatro pessoas usam esta pasta com assistentes de IA diferentes. Ao abrir uma conversa nova:
+
+1. **Pergunte primeiro quem está falando: João, Thiago, Cauã ou Gabriel.** Se a pessoa já se identificou na
+   primeira mensagem (ex.: "Eu sou o João"), não pergunte de novo. Mantenha a resposta pelo resto da conversa.
+2. Registre a mensagem dela no histórico de prompts dessa pessoa (seção 9).
+3. Leia `docs/cronograma.md` e ofereça um **resumo curto**, de 5 a 8 linhas:
+   - quanto tempo falta até o congelamento do código (10h30) e até a submissão (12h);
+   - o que já está pronto e o que está atrasado ou bloqueado;
+   - as próximas tarefas **dessa pessoa** e as entregas da Fase 1 que dependem dela.
+4. Só então trate do pedido. Se a primeira mensagem já trouxer um pedido, faça o resumo antes e siga com o pedido em seguida.
+
+**Cronograma vivo:** `docs/cronograma.md` é a fonte do status do projeto. Atualize-o (status, "Última atualização"
+e uma linha em "Registro de atualizações") ao terminar cada tarefa e sempre que um integrante contar como está
+a parte dele. Use ❔ para o que ninguém confirmou; nunca marque como concluído o que não foi verificado.
+Faça commit do cronograma junto com o trabalho da vez.
+
 ## 1. Situação
 
 - **Evento:** 1º Hackathon LEPV (Liga de Empreendedorismo da Praia Vermelha, IME) × FGV, patrocínio Teachy. Tema: Educação.
@@ -100,6 +118,7 @@ nextlearn/
 ├── manage.py
 ├── docs/
 │   ├── historico_prompts/     # OBRIGATÓRIO, ver seção 9: README.md (índice) + um .md por integrante
+│   ├── cronograma.md          # status vivo das fatias e entregas, ver seção 0
 │   ├── arquitetura.md         # diagrama + modelo de dados
 │   └── decisoes.md            # a tabela da seção 4, expandida
 ├── config/                    # settings.py, urls.py, wsgi.py
@@ -192,7 +211,7 @@ A banca (e o agente que avalia "condução da IA") lê `docs/historico_prompts/`
 
 ## 12. Como trabalhar com a equipe
 
-- Antes de cada fatia, diga em 2–3 linhas o que vai fazer. Ao terminar, diga o que testar e como.
+- Antes de cada fatia, diga em 2–3 linhas o que vai fazer. Ao terminar, diga o que testar e como, e atualize `docs/cronograma.md`.
 - Mantenha `README.md` com: como rodar localmente (Windows; a equipe usa Windows), variáveis de ambiente e link do deploy.
 - Escreva testes simples nos pontos críticos (máscara, prompt_builder, cache, gabarito não alterado pela IA).
 - Se algo da seção 3 ou 4 parecer errado, **pergunte antes de mudar**. São decisões tomadas e defendidas pela equipe.

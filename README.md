@@ -6,6 +6,7 @@ O professor prepara a aula **uma vez** e cada aluno recebe a **mesma aula** no f
 Projeto do 1º Hackathon LEPV × FGV (tema: Educação, patrocínio Teachy) — Desafio 1: Inclusão e acessibilidade.
 
 - **Deploy:** _(link do Render, preencher após o primeiro deploy)_
+- **Cronograma e status das entregas:** [docs/cronograma.md](docs/cronograma.md)
 - **Histórico de prompts usados com IA:** [docs/historico_prompts/](docs/historico_prompts/README.md) (um arquivo por integrante)
 
 ## Equipe
