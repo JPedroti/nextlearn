@@ -20,3 +20,6 @@ referencias/
 !.env.example
 .vscode/
 .idea/
+
+# Contas de teste criadas no computador de cada um (nunca vão para o Git)
+contas_locais.txt

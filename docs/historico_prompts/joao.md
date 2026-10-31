@@ -567,3 +567,11 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** conferiu o GitHub: o login do Thiago está só nas branches de protótipo; a `main` já tem login real para professor, família e aluno. Explicou que os camaleões dá para fazer como desenhos SVG nas telas reais, sem emoji e com descrição para leitor de tela, mas que o código já congelou e faltam menos de 1 hora para a submissão; perguntou se faz agora.
 
 ---
+
+## Prompt 45 — 31/10/2026, 11:04 (BRT) — autor: João — ferramenta: Claude Code
+
+> Pode fazer os camaleões e pensar em formas de enriquecer graficamente o produto. Só queria que você disponibilizasse também uma forma de eu testá-lo
+
+**Resumo da resposta da IA:** desenhou o mascote do NextLearn em SVG (um camaleão que usa as cores do tema da tela, então muda de cor conforme o apoio do aluno): professor de óculos e livro na área do professor, pai, mãe e filhote na área da família, estudante de mochila na área do aluno e um acenando no login. Sem emoji e com descrição para leitor de tela; teste novo (132 passando). Para o João testar: criou uma conta local de professor com senha gerada, guardada em `contas_locais.txt` (fora do Git), deixou o servidor rodando e abriu o app no navegador do Claude.
+
+---

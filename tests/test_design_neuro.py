@@ -163,3 +163,24 @@ class DicasParaAFamiliaTests(TestCase):
         self.assertContains(resposta, "Como ajudar em casa")
         self.assertContains(resposta, "dividir uma pizza")
         self.assertNotContains(resposta, "Divida a lição de casa")  # foco não está ligado
+
+
+class MascoteTests(TestCase):
+    """O camaleão de cada área aparece como desenho (SVG) com descrição para leitor de tela, sem emoji."""
+
+    def test_cada_area_tem_o_seu_camaleao(self):
+        professor = Usuario.objects.create_user("prof", password=SENHA, papel=Usuario.Papel.PROFESSOR)
+        familia = Usuario.objects.create_user("mae", password=SENHA, papel=Usuario.Papel.FAMILIA)
+        Usuario.objects.create_user("ana", password=SENHA, papel=Usuario.Papel.ALUNO)
+        self.assertContains(self.client.get(reverse("contas:entrar")), 'aria-label="Camaleão do NextLearn acenando"')
+        casos = [
+            ("prof", "painel:inicio", "Camaleão professor"),
+            ("mae", "perfis:inicio", "Família de camaleões"),
+            ("ana", "aulas:inicio", "Camaleão estudante"),
+        ]
+        for username, url, descricao in casos:
+            with self.subTest(area=url):
+                self.client.login(username=username, password=SENHA)
+                resposta = self.client.get(reverse(url))
+                self.assertContains(resposta, 'role="img"')
+                self.assertContains(resposta, descricao)
