@@ -3,7 +3,7 @@
 <head>{% include "prototipo/_cabeca.html" %}<title>Família · Chamilion</title></head>
 <body class="pg-progresso tema-base pg-familia">
   <header class="topo">
-    <a href="{% url 'prototipo:familia' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>Chamilion · Família</a>
+    <a href="{% url 'prototipo:familia' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"> · Família</a>
     <nav class="topo-direita">
       {% if filhos|length > 1 %}<form method="get">{% for f in filhos %}<button name="aluno" value="{{ f.pk }}" class="btn-contorno{% if f.pk == aluno.pk %} ativo{% endif %}">{{ f.usuario.first_name }}</button>{% endfor %}</form>{% endif %}
       <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form>
@@ -15,6 +15,7 @@
       <section class="cartao-pg"><h2>Ainda não há aluno ligado a este acesso</h2><p>O professor liga o acesso da família ao aluno na tela da turma.</p></section>
     {% else %}
     <section class="pg-hero">
+      {% include "prototipo/_camaleao.html" with tipo="familia" %}
       <div><p class="pg-sobre">{{ aluno.turma.nome }} · professor(a) {{ aluno.turma.professor.first_name|default:aluno.turma.professor.username }}</p>
         <h1>Como {{ aluno.usuario.first_name }} está indo</h1>
         <p class="pg-sub">Tudo comparado só com {{ aluno.usuario.first_name }}. Sem nota de colegas, sem ranking.</p></div>

@@ -11,7 +11,7 @@
 <body class="tema-{% if foco %}foco{% else %}base{% endif %}{% if foco %} apoio-foco{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
-    <a href="{% url 'prototipo:painel_aluno' %}" class="marca">Chamilion</a>
+    <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"></a>
     <div class="topo-direita">
       <a href="{% url 'prototipo:painel_aluno' %}#calendario" class="btn-contorno"><svg class="ico" aria-hidden="true"><use href="#i-calendario"/></svg>Calendário</a>
       <a href="{% url 'prototipo:painel_aluno' %}" class="btn-link">Voltar para minha área</a>

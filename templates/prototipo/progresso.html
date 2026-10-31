@@ -12,7 +12,7 @@
 <body data-perfil-dev="{{ perfil_dev }}" data-modo="{{ modo }}" class="pg-progresso modo-{{ modo }} tema-{{ tema }}{% if foco %} apoio-foco{% endif %}{% if limpo %} modo-limpo{% endif %}{% if letras %} letras-espacadas{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
-    <a href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>Chamilion</a>
+    <a href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"></a>
     <nav class="topo-direita" aria-label="Navegação">
       {% if quem_ve == "familia" %}<a class="btn-contorno" href="{% url 'prototipo:familia' %}?aluno={{ aluno.pk }}">Voltar</a>{% elif quem_ve == "professor" %}<a class="btn-contorno" href="{% url 'prototipo:professor' %}">Voltar à turma</a>{% else %}<a class="btn-contorno" href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}">Voltar à trilha</a>{% endif %}
       <button type="button" class="btn-contorno" onclick="window.print()">Imprimir / PDF</button>

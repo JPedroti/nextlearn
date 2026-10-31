@@ -115,3 +115,8 @@
 .grafico-det { min-height: 1.4em; margin-top: 8px; }
 @media (prefers-reduced-motion: reduce) { .bn-barra { transition: none; } }
 @media print { .topo, .abas-familia, nav, .btn-contorno { display: none !important; } }
+
+/* Logo no topo (Chamaleon) e mascotes camaleão nas áreas do professor e da família */
+.marca-logo { height: 34px; width: auto; vertical-align: middle; }
+.pg-hero .camaleao { flex-shrink: 0; }
+.pg-hero .camaleao { background: var(--cartao, #FFFFFF); border-radius: 20px; padding: 6px 10px; }

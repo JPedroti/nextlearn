@@ -9,6 +9,7 @@
       <section class="cartao-pg"><h2>Você ainda não tem turma</h2><p><a class="btn-missao" href="{% url 'prototipo:prof_cadastrar' %}">Criar turma e cadastrar alunos</a> <a class="btn-contorno" href="{% url 'turmas:nova' %}">Só criar turma</a></p></section>
     {% else %}
     <section class="pg-hero">
+      {% include "prototipo/_camaleao.html" with tipo="professor" %}
       <div><p class="pg-sobre">Olá, {{ request.user.first_name|default:request.user.username }}</p><h1>{{ turma.nome }}</h1>
         <p class="pg-sub">A mesma aula para todos; cada aluno recebe o formato que remove a sua barreira. Você decide tudo.</p></div>
       {% if turmas|length > 1 %}<form method="get"><select name="turma" onchange="this.form.submit()" class="sel-turma">{% for t in turmas %}<option value="{{ t.pk }}" {% if t.pk == turma.pk %}selected{% endif %}>{{ t.nome }}</option>{% endfor %}</select></form>{% endif %}

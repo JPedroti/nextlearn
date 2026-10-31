@@ -1,0 +1,72 @@
+{% comment %}
+Mascote do NextLearn: um camaleão, que muda de cor para combinar com o ambiente, como a aula muda de formato para
+combinar com cada aluno. As cores vêm do tema da tela (--destaque, --destaque-suave...), então ele também muda de cor
+com o apoio do aluno. Desenho em SVG, sem emoji, com descrição para leitor de tela (skill design-neuro).
+
+Uso: {% include "prototipo/_camaleao.html" with tipo="professor" %}   tipos: professor, familia, aluno, boas_vindas
+{% endcomment %}
+<svg class="camaleao {{ classe|default:'w-32 h-24 sm:w-40 sm:h-28' }} shrink-0" viewBox="0 0 220 140" role="img"
+     aria-label="{% if tipo == 'professor' %}Camaleão professor, de óculos e com um livro{% elif tipo == 'familia' %}Família de camaleões: pai, mãe e filhote{% elif tipo == 'aluno' %}Camaleão estudante, de mochila{% else %}Camaleão do Chamilion acenando{% endif %}">
+  <defs>
+    {# Camaleão básico olhando para a direita, ocupando mais ou menos x 10–150, y 20–120. #}
+    <g id="camaleao-{{ tipo }}">
+      <path d="M48 88 C 14 90, 12 52, 38 50 C 54 49, 56 70, 42 71 C 33 72, 33 60, 40 60" fill="none"
+            stroke="var(--destaque, #4338CA)" stroke-width="9" stroke-linecap="round"/>
+      <ellipse cx="82" cy="78" rx="40" ry="25" fill="var(--destaque, #4338CA)"/>
+      <ellipse cx="86" cy="89" rx="29" ry="10" fill="var(--destaque-claro, #E6EDFB)"/>
+      <path d="M64 66 Q 74 58 84 66 M 84 66 Q 94 58 104 66" fill="none" stroke="var(--destaque-claro, #E6EDFB)" stroke-width="3"
+            stroke-linecap="round" opacity="0.7"/>
+      <path d="M106 58 Q 142 50 148 76 Q 138 92 110 90 Z" fill="var(--destaque, #4338CA)"/>
+      <path d="M103 60 Q 114 38 128 53" fill="var(--destaque, #4338CA)"/>
+      <circle cx="126" cy="68" r="10" fill="var(--cartao, #FFFFFF)" stroke="var(--texto, #1F2937)" stroke-width="2"/>
+      <circle cx="129" cy="68" r="4.5" fill="var(--texto, #1F2937)"/>
+      <path d="M131 82 Q 139 84 146 79" fill="none" stroke="var(--texto, #1F2937)" stroke-width="2" stroke-linecap="round"/>
+      <path d="M66 98 L 62 114 M 100 97 L 104 114" stroke="var(--destaque, #4338CA)" stroke-width="8" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  {% if tipo == "familia" %}
+    {# Pai (de óculos) e mãe (com uma flor) de frente um para o outro, e o filhote no meio. #}
+    <line x1="6" y1="124" x2="214" y2="124" stroke="var(--borda, #E1E5EA)" stroke-width="6" stroke-linecap="round"/>
+    <g transform="translate(-6 18) scale(0.72)">
+      <use href="#camaleao-{{ tipo }}"/>
+      <circle cx="126" cy="68" r="14" fill="none" stroke="var(--texto, #1F2937)" stroke-width="3"/>
+      <path d="M112 66 L 104 64" stroke="var(--texto, #1F2937)" stroke-width="3" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(226 18) scale(-0.72 0.72)">
+      <use href="#camaleao-{{ tipo }}"/>
+      <g transform="translate(118 44)">
+        <circle cx="0" cy="-7" r="5" fill="var(--cartao, #FFFFFF)" stroke="var(--texto, #1F2937)" stroke-width="1.5"/>
+        <circle cx="7" cy="0" r="5" fill="var(--cartao, #FFFFFF)" stroke="var(--texto, #1F2937)" stroke-width="1.5"/>
+        <circle cx="0" cy="7" r="5" fill="var(--cartao, #FFFFFF)" stroke="var(--texto, #1F2937)" stroke-width="1.5"/>
+        <circle cx="-7" cy="0" r="5" fill="var(--cartao, #FFFFFF)" stroke="var(--texto, #1F2937)" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="4" fill="var(--destaque-claro, #E6EDFB)" stroke="var(--texto, #1F2937)" stroke-width="1.5"/>
+      </g>
+    </g>
+    <g transform="translate(78 66) scale(0.42)">
+      <use href="#camaleao-{{ tipo }}"/>
+    </g>
+  {% else %}
+    <line x1="20" y1="124" x2="200" y2="124" stroke="var(--borda, #E1E5EA)" stroke-width="6" stroke-linecap="round"/>
+    <g transform="translate(20 8)">
+      <use href="#camaleao-{{ tipo }}"/>
+      {% if tipo == "professor" %}
+        <circle cx="126" cy="68" r="14" fill="none" stroke="var(--texto, #1F2937)" stroke-width="3"/>
+        <path d="M112 66 L 104 64" stroke="var(--texto, #1F2937)" stroke-width="3" stroke-linecap="round"/>
+        <g transform="translate(150 84) rotate(-12)">
+          <rect x="0" y="0" width="34" height="24" rx="2" fill="var(--cartao, #FFFFFF)" stroke="var(--texto, #1F2937)" stroke-width="2"/>
+          <path d="M17 0 L 17 24 M 5 7 L 13 7 M 5 12 L 13 12 M 21 7 L 29 7 M 21 12 L 29 12" stroke="var(--texto, #1F2937)"
+                stroke-width="1.5"/>
+        </g>
+      {% elif tipo == "aluno" %}
+        <rect x="58" y="44" width="26" height="30" rx="7" fill="var(--destaque-claro, #E6EDFB)" stroke="var(--texto, #1F2937)" stroke-width="2"/>
+        <path d="M64 56 L 78 56" stroke="var(--texto, #1F2937)" stroke-width="2" stroke-linecap="round"/>
+        <path d="M84 50 Q 96 58 92 74" fill="none" stroke="var(--texto, #1F2937)" stroke-width="2.5"/>
+      {% else %}
+        <path d="M118 88 Q 150 96 160 70" fill="none" stroke="var(--destaque, #4338CA)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M162 58 Q 172 52 176 60 M 166 50 Q 178 44 182 54" fill="none" stroke="var(--suave, #52606D)" stroke-width="2"
+              stroke-linecap="round"/>
+      {% endif %}
+    </g>
+  {% endif %}
+</svg>

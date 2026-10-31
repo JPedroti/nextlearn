@@ -1,4 +1,4 @@
-{% load static l10n %}<!DOCTYPE html>
+{% load static %}{% load static l10n %}<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
@@ -11,7 +11,7 @@
 <body data-perfil-dev="{{ perfil_dev }}" data-ambiente-dev="{{ ambiente_dev }}" data-modo="{{ modo }}" class="modo-{{ modo }} tema-{{ tema|default:'base' }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}{% if concreto %} apoio-concreto{% endif %}{% if limpo %} modo-limpo{% endif %}{% if voz %} com-voz{% endif %}{% if letras %} letras-espacadas{% endif %}{% if alvos %} alvos-grandes{% endif %}" data-padrao-movimento="{% if foco or limpo %}0{% else %}1{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
-    <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>Chamilion</a>
+    <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamilion" class="marca-logo"></a>
     <div class="topo-direita">
       <span class="quem">{{ aluno.usuario.first_name|default:aluno.usuario.username }} · {{ aluno.turma.nome }}</span>
       {% if not sem_turma %}<a class="btn-contorno" href="{% url 'prototipo:progresso' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}"><svg class="ico" aria-hidden="true"><use href="#i-estrela"/></svg>Meu progresso</a>
