@@ -12,7 +12,6 @@ from apps.painel.resumo import placar
 from apps.turmas.models import Aluno
 
 from .context_processors import CHAVE_SESSAO
-from .dicas import dicas_do_perfil
 from .forms import ApoiosForm, QuestionarioForm
 from .models import PREFERENCIAS, Perfil, RespostaQuestionario, SugestaoPerfil
 from .questionario import criar_sugestoes, respostas_legiveis
@@ -122,7 +121,6 @@ def relatorio(request, aluno_pk):
         "diferenca": diferenca,
         "diferenca_absoluta": abs(diferenca) if diferenca is not None else None,
         "usos": _usos_de_leitura(aluno),
-        "dicas": dicas_do_perfil(perfil),
     }
     return render(request, "perfis/relatorio.html", contexto)
 

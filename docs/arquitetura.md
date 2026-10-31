@@ -38,7 +38,7 @@ flowchart LR
 | `ia/` | Motor de IA: blocos do prompt (`blocos/*.md`), montagem do prompt, chamada ao provedor (Gemini ou API compatível com a da OpenAI, em `cliente.py`) e geração com cache |
 | `templates/` | Páginas HTML (Django templates + Tailwind), inclusive as páginas de erro 403, 404 e 500 |
 | `static/` | CSS das preferências e os scripts da barra de apoios, da leitura em voz alta e da navegação da aula (`aula.js`) |
-| `tests/` | Testes automatizados (131), que também rodam no GitHub a cada envio (`.github/workflows/testes.yml`) |
+| `tests/` | Testes automatizados (120), que também rodam no GitHub a cada envio (`.github/workflows/testes.yml`) |
 
 ## Modelo de dados
 
@@ -151,7 +151,7 @@ Sem chave de IA configurada, a tela da aula avisa e o botão "Gerar com IA" fica
 
 ## Testes
 
-`python manage.py test` roda 131 testes, em `tests/`:
+`python manage.py test` roda 120 testes, em `tests/`:
 
 | Arquivo | O que confere |
 |---|---|
@@ -164,6 +164,5 @@ Sem chave de IA configurada, a tela da aula avisa e o botão "Gerar com IA" fica
 | `test_pdf.py` | Nova aula a partir de PDF (texto, arquivo inválido, PDF sem texto, permissões) |
 | `test_relatorio_e_acertos.py` | Relatório da família, página do aluno e sugestão pelos acertos |
 | `test_paginas_de_erro.py` | Páginas 403, 404 e 500 em português |
-| `test_design_neuro.py` | Contraste das paletas (≥ 4,5:1), tema por apoio, certo/errado escrito, aulas recolhidas com foco, dicas para a família |
 
 Nos testes, a chamada à IA é simulada: não precisam de chave nem de internet.

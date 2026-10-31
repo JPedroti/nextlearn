@@ -48,9 +48,6 @@ projeto (prompts 01–14 do João, em `docs/historico_prompts/joao.md`); as outr
 | **Com o apoio de foco, o texto aparece um passo por vez** | É o "um de cada vez" do apoio de foco: o bloco `foco.md` pede passos numerados e a tela mostra um de cada vez, com "Passo X de N". Sem JavaScript, aparece tudo |
 | **Questões uma por vez, com barra de progresso, e "modo concentração" em tela cheia** (Cauã) | Menos coisas competindo pela atenção, para qualquer aluno. Se faltar responder alguma, a tela leva até ela; o servidor confere de novo |
 | **Sugestão pelos acertos com uma regra só**: com 6 ou mais questões respondidas e menos da metade de acertos, sugerir a linguagem simples | Fácil de explicar e de conferir. Regras que tentavam medir "atenção" pela queda de acertos foram retiradas: misturavam aulas e não mediam o que diziam |
-| **Paleta e regras de tela por apoio (skill design-neuro do Thiago)** | O tema da tela segue o apoio mais restritivo do aluno (foco > textual > concreto; modo limpo por cima). O contraste de todos os pares de texto é testado (≥ 4,5:1, WCAG). "Letras espaçadas" no lugar de "Fonte para dislexia": a evidência é para o espaçamento (Zorzi et al., 2012) |
-| **Protótipos e gamificação fora da `main`** (decisão do João, 31/10, prompt 43) | O app de protótipo trazia um aluno fictício com respostas inventadas e rótulo clínico (proibido pelo `CLAUDE.md`) e gamificação, que estava fora da v1.0 |
-| **A IA não recebe métricas das turmas** (decisão do João, prompt 43) | A IA recebe só os apoios e a aula. Os acertos e as avaliações do professor ficam no app |
 | **Relatório da família e página do aluno para o professor só com números reais** | A comparação original × adaptada vem com o aviso de que as questões podem ser de aulas diferentes; nada de "as adaptações estão funcionando" com poucos dados |
 
 ## Pendente

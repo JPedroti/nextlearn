@@ -17,10 +17,7 @@
 {% if passos|length > 1 %}
   {# Apoio de foco: o texto aparece um passo por vez (sem JavaScript, aparece inteiro). #}
   <section class="cartao mb-6" data-paginas="Passo" aria-label="Texto da aula, em passos">
-    <p class="text-sm font-medium mb-2" style="color: var(--texto-suave);" data-contador aria-live="polite" hidden></p>
-    <div class="h-2 rounded-full mb-4" style="background: var(--destaque-suave);" aria-hidden="true" data-progresso-passos hidden>
-      <div class="h-2 rounded-full" style="background: var(--destaque); width: 0%;" data-barra-passos></div>
-    </div>
+    <p class="text-sm font-medium text-slate-600 mb-3" data-contador aria-live="polite" hidden></p>
     <div id="texto-aula" class="text-lg leading-relaxed">
       {% for passo in passos %}
         <div class="space-y-4 mb-6" data-pagina>{{ passo|linebreaks }}</div>
@@ -47,9 +44,6 @@
     {% for item in itens %}
       <div class="cartao mb-4" data-pagina>
         <p id="questao-{{ forloop.counter }}-enunciado" class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</p>
-        <p class="font-medium mb-2" style="color: var(--texto);">
-          {% if item.resposta.correta %}✓ Certo!{% else %}Ainda não. A resposta certa é a {{ item.questao.indice_correto|add:65|stringformat:"c" }}.{% endif %}
-        </p>
         <ul id="questao-{{ forloop.counter }}-alternativas" class="space-y-1">
           {% for alternativa in item.questao.alternativas %}
             {% with escolhida=item.resposta.indice_escolhido correta=item.questao.indice_correto %}
@@ -78,8 +72,8 @@
         <span data-contador aria-live="polite"></span>
         <span data-respondidas></span>
       </div>
-      <div class="h-2 rounded-full" style="background: var(--destaque-suave);" aria-hidden="true">
-        <div class="h-2 rounded-full" data-barra style="background: var(--destaque); width: 0%"></div>
+      <div class="h-2 bg-slate-200 rounded-full" aria-hidden="true">
+        <div class="h-2 bg-indigo-600 rounded-full" data-barra style="width: 0%"></div>
       </div>
     </div>
 

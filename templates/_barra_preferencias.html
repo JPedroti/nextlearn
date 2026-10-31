@@ -1,6 +1,6 @@
 {# Barra de apoios de leitura, só para alunos. Qualquer aluno pode ligar e desligar. #}
 {# A cor de ligado/desligado vem do CSS de .pref-botao[aria-pressed], que o script troca sem recarregar a página. #}
-<nav class="border-b" style="background: var(--color-primary-light); border-color: var(--color-border);" aria-label="Apoios de leitura">
+<nav class="border-b" style="background: var(--color-primary-light); border-color: #c7d2fe;" aria-label="Apoios de leitura">
   <div class="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-1.5">
     <span class="text-xs font-medium mr-2" style="color: var(--color-primary);">Apoios de leitura</span>
     {% for item in barra_preferencias %}
@@ -10,7 +10,10 @@
         <input type="hidden" name="valor" value="{% if item.ligado %}0{% else %}1{% endif %}">
         <input type="hidden" name="aula" value="{{ aula.pk|default:'' }}">
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="pref-botao" aria-pressed="{% if item.ligado %}true{% else %}false{% endif %}">{{ item.rotulo }}</button>
+        <button type="submit" class="pref-botao gap-1.5" aria-pressed="{% if item.ligado %}true{% else %}false{% endif %}">
+          <span aria-hidden="true">{% if item.campo == 'fonte_dislexia' %}🔤{% elif item.campo == 'leitura_voz' %}🔊{% elif item.campo == 'modo_limpo' %}☀️{% endif %}</span>
+          {{ item.rotulo }}
+        </button>
       </form>
     {% endfor %}
   </div>

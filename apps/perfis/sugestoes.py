@@ -5,7 +5,7 @@ from apps.aulas.models import EventoUso
 
 from .models import Perfil, SugestaoPerfil
 
-# Quantas vezes o aluno precisa ligar o mesmo apoio para virar sugestão (valor de produto, a calibrar).
+# Quantas vezes o aluno precisa ligar o mesmo apoio para virar sugestão.
 LIMITE_DE_USOS = 3
 
 

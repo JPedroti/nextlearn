@@ -91,7 +91,7 @@ Para gerar versões com IA no seu computador, coloque a chave em `GEMINI_API_KEY
 python manage.py test
 ```
 
-São 131 testes, em `tests/`. A chamada à IA é simulada, então não precisam de chave nem de internet.
+São 120 testes, em `tests/`. A chamada à IA é simulada, então não precisam de chave nem de internet.
 No GitHub, eles rodam sozinhos a cada envio para a `main` ([.github/workflows/testes.yml](.github/workflows/testes.yml)).
 
 ## Como funciona
@@ -118,8 +118,8 @@ No GitHub, eles rodam sozinhos a cada envio para a `main` ([.github/workflows/te
    aprovada). Com o apoio de foco, o texto aparece **um passo por vez**. As questões vêm uma por vez, com barra de
    progresso, e o **modo concentração** abre a aula em tela cheia. A correção usa sempre o gabarito do professor:
    a IA nunca mexe em alternativas nem na resposta certa.
-7. A barra **Apoios de leitura** (sem IA) vale para qualquer aluno: **Letras espaçadas** (mais espaço entre letras,
-   palavras e linhas, na fonte OpenDyslexic), **Leitura em voz alta** (voz do próprio navegador) e **Modo limpo**. O professor escolhe o
+7. A barra **Apoios de leitura** (sem IA) vale para qualquer aluno: **Fonte para dislexia** (OpenDyslexic, com mais
+   espaço entre as letras), **Leitura em voz alta** (voz do próprio navegador) e **Modo limpo**. O professor escolhe o
    que já vem ligado; o aluno liga e desliga quando quiser, e cada vez que ele liga um apoio o sistema registra o uso.
 8. O professor acompanha tudo, calculado na hora a partir do uso real:
    - **Painel da turma** (botão **Ver painel**): acertos por aluno e por questão, comparação entre a aula original e as versões adaptadas,

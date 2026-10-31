@@ -9,8 +9,8 @@ from apps.aulas.models import Resposta
 
 from .models import Perfil, SugestaoPerfil
 
-MINIMO_DE_RESPOSTAS = 6  # valor de produto, a calibrar com o uso real
-LIMITE_DE_ACERTOS = 50  # em %; valor de produto, a calibrar
+MINIMO_DE_RESPOSTAS = 6
+LIMITE_DE_ACERTOS = 50  # em %
 
 
 def criar_sugestoes_por_padrao(aluno):

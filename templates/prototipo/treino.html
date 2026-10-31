@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ aula.titulo|default:"Aula" }} · NextLearn</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --fundo: #F7F8FA; --superficie: #FFFFFF; --texto: #1F2933;
+      --texto-suave: #52606D; --destaque: #2B59C3; --destaque-suave: #E6EDFB; --borda: #E1E5EA;
+    }
+    body { background: var(--fundo); color: var(--texto); font-family: "Atkinson Hyperlegible", system-ui, sans-serif; padding: 2rem 1rem; }
+    button, a { min-height: 44px; min-width: 44px; }
+    :focus-visible { outline: 3px solid var(--destaque); outline-offset: 2px; }
+    .container { max-width: 40rem; margin: 0 auto; }
+    .questao { background: var(--superficie); border: 1px solid var(--borda); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1rem; }
+    .questao h3 { font-weight: 600; margin-bottom: 1rem; }
+    .alternativa { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: 0.5rem; cursor: pointer; transition: background .15s; }
+    .alternativa:hover { background: var(--destaque-suave); }
+    .alternativa input { width: 1.25rem; height: 1.25rem; }
+    .progresso { height: 0.5rem; background: var(--borda); border-radius: 1rem; margin-bottom: 1.5rem; }
+    .progresso-bar { height: 100%; background: var(--destaque); border-radius: 1rem; transition: width .3s; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.5rem; background: var(--destaque); color: #fff; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all .15s; }
+    .btn:hover { opacity: 0.9; }
+    .btn:active { transform: scale(0.97); }
+    .btn-sec { background: var(--superficie); color: var(--texto); border: 1px solid var(--borda); }
+    .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="progresso"><div class="progresso-bar" style="width: 0%" id="barra"></div></div>
+    <p style="color: var(--texto-suave); font-size: 0.875rem; margin-bottom: 1rem;">
+      Questão <span id="num">1</span> de <span id="total">5</span>
+      · <span id="respondidas">0</span> respondidas
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      <div id="questoes">
+        {% for item in itens %}
+        <div class="questao" data-questao="{{ forloop.counter }}" {% if not forloop.first %}hidden{% endif %}>
+          <h3>{{ forloop.counter }}. {{ item.enunciado|default:item.questao.enunciado }}</h3>
+          {% for alternativa in item.alternativas %}
+            <label class="alternativa">
+              <input type="radio" name="q{{ forloop.parentloop.counter }}" value="{{ forloop.counter0 }}">
+              <span>{{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        {% empty %}
+        <p style="color: var(--texto-suave);">Nenhuma questão disponível. Crie uma aula primeiro.</p>
+        {% endfor %}
+      </div>
+      <div class="nav">
+        <button type="button" class="btn btn-sec" id="btn-voltar" disabled>← Voltar</button>
+        <button type="button" class="btn" id="btn-proximo">Próximo →</button>
+      </div>
+      <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;" id="btn-enviar" disabled>Enviar respostas</button>
+    </form>
+  </div>
+
+  <script>
+    var total = document.querySelectorAll(".questao").length;
+    var atual = 1;
+    document.getElementById("total").textContent = total;
+
+    function atualizar() {
+      document.querySelectorAll(".questao").forEach(function(el) { el.hidden = el.dataset.questao != atual; });
+      document.getElementById("num").textContent = atual;
+      document.getElementById("btn-voltar").disabled = atual === 1;
+      document.getElementById("btn-proximo").textContent = atual === total ? "Finalizar ✓" : "Próximo →";
+      var resp = document.querySelectorAll("input[type=radio]:checked").length;
+      document.getElementById("respondidas").textContent = resp;
+      document.getElementById("barra").style.width = (resp / total * 100) + "%";
+      document.getElementById("btn-enviar").disabled = resp < total;
+    }
+
+    document.getElementById("btn-voltar").addEventListener("click", function() { if (atual > 1) { atual--; atualizar(); } });
+    document.getElementById("btn-proximo").addEventListener("click", function() { if (atual < total) { atual++; atualizar(); } });
+    document.querySelectorAll("input[type=radio]").forEach(function(r) { r.addEventListener("change", atualizar); });
+    atualizar();
+  </script>
+</body>
+</html>

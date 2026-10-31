@@ -52,9 +52,7 @@ class Perfil(models.Model):
 
     # Preferências de interface (sem IA): já vêm ligadas para o aluno, que também pode ligar e desligar sozinho
     fonte_dislexia = models.BooleanField(
-        "Letras espaçadas",
-        default=False,
-        help_text="Mais espaço entre letras, palavras e linhas, na fonte OpenDyslexic.",
+        "Fonte para dislexia", default=False, help_text="Texto na fonte OpenDyslexic, com mais espaço entre letras."
     )
     leitura_voz = models.BooleanField(
         "Leitura em voz alta", default=False, help_text="Botões para ouvir o texto da aula e as questões."
@@ -126,7 +124,7 @@ class SugestaoPerfil(models.Model):
         ("foco", "Atenção e foco"),
         ("textual", "Acessibilidade textual"),
         ("concreto", "Interativo e concreto"),
-        ("fonte_dislexia", "Letras espaçadas"),
+        ("fonte_dislexia", "Fonte para dislexia"),
         ("leitura_voz", "Leitura em voz alta"),
         ("modo_limpo", "Modo limpo"),
     ]

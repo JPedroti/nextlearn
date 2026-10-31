@@ -58,16 +58,6 @@ class OQueVaiParaAIATests(PrivacidadeBase):
             gerar_versao(self.aula, 4)
         self.assertEqual(gerar.call_count, 1)
 
-    def test_respostas_das_turmas_nao_mudam_o_prompt(self):
-        from apps.aulas.models import Resposta
-        from ia.prompt_builder import montar_system_prompt
-
-        antes = montar_system_prompt(True, False, False)
-        Resposta.objects.create(
-            aluno=self.aluno, questao=self.aula.questoes.get(), indice_escolhido=1, correta=False, versao_mascara=4
-        )
-        self.assertEqual(montar_system_prompt(True, False, False), antes)
-
     def test_gerar_de_novo_sem_forcar_nao_tira_a_aprovacao(self):
         VersaoAdaptada.objects.create(aula=self.aula, mascara=4, conteudo="Aprovada", enunciados=["E"], aprovada=True)
         with mock.patch("ia.cliente.gerar") as gerar:

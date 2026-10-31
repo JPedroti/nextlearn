@@ -623,3 +623,17 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** respondeu que não: todo o trabalho desta conversa foi feito e publicado na `main`, e não achou na conversa um pedido para trabalhar na branch do Thiago. Listou o que foi para a `main` desde a skill do Thiago e explicou as opções (manter na `main`, levar para a branch do Thiago ou desfazer na `main` com commits de reversão, sem reescrever histórico).
 
 ---
+
+## Prompt 51 — 31/10/2026, 11:20 (BRT) — autor: João — ferramenta: Claude Code
+
+> voce consegue voltar do jeito que tava e trabalhar na branch do thiago?
+
+**Perguntas da IA e respostas do João (por botões):**
+
+> Voltar a `main` para qual ponto? R: Antes de tudo o que a IA fez a partir de 10h57 (inclusive a remoção do protótipo; o aviso de risco de cartão vermelho foi dado).
+> Em qual branch do Thiago trabalhar? R: `thiago/prototipo-neuro`.
+> O que levar para a branch do Thiago? R: Camaleões e logos.
+
+**Resumo da resposta da IA:** _(preencher ao final)_
+
+---

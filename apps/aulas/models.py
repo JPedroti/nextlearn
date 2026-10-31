@@ -83,7 +83,7 @@ class EventoUso(models.Model):
     """Registro de quando o aluno liga um apoio de interface. Alimenta o painel e as sugestões de perfil."""
 
     class Tipo(models.TextChoices):
-        ATIVOU_FONTE_DISLEXIA = "ativou_fonte_dislexia", "Ligou as letras espaçadas"
+        ATIVOU_FONTE_DISLEXIA = "ativou_fonte_dislexia", "Ligou a fonte para dislexia"
         ATIVOU_LEITURA_VOZ = "ativou_leitura_voz", "Ligou a leitura em voz alta"
         ATIVOU_MODO_LIMPO = "ativou_modo_limpo", "Ligou o modo limpo"
 

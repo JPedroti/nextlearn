@@ -1,9 +1,0 @@
-{# Uma aula na lista do aluno, com o estado escrito (não só a cor). #}
-<a href="{% url 'aulas:ver' aula.pk %}" class="cartao flex items-center justify-between gap-3" style="text-decoration: none; color: var(--texto);">
-  <span class="text-lg font-medium">{{ aula.titulo }}</span>
-  {% if aula.respondida %}
-    <span class="etiqueta bg-green-100 text-green-900">Respondida</span>
-  {% else %}
-    <span class="etiqueta" style="background: var(--destaque-suave); color: var(--destaque);">Nova</span>
-  {% endif %}
-</a>

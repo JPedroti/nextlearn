@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block titulo %}Entrar · NextLearn{% endblock %}
 
@@ -8,8 +7,7 @@
   <div class="w-full max-w-sm">
     <!-- Hero: o que é NextLearn -->
     <div class="text-center mb-10">
-      <img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="mx-auto mb-3 h-20 w-auto">
-      <h1 class="mb-3"><img src="{% static 'img/logo_nextlearn.png' %}" alt="NextLearn" class="mx-auto h-12 w-auto"></h1>
+      <h1 class="text-3xl font-bold tracking-tight mb-3" style="color: var(--color-text);">NextLearn</h1>
       <p class="text-lg leading-relaxed" style="color: var(--color-text-secondary); max-width: 20rem; margin: 0 auto;">
         A mesma aula, no jeito de cada aluno aprender.
       </p>

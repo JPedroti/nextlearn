@@ -62,7 +62,7 @@ PERGUNTAS = [
 OPCOES = [(0, "Quase nunca"), (1, "Às vezes"), (2, "Com frequência")]
 NOME_OPCAO = dict(OPCOES)
 
-# Soma das 3 respostas de um apoio a partir da qual ele é sugerido ao professor (valor de produto, a calibrar).
+# Soma das 3 respostas de um apoio a partir da qual ele é sugerido ao professor.
 # Com 3 perguntas por apoio (0–2 cada), a soma máxima é 6.
 # Sugerir com soma >= 3: "com frequência" em 1 pergunta + "às vezes" em outra,
 # ou "às vezes" nas 3, ou "com frequência" em 2.
