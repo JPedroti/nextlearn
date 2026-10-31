@@ -3,64 +3,98 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Meu progresso · NextLearn</title>
+  <title>Progresso de {{ aluno.usuario.first_name }} · NextLearn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'prototipo/aluno_painel.css' %}">
+  <link rel="stylesheet" href="{% static 'prototipo/progresso.css' %}">
 </head>
-<body data-perfil-dev="{{ perfil_dev }}" class="tema-{{ tema }}{% if foco %} apoio-foco{% endif %}{% if textual %} apoio-textual{% endif %}{% if concreto %} apoio-concreto{% endif %}{% if limpo %} modo-limpo{% endif %}{% if letras %} letras-espacadas{% endif %}">
+<body data-perfil-dev="{{ perfil_dev }}" data-modo="{{ modo }}" class="pg-progresso modo-{{ modo }} tema-{{ tema }}{% if foco %} apoio-foco{% endif %}{% if limpo %} modo-limpo{% endif %}{% if letras %} letras-espacadas{% endif %}">
   {% include "prototipo/_icones.html" %}
   <header class="topo">
     <a href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}" class="marca"><span class="marca-bola" aria-hidden="true"></span>NextLearn</a>
-    <div class="topo-direita">
-      <a class="btn-contorno" href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}">Minha trilha</a>
-    </div>
+    <nav class="topo-direita" aria-label="Navegação">
+      <a class="btn-contorno" href="{% url 'prototipo:painel_aluno' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}">Voltar à trilha</a>
+      <button type="button" class="btn-contorno" onclick="window.print()">Imprimir / PDF</button>
+    </nav>
   </header>
-  <main class="pagina prog-pagina">
-    <section class="cartao prog-topo">
+
+  <main class="pg">
+    <section class="pg-hero">
       <div>
-        <p class="rotulo">Meu progresso</p>
-        <h1>{{ aluno.usuario.first_name }}, olha o quanto você já andou</h1>
-        <p class="suave">{{ n_sessoes }} aulas feitas · {{ n_respostas }} respostas guardadas · comparado só com você mesmo</p>
+        <p class="pg-sobre">Relatório de progresso · {{ periodo }}</p>
+        <h1>{{ aluno.usuario.first_name }}</h1>
+        <p class="pg-sub">{{ aluno.turma.nome }} · {{ n_sessoes }} aulas · {{ n_respostas }} respostas registradas · comparado só com ele mesmo</p>
       </div>
-      <div class="estado"><span class="rotulo">Situação</span><strong>{{ estado }}</strong>{% if dias is not None %}<span class="mini">última aula há {{ dias }} dia{{ dias|pluralize }}</span>{% endif %}</div>
+      <div class="pg-estado estado-{{ sinais.0.cls }}"><span class="pg-ponto" aria-hidden="true"></span>{{ sinais.0.txt }}</div>
     </section>
 
-    <section class="prog-grade">
-      {% for c in cartoes %}
-        <article class="cartao prog-cartao">
-          <header><h2><span class="marcador m-{% if c.tema == 'tempo' %}tempo{% elif c.tema == 'foco' %}treino{% else %}notas{% endif %}" aria-hidden="true"></span>{{ c.titulo }}</h2>
-            <p class="prog-valor">{{ c.valor }} <span class="mini">{{ c.unid }}</span></p></header>
-          {{ c.graf|safe }}
-          <details class="porque"><summary>Por que medimos isso?</summary><p>{{ c.porque }}</p><p class="mini">Fonte: {{ c.fonte }}</p></details>
+    <section class="pg-kpis" aria-label="Indicadores principais">
+      {% for k in kpis %}
+        <article class="kpi kpi-{{ k.cor }}">
+          <p class="kpi-rot">{{ k.rot }}</p>
+          <p class="kpi-val">{{ k.val }}</p>
+          <div class="kpi-pe"><span class="kpi-sub">{{ k.sub }}</span>{{ k.spark|safe }}</div>
         </article>
       {% endfor %}
     </section>
 
-    <section class="cartao">
-      <h2><span class="marcador m-tarefas" aria-hidden="true"></span>Ofensiva semanal (meta: 2 aulas por semana)</h2>
-      <ol class="semanas">
-        {% for r, ok, n in metas %}<li class="{% if ok %}ok{% endif %}"><span class="sem-quadro">{% if ok %}✓{% else %}{{ n }}{% endif %}</span><span class="mini">{{ r }}</span></li>{% endfor %}
-      </ol>
-      <p class="mini">✓ = meta cumprida. Semana parada não zera nada: só pausa. Sem punição (ECA Digital; METRICAS_ENSINO camada D).</p>
+    <section class="pg-resumo cartao-pg" aria-labelledby="resumo-titulo">
+      <h2 id="resumo-titulo">Resumo para a família</h2>
+      <ul>{% for r in resumo %}<li>{{ r }}</li>{% endfor %}</ul>
+      <p class="pg-nota">Sem laudo, sem câmera e sem comparação com colegas. Os números saem das respostas do próprio aluno.</p>
     </section>
 
-    <section class="prog-grade">
-      {% for m, g in por_materia %}
-        <article class="cartao prog-cartao"><h2>{{ m }}: nota por aula</h2>{{ g|safe }}</article>
+    <section class="pg-grade">
+      <article class="cartao-pg grande">
+        <header><h2>Evolução do acerto</h2><span class="pg-tag">por semana</span></header>
+        {{ g_acerto|safe }}
+        <details class="porque"><summary>Por que medimos isso?</summary><p>Mostra se o aluno está aprendendo com o formato atual. Comparação só com ele mesmo; a zona de prática ideal é acertar a maioria sem ser fácil demais. (METRICAS_ENSINO, camada C)</p></details>
+      </article>
+      <article class="cartao-pg">
+        <header><h2>Assuntos dominados</h2><span class="pg-tag">acumulado</span></header>
+        {{ g_dominio|safe }}
+        <details class="porque"><summary>Por que medimos isso?</summary><p>É a métrica principal: aprendizagem que fica, não tempo de tela. Conta como dominado quando acerta tudo; é provisório até a revisão de 7 dias confirmar. (METRICAS_ENSINO §3)</p></details>
+      </article>
+      <article class="cartao-pg">
+        <header><h2>Tempo de estudo</h2><span class="pg-tag">minutos por semana</span></header>
+        {{ g_tempo|safe }}
+        <details class="porque"><summary>Por que medimos isso?</summary><p>Hábito, sem premiar tempo de uso. O limite diário é combinado com a família (ECA Digital). (METRICAS_ENSINO, camadas D e E)</p></details>
+      </article>
+      <article class="cartao-pg">
+        <header><h2>Dias de estudo</h2><span class="pg-tag">últimas 10 semanas</span></header>
+        <div class="calor" role="img" aria-label="Mapa de dias com estudo">
+          <div class="calor-cab"><span></span>{% for d in dias_semana %}<span>{{ d }}</span>{% endfor %}</div>
+          {% for s in calor %}<div class="calor-linha"><span class="calor-rot">{{ s.rot }}</span>{% for d in s.dias %}<span class="calor-dia n{{ d.nivel }}{% if d.futuro %} futuro{% endif %}" title="{{ d.data }}: {{ d.min }} min"></span>{% endfor %}</div>{% endfor %}
+          <div class="calor-legenda"><span>menos</span><i class="calor-dia n0"></i><i class="calor-dia n1"></i><i class="calor-dia n2"></i><i class="calor-dia n3"></i><span>mais</span></div>
+        </div>
+      </article>
+      <article class="cartao-pg">
+        <header><h2>Meta semanal</h2><span class="pg-tag">2 aulas (combinada)</span></header>
+        <ol class="semanas">{% for r, ok, n in metas %}<li class="{% if ok %}ok{% endif %}"><span class="sem-quadro">{% if ok %}✓{% else %}{{ n }}{% endif %}</span><span class="mini">{{ r }}</span></li>{% endfor %}</ol>
+        <p class="pg-nota">✓ meta cumprida. Semana parada só pausa, não zera (sem punição).</p>
+      </article>
+      <article class="cartao-pg">
+        <header><h2>Acerto dentro da aula</h2><span class="pg-tag">indicativo</span></header>
+        {{ g_pos|safe }}
+        <details class="porque"><summary>Por que medimos isso?</summary><p>Para quem tem apoio de foco: se o acerto cai no fim, a aula pode ficar mais curta ou ganhar pausa. Atenção: as questões finais podem ser mais difíceis; olhe junto com o professor. (PERFIS_E_METRICAS, P3)</p></details>
+      </article>
+    </section>
+
+    <h2 class="pg-secao">Por matéria</h2>
+    <section class="pg-grade tres">
+      {% for m, g, med in por_materia %}
+        <article class="cartao-pg"><header><h2>{{ m }}</h2><span class="pg-tag">média recente {{ med }}</span></header>{{ g|safe }}</article>
       {% endfor %}
     </section>
 
-    <section class="cartao">
-      <h2>Sinais para o professor ajustar o apoio</h2>
-      <ul class="sinais">
-        <li><strong>Variação do tempo entre aulas:</strong> {% if cv is not None %}{{ cv }}%{% else %}poucos dados{% endif %}. Se sobe muito, vale encurtar a aula ou pôr pausa. Não é diagnóstico (Kofler et al., 2013).</li>
-        <li><strong>3 erros seguidos na mesma matéria:</strong> aconteceu {{ alertas }} vez{{ alertas|pluralize:"es" }}. Sinal para mudar a estratégia (exemplo resolvido, pré-requisito).</li>
-        <li><strong>Retenção (revisão de 7 dias):</strong> aparece quando houver revisões registradas (próxima etapa: EventoUso).</li>
-      </ul>
-      <p class="mini">Os dados ficam guardados por aluno (cada resposta com acerto, tempo e data). Sem laudo, sem câmera, sem comparação com colegas.</p>
+    <section class="cartao-pg" aria-labelledby="sinais-titulo">
+      <h2 id="sinais-titulo">Sinais para o professor ajustar o apoio</h2>
+      <ul class="pg-sinais">{% for x in sinais %}<li class="sinal-{{ x.cls }}"><span class="pg-ponto" aria-hidden="true"></span><div><strong>{{ x.nome }}</strong><p>{{ x.txt }}</p></div></li>{% endfor %}</ul>
+      <p class="pg-nota">Sinais são pistas para conversar, nunca diagnóstico. Toda mudança de apoio é decisão do professor.</p>
     </section>
   </main>
+  <script src="{% static 'prototipo/brilho.js' %}"></script>
   <script src="{% static 'prototipo/ao_vivo.js' %}"></script>
 </body>
 </html>

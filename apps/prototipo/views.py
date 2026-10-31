@@ -241,8 +241,9 @@ def _dados_aluno(aluno):
     return {
         "feitas": list(reversed(feitas)), "pendentes": pendentes, "proxima": pendentes[0] if pendentes else None,
         "media_geral": media(feitas), "media_recente": m_rec, "media_antiga": m_ant,
-        "delta": round(m_rec - m_ant, 1) if m_rec is not None and m_ant is not None else None,
-        "delta_abs": abs(round(m_rec - m_ant, 1)) if m_rec is not None and m_ant is not None else None,
+        # Revisão dos especialistas: só comparar períodos com 3+ aulas cada (com menos, a variação é ruído)
+        "delta": round(m_rec - m_ant, 1) if len(recentes) >= 3 and len(antigas) >= 3 else None,
+        "delta_abs": abs(round(m_rec - m_ant, 1)) if len(recentes) >= 3 and len(antigas) >= 3 else None,
         "por_materia": por_materia, "evolucao": evolucao,
         "ofensiva": ofensiva, "feitas_semana": feitas_semana, "meta_semanal": META_SEMANAL,
         "meta_bolinhas": [n < feitas_semana for n in range(META_SEMANAL)],
@@ -608,13 +609,25 @@ def _fmt(v):
     return str(round(v, 1)).replace(".", ",").removesuffix(",0")
 
 
-def _grafico_linha(valores, rotulos, maximo=None, sufixo="", altura=190, cor="#4F46E5", id_="g", degrau=False):
+def _topo_redondo(v):
+    import math
+
+    if v <= 0:
+        return 1
+    passo = 10 ** math.floor(math.log10(v))
+    for m in (1, 2, 2.5, 5, 10):
+        if v <= m * passo:
+            return m * passo
+    return 10 * passo
+
+
+def _grafico_linha(valores, rotulos, maximo=None, sufixo="", altura=190, cor="#4F46E5", id_="g", degrau=False, largura=560):
     """Linha com área em degradê, grade, eixo e pontos com dica ao passar o mouse (SVG puro)."""
-    W, H, ml, mr, mt, mb = 560, altura, 40, 16, 16, 30
+    W, H, ml, mr, mt, mb = largura, altura, 40, 16, 16, 30
     vals = [v for v in valores if v is not None]
     if not vals:
         return '<p class="vazio">Ainda sem dados suficientes.</p>'
-    top = maximo or (max(vals) * 1.15 or 1)
+    top = maximo or _topo_redondo(max(vals) * 1.1)
     n = len(valores)
     X = lambda i: ml + (W - ml - mr) * (i / max(1, n - 1))  # noqa: E731
     Y = lambda v: mt + (H - mt - mb) * (1 - v / top)         # noqa: E731
@@ -641,9 +654,9 @@ def _grafico_linha(valores, rotulos, maximo=None, sufixo="", altura=190, cor="#4
     return "".join(s) + "</svg>"
 
 
-def _grafico_barras(valores, rotulos, sufixo="", altura=190, cor="#0F9D6E", linha=None, rot_linha=""):
+def _grafico_barras(valores, rotulos, sufixo="", altura=190, cor="#0F9D6E", linha=None, rot_linha="", maximo=None):
     W, H, ml, mr, mt, mb = 560, altura, 40, 16, 16, 30
-    top = max([v for v in valores] + [linha or 0, 1]) * 1.15
+    top = maximo or _topo_redondo(max([v for v in valores] + [linha or 0, 1]) * 1.1)
     n = len(valores)
     larg = (W - ml - mr) / max(1, n)
     Y = lambda v: mt + (H - mt - mb) * (1 - v / top)  # noqa: E731
@@ -811,10 +824,10 @@ def progresso(request):
         "aluno": aluno, "perfil": perfil, "tema": tema, "modo": modo, "foco": a["foco"], "textual": a["textual"], "concreto": a["concreto"],
         "limpo": a["limpo"], "voz": a["voz"], "letras": a["letras"], "perfil_dev": perfil_dev, "dev": settings.DEBUG,
         "kpis": kpis, "resumo": resumo, "sinais": sinais, "calor": calor, "dias_semana": ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"],
-        "g_acerto": _grafico_linha(acerto, rot, maximo=100, sufixo="%", cor="#4F46E5", id_="ga"),
+        "g_acerto": _grafico_linha(acerto, rot, maximo=100, sufixo="%", cor="#4F46E5", id_="ga", largura=1120, altura=240),
         "g_dominio": _grafico_linha(dominadas, rot, cor="#1E7B4A", id_="gd", degrau=True),
         "g_tempo": _grafico_barras(minutos, rot, cor="#10B981", linha=None),
-        "g_pos": _grafico_barras(acerto_pos, [f"{i + 1}ª questão" for i in range(len(acerto_pos))], sufixo="%", cor="#6366F1"),
+        "g_pos": _grafico_barras(acerto_pos, [f"{i + 1}ª questão" for i in range(len(acerto_pos))], sufixo="%", cor="#6366F1", maximo=100),
         "metas": list(zip(rot, metas, n_sessoes)),
         "por_materia": [(m, _grafico_linha(v, [f"aula {i + 1}" for i in range(len(v))], maximo=10, cor="#0EA5E9", id_=f"gm{k}"),
                          _fmt(sum(v[-3:]) / len(v[-3:]))) for k, (m, v) in enumerate(sorted(por_materia.items()))],

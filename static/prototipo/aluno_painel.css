@@ -506,3 +506,29 @@ body.apoio-foco .mapa .no-atual .no-legenda { animation-duration: 2.4s !importan
   .modo-leitura .lado, .modo-desafio .lado, .desafios ul { grid-template-columns: minmax(0, 1fr); }
   .agenda { grid-template-columns: minmax(0, 1fr); } .agenda li + li::before { content: "↓"; left: 50%; top: -18px; }
 }
+
+/* Brilho que segue o mouse (brilho.js) */
+.brilhando { position: relative; isolation: isolate; }
+.brilhando::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 1;
+  background: radial-gradient(180px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 60%);
+  mix-blend-mode: soft-light; }
+.cartao.brilhando::after, .cartao-pg.brilhando::after, .kpi.brilhando::after { background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgba(99, 102, 241, .14), transparent 60%); mix-blend-mode: normal; }
+.brilhando { box-shadow: 0 0 0 2px color-mix(in srgb, var(--destaque) 25%, transparent), 0 10px 26px rgba(0, 0, 0, .08); }
+.modo-agenda .brilhando::after, .modo-limpo .brilhando::after { display: none; }
+
+/* ===== Ajustes da revisão dos especialistas (docs/REVISAO_ESPECIALISTAS.md) ===== */
+/* TEA: nada pisca; a fase atual fica marcada por um anel fixo e um texto */
+body.modo-agenda .mapa .no-atual .no-bt, body.modo-agenda .mapa .no-atual .no-legenda { animation: none !important; }
+body.modo-agenda .mapa .no-atual .no-bt { box-shadow: 0 7px 0 var(--sombra), 0 0 0 10px var(--atual) !important; }
+.voce-aqui { position: absolute; bottom: calc(100% + 6px); padding: 4px 10px; border-radius: 999px; background: #1F2933; color: #FFFFFF; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+/* Nota baixa: coral suave em vez de vermelho forte (menos sensação de fracasso; texto e símbolo continuam) */
+.no-feita .no-bt.g1 { background: #E57A6B !important; --sombra: #B4544A !important; }
+.g1 { --cor: #E57A6B; }
+/* Leitura (dislexia): sem sublinhado, sem caixa-alta, sem letras espremidas */
+.modo-leitura .missao h1 span { text-decoration: none; border-bottom: 3px solid var(--atual); }
+.modo-leitura .rotulo-claro, .modo-leitura .u-num, .modo-leitura .nl-fase, .modo-leitura .rotulo, .modo-leitura .nc-materia,
+.modo-leitura .ag-quando, .modo-leitura .placa-mundo span { text-transform: none; letter-spacing: .02em; }
+/* Visual (discalculia): quantidade primeiro ("2 de 3"), a nota decimal fica pequena */
+.nc-nota-mini { display: block; font-size: .8rem; font-weight: 700; opacity: .8; }
+.nc-visual .nc-nota { font-size: 1.5rem; line-height: 1.1; }
+.no-estrelas i:not(.cheia) { color: rgba(255,255,255,.95); text-shadow: 0 0 2px rgba(0,0,0,.35); }

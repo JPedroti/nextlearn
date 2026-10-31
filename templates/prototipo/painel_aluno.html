@@ -82,11 +82,12 @@
                       <a class="no-bt {{ no.faixa.classe }}" href="{{ no.url }}" aria-label="Fase {{ no.fase }}: {{ no.titulo }}. {{ no.detalhe }}, {{ no.faixa.rotulo }}">
                         <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}check{% endif %}"/></svg>
                       </a>
-                      <span class="no-estrelas" aria-hidden="true">{% for e in no.estrelas %}<i class="cheia">★</i>{% endfor %}{% for e in no.vazias %}<i>★</i>{% endfor %}</span>
+                      <span class="no-estrelas" aria-hidden="true">{% for e in no.estrelas %}<i class="cheia">★</i>{% endfor %}{% for e in no.vazias %}<i>☆</i>{% endfor %}</span>
                     {% elif no.estado == "atual" %}
                       <a class="no-bt" href="{{ no.url }}" aria-label="Fase {{ no.fase }}, de agora: {{ no.titulo }}. Começar">
                         <svg aria-hidden="true"><use href="#i-{% if concreto %}{{ no.icone }}{% else %}estrela{% endif %}"/></svg>
                       </a>
+                      {% if modo == "agenda" %}<span class="voce-aqui">Você está aqui</span>{% endif %}
                       <div class="next-no" aria-live="polite">
                         <p class="fala-next" data-fala-next>{% if foco %}Próxima fase: {{ no.titulo }}.{% else %}Vamos nessa? Eu vou junto!{% endif %}</p>
                         <span class="next-trilha" aria-hidden="true" data-pose="livro">{% include "prototipo/_next.html" %}</span>
@@ -149,7 +150,7 @@
           {% for c in cartoes %}
             <article class="nota-cartao {{ c.faixa.classe }}" data-materia="{{ c.materia }}" aria-label="{{ c.assunto }}, {{ c.materia }}: nota {{ c.nota }}, {{ c.faixa.rotulo }}">
               <p class="nc-materia">{% if concreto %}<svg class="ico" aria-hidden="true"><use href="#i-{% if c.materia == 'Matemática' %}fracao{% elif c.materia == 'Português' %}livro{% else %}gota{% endif %}"/></svg>{% endif %}{{ c.materia }}</p>
-              {% if modo == "visual" or concreto %}<div class="nc-visual">{{ c.pizza|safe }}<p class="nc-nota">{{ c.nota }}</p></div>{% else %}<p class="nc-nota">{{ c.nota }}</p>{% endif %}
+              {% if modo == "visual" or concreto %}<div class="nc-visual">{{ c.pizza|safe }}<p class="nc-nota">{{ c.acertos }} de {{ c.total }}<span class="nc-nota-mini">nota {{ c.nota }}</span></p></div>{% else %}<p class="nc-nota">{{ c.nota }}</p>{% endif %}
               <p class="nc-faixa"><span aria-hidden="true">{{ c.faixa.simbolo }}</span> {{ c.faixa.rotulo }}</p>
               <p class="nc-assunto">{{ c.assunto }}</p>
               <p class="nc-data">{{ c.quando|date:"d/m" }} · {{ c.acertos }} de {{ c.total }} certas</p>
@@ -272,6 +273,7 @@
   <script id="dados-painel" type="application/json">{{ dados_json|safe }}</script>
   {% endif %}
   <script src="{% static 'prototipo/aluno_painel.js' %}"></script>
+<script src="{% static 'prototipo/brilho.js' %}"></script>
 <script src="{% static 'prototipo/ao_vivo.js' %}"></script>
 </body>
 </html>
