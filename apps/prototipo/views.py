@@ -576,7 +576,7 @@ def treino(request, tipo):
         random.shuffle(questoes)
         questoes = questoes[:3]
     itens = [{"enunciado": q.enunciado, "alternativas": q.alternativas, "correta": q.indice_correto,
-              "assunto": _assunto(q.aula.titulo)} for q in questoes]
+              "assunto": _assunto(q.aula.titulo)} for q in questoes if q.tipo == "multipla" and q.alternativas]
     perfil = getattr(aluno, "perfil", None)
     return render(request, "prototipo/treino.html", {
         "titulo": TREINOS[tipo][0], "descricao": TREINOS[tipo][1], "itens_json": json.dumps(itens, ensure_ascii=False),
@@ -1172,48 +1172,81 @@ def dividir_em_fases(texto, max_palavras=110, max_fases=10):
 
 @papel_requerido("professor")
 def prof_material(request):
-    """Professor envia PDF/material → vira um mundo da trilha (até 10 fases, criadas como rascunho para revisar)."""
+    """Professor envia PDF/material → a IA (ou, sem IA, um gerador local) interpreta e cria um MÓDULO de questões:
+    um mundo da trilha com até 10 fases curtas, cada uma com questões (múltipla escolha + flashcard).
+    Tudo entra como rascunho: o professor revisa, corrige e publica (Parecer CNE/CP 15/2026)."""
     from django.contrib import messages
+    from django.db import transaction
     from django.shortcuts import redirect
 
-    from apps.aulas.models import Aula
+    from apps.aulas.models import Aula, Questao
+    from apps.aulas.pdf import ErroPDF, extrair_texto
     from apps.turmas.models import Turma
+    from ia import cliente
 
     from .analise_aula import analisar
+    from .questoes_locais import gerar_rascunho
 
     turmas = list(Turma.objects.filter(professor=request.user))
+    ia_ok = cliente.configurado()
     criadas = []
     if request.method == "POST":
         turma = next((t for t in turmas if str(t.pk) == request.POST.get("turma")), None)
         materia = (request.POST.get("materia") or "Geral").strip()[:40]
         titulo = (request.POST.get("titulo") or "Material").strip()[:80]
-        texto, erro = "", None
-        if request.FILES.get("arquivo"):
-            texto, erro = _texto_do_arquivo(request.FILES["arquivo"])
-        if not texto:
-            texto = request.POST.get("texto", "")
+        texto, erro = request.POST.get("texto", "").strip(), None
+        arquivo = request.FILES.get("arquivo")
+        if arquivo:
+            if arquivo.name.lower().endswith(".pdf"):
+                try:
+                    texto = extrair_texto(arquivo)
+                except ErroPDF as e:
+                    erro = str(e)
+            else:
+                texto = arquivo.read().decode("utf-8", errors="ignore")
         if erro and not request.POST.get("texto"):
             messages.error(request, erro)
         elif not turma or len((texto or "").split()) < 20:
             messages.error(request, "Escolha a turma e envie um material com pelo menos 20 palavras.")
         else:
             fases, sobra = dividir_em_fases(texto)
-            ids = []
+            ids, via_ia, falhas_ia = [], 0, 0
             for n, conteudo in enumerate(fases, 1):
                 roteiro = f"Hoje vamos ver a parte {n} de {len(fases)} sobre {titulo}.\n\n"
-                a = Aula.objects.create(turma=turma, titulo=f"{materia}: {titulo} — parte {n}", conteudo=roteiro + conteudo, publicada=False)
+                questoes = None
+                if ia_ok:
+                    try:
+                        from ia.gerar_questoes import gerar_questoes
+
+                        saida = gerar_questoes(conteudo, f"{titulo} — parte {n}")
+                        questoes = [q.model_dump() for q in saida.questoes][:5]
+                        via_ia += 1
+                    except Exception:
+                        falhas_ia += 1
+                if not questoes:
+                    questoes = gerar_rascunho(conteudo, texto, semente=n)
+                with transaction.atomic():
+                    a = Aula.objects.create(turma=turma, titulo=f"{materia}: {titulo} — parte {n}", conteudo=roteiro + conteudo, publicada=False)
+                    for k, q in enumerate(questoes, 1):
+                        Questao.objects.create(aula=a, ordem=k, tipo=q.get("tipo", "multipla"), enunciado=q["enunciado"][:2000],
+                                               alternativas=q.get("alternativas") or [], indice_correto=q.get("indice_correto"),
+                                               resposta_referencia=q.get("resposta_referencia", ""))
                 ids.append(a.pk)
             request.session["material_criado"] = ids
+            origem = (f"a IA criou as questões de {via_ia} fase(s)" if via_ia else "questões de rascunho geradas no seu computador (IA não configurada)")
+            if falhas_ia:
+                origem += f"; em {falhas_ia} fase(s) a IA não respondeu e usamos o rascunho local"
             if sobra:
                 messages.info(request, f"O material deu mais de 10 fases; {sobra} ficaram de fora. Envie o resto como outro material (vira um novo mundo).")
-            messages.success(request, f"{len(fases)} fases criadas como rascunho. Revise, adicione as questões e publique.")
+            messages.success(request, f"Módulo criado: {len(fases)} fases como rascunho — {origem}. Revise e publique.")
             return redirect("prototipo:prof_material")
     ids = request.session.get("material_criado", [])
     for a in Aula.objects.filter(pk__in=ids, turma__professor=request.user).prefetch_related("questoes").order_by("pk"):
         r = analisar(a, list(a.questoes.all()))
         criadas.append({"aula": a, "indice": r["indice"], "faltam": [c["nome"] for c in r["checagens"] if not c["ok"]][:3],
-                        "palavras": r["palavras"], "minutos": r["minutos"], "n_q": a.questoes.count(), "assunto": _assunto(a.titulo)})
-    return render(request, "prototipo/prof_material.html", {"turmas": turmas, "criadas": criadas})
+                        "palavras": r["palavras"], "minutos": r["minutos"], "n_q": a.questoes.count(), "assunto": _assunto(a.titulo),
+                        "questoes": list(a.questoes.all())[:3]})
+    return render(request, "prototipo/prof_material.html", {"turmas": turmas, "criadas": criadas, "ia_ok": ia_ok})
 
 
 @papel_requerido("professor")

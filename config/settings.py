@@ -93,6 +93,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.perfis.context_processors.preferencias",
             ],
         },
     },
@@ -164,3 +165,9 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
+
+# Provedor compatível com OpenAI (ia/cliente.py): IA_PROVEDOR=openai + IA_API_KEY + IA_BASE_URL (+ IA_MODEL)
+IA_PROVEDOR = os.environ.get("IA_PROVEDOR", "openai" if os.environ.get("IA_API_KEY") and os.environ.get("IA_BASE_URL", os.environ.get("API_BASE_URL", "")) else "gemini")
+IA_API_KEY = os.environ.get("IA_API_KEY", "")
+IA_BASE_URL = os.environ.get("IA_BASE_URL", "") or os.environ.get("API_BASE_URL", "")
+IA_MODEL = os.environ.get("IA_MODEL", "") or os.environ.get("IA_MODELO", "") or "gpt-4o-mini"

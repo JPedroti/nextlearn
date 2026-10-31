@@ -25,9 +25,15 @@ class Questao(models.Model):
 
     aula = models.ForeignKey(Aula, on_delete=models.CASCADE, related_name="questoes")
     ordem = models.PositiveSmallIntegerField()
+    TIPOS = [("multipla", "Múltipla escolha"), ("escrever", "Escrever (resposta livre)"), ("flashcard", "Flashcard")]
     enunciado = models.TextField()
-    alternativas = models.JSONField(help_text="Lista com o texto de cada alternativa, na ordem.")
-    indice_correto = models.PositiveSmallIntegerField(help_text="Posição da alternativa correta (0 = primeira).")
+    tipo = models.CharField(max_length=20, choices=TIPOS, default="multipla",
+                            help_text="Formato da questão. 'multipla' usa alternativas e gabarito; 'escrever' e 'flashcard' usam a resposta de referência.")
+    alternativas = models.JSONField(blank=True, default=list, help_text="Lista com o texto de cada alternativa (só no tipo multipla).")
+    indice_correto = models.PositiveSmallIntegerField(blank=True, null=True,
+                                                      help_text="Posição da alternativa correta (0 = primeira). Só no tipo multipla.")
+    resposta_referencia = models.TextField(blank=True,
+                                           help_text="Para 'escrever': um exemplo de resposta para o aluno conferir. Para 'flashcard': o verso do cartão.")
 
     class Meta:
         ordering = ["ordem"]
@@ -64,6 +70,7 @@ class Resposta(models.Model):
     questao = models.ForeignKey(Questao, on_delete=models.CASCADE, related_name="respostas")
     indice_escolhido = models.PositiveSmallIntegerField()
     correta = models.BooleanField()
+    versao_mascara = models.PositiveSmallIntegerField(default=0, help_text="Máscara da versão que o aluno viu ao responder (0 = aula original).")
     tempo_ms = models.PositiveIntegerField(
         null=True, blank=True, help_text="Tempo entre abrir a aula e enviar as respostas, em milissegundos."
     )
@@ -74,3 +81,32 @@ class Resposta(models.Model):
 
     def __str__(self):
         return f"{self.aluno} — {self.questao}"
+
+
+class EventoUso(models.Model):
+    """Uso de apoio pelo aluno (ex.: ligou a leitura em voz alta). Base das sugestões por uso."""
+
+    TIPOS = [("ativou_fonte_dislexia", "Ligou a fonte para dislexia"), ("ativou_leitura_voz", "Ligou a leitura em voz alta"),
+             ("ativou_modo_limpo", "Ligou o modo limpo")]
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name="eventos")
+    aula = models.ForeignKey(Aula, on_delete=models.SET_NULL, null=True, blank=True, related_name="eventos",
+                             help_text="Aula aberta quando o apoio foi ligado (vazio se foi em outra tela).")
+    tipo = models.CharField(max_length=30, choices=TIPOS)
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]
+
+
+class FeedbackVersao(models.Model):
+    """Nota do professor para uma versão adaptada (retroalimenta a qualidade das gerações)."""
+
+    versao = models.ForeignKey(VersaoAdaptada, on_delete=models.CASCADE, related_name="feedbacks")
+    professor = models.ForeignKey("contas.Usuario", on_delete=models.CASCADE, related_name="feedbacks_dados",
+                                  limit_choices_to={"papel": "professor"})
+    nota = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)], help_text="1 (ruim) a 5 (excelente)")
+    comentario = models.TextField(blank=True, help_text="O que funcionou bem ou mal nesta versão.")
+    criado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-criado_em"]

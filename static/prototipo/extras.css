@@ -67,3 +67,4 @@
 .atividade-casa { background: linear-gradient(135deg, #FFFFFF, #FFF7ED); border: 1px solid #FED7AA; } .atividade-casa ol { padding-left: 20px; }
 .lista-simples { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; } .sub-h { margin: 16px 0 4px; font-size: 1rem; }
 .topo .btn-contorno.ativo { border-color: #4F46E5; color: #4F46E5; }
+.q-prev { display: block; margin-top: 4px; }

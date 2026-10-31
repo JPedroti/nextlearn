@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db import IntegrityError, transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from apps.contas.decorators import papel_requerido
@@ -13,7 +14,7 @@ from ia.gerar_versao import ErroGeracao, gerar_versao
 
 from .forms import AulaForm, QuestaoFormSet, VersaoForm
 from .models import Aula, Resposta, VersaoAdaptada
-from .versoes import versao_para_aluno
+from .versoes import mascara_do_aluno, versao_para_aluno
 
 # ---------------------------------------------------------------------------
 # Professor
@@ -186,7 +187,7 @@ def ver_aula(request, pk):
 
     if request.method == "POST" and not respostas:
         escolhas = {}
-        for questao, _ in questoes:
+        for questao, _ in [(q, e) for q, e in questoes if q.tipo == "multipla"]:
             try:
                 indice = int(request.POST.get(f"questao_{questao.pk}", ""))
             except ValueError:
@@ -207,6 +208,7 @@ def ver_aula(request, pk):
                         indice_escolhido=indice,
                         correta=indice == questao.indice_correto,  # gabarito do professor
                         tempo_ms=tempo_ms,
+                        versao_mascara=mascara_do_aluno(aluno),
                     )
         except IntegrityError:
             pass  # envio duplicado (ex.: dois cliques); as respostas já estão salvas
@@ -221,11 +223,134 @@ def ver_aula(request, pk):
         request.session[chave_tempo] = int(time.time() * 1000)
 
     itens = [{"questao": q, "enunciado": enunciado, "resposta": respostas.get(q.pk)} for q, enunciado in questoes]
+    perfil = Perfil.objects.filter(aluno=aluno).first()
+    passos = [p.strip() for p in conteudo.split("\n\n") if p.strip()] if perfil and perfil.foco else []
     contexto = {
         "aula": aula,
         "conteudo": conteudo,
+        "passos": passos,
         "itens": itens,
+        "itens_multipla": [i for i in itens if i["questao"].tipo == "multipla"],
+        "itens_abertos": [i for i in itens if i["questao"].tipo != "multipla"],
         "respondida": bool(respostas),
         "acertos": sum(1 for r in respostas.values() if r.correta),
     }
     return render(request, "aulas/ver_aula.html", contexto)
+
+
+
+# ---------------------------------------------------------------------------
+# PDF e geração de questões com IA (fluxo do Cauã): PDF/texto → IA sugere → professor revisa → aula rascunho
+# ---------------------------------------------------------------------------
+@papel_requerido("professor")
+def nova_via_pdf(request, turma_pk):
+    """Extrai o texto do PDF e abre o formulário normal de nova aula já preenchido (nada é salvo antes)."""
+    from .pdf import ErroPDF, extrair_texto, sugerir_titulo
+
+    turma = get_object_or_404(Turma, pk=turma_pk, professor=request.user)
+    erro = None
+    if request.method == "POST":
+        arquivo = request.FILES.get("pdf")
+        if not arquivo:
+            erro = "Escolha um arquivo PDF."
+        else:
+            try:
+                texto = extrair_texto(arquivo)
+            except ErroPDF as e:
+                erro = str(e)
+            else:
+                form = AulaForm(initial={"titulo": sugerir_titulo(texto), "conteudo": texto}, instance=Aula(turma=turma))
+                formset = QuestaoFormSet(instance=form.instance)
+                return render(request, "aulas/form_aula.html", {"turma": turma, "form": form, "formset": formset,
+                                                                "acao": reverse("aulas:nova", args=[turma.pk])})
+    return render(request, "aulas/upload_pdf.html", {"turma": turma, "erro": erro}, status=200)
+
+
+CHAVE_GERACAO = "questoes_geradas"
+
+
+@papel_requerido("professor")
+def gerar_questoes_via_pdf(request, turma_pk):
+    from ia import cliente
+    from ia.gerar_questoes import ErroGeracaoQuestoes, gerar_questoes
+
+    from .pdf import ErroPDF, extrair_texto, sugerir_titulo
+
+    turma = get_object_or_404(Turma, pk=turma_pk, professor=request.user)
+    if not cliente.configurado():
+        messages.error(request, "A IA não está configurada neste computador. Crie a aula pelo PDF e escreva as questões.")
+        return redirect("aulas:nova_via_pdf", turma_pk=turma.pk)
+    if request.method == "POST":
+        texto = request.POST.get("texto", "").strip()
+        try:
+            if request.FILES.get("pdf"):
+                texto = extrair_texto(request.FILES["pdf"])
+            saida = gerar_questoes(texto, sugerir_titulo(texto))
+        except (ErroPDF, ErroGeracaoQuestoes) as e:
+            messages.error(request, str(e))
+            return render(request, "aulas/gerar_questoes.html", {"turma": turma})
+        request.session[CHAVE_GERACAO] = {"turma": turma.pk, "titulo": saida.titulo, "conteudo": texto,
+                                          "questoes": [q.model_dump() for q in saida.questoes]}
+        return redirect("aulas:revisar_questoes", turma_pk=turma.pk)
+    return render(request, "aulas/gerar_questoes.html", {"turma": turma})
+
+
+def _form_revisao(questoes, dados=None):
+    """Formulário dinâmico para revisar as questões sugeridas (tipo, enunciado, alternativas a–d, correta, resposta)."""
+    from django import forms
+
+    campos = {}
+    for i, q in enumerate(questoes):
+        campos[f"{i}_tipo"] = forms.ChoiceField(choices=Questao_TIPOS(), initial=q.get("tipo", "multipla"), label="Tipo")
+        campos[f"{i}_enunciado"] = forms.CharField(widget=forms.Textarea(attrs={"rows": 2}), initial=q.get("enunciado", ""), label="Enunciado")
+        alts = list(q.get("alternativas") or []) + ["", "", "", ""]
+        for k, letra in enumerate("abcd"):
+            campos[f"{i}_alt_{letra}"] = forms.CharField(required=False, initial=alts[k], label=letra.upper())
+        idx = q.get("indice_correto")
+        campos[f"{i}_correta"] = forms.ChoiceField(choices=[(x, x.upper()) for x in "abcd"], widget=forms.RadioSelect, required=False,
+                                                   initial="abcd"[idx] if isinstance(idx, int) and 0 <= idx < 4 else "a", label="Correta")
+        campos[f"{i}_resposta"] = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": 2}), initial=q.get("resposta_referencia", ""), label="Resposta de referência")
+    Classe = type("RevisaoQuestoesForm", (forms.Form,), campos)
+    form = Classe(dados) if dados is not None else Classe()
+    form.questoes_campos = [{"tipo": form[f"{i}_tipo"], "enunciado": form[f"{i}_enunciado"],
+                             "alternativas": [form[f"{i}_alt_{x}"] for x in "abcd"], "correta": form[f"{i}_correta"],
+                             "resposta": form[f"{i}_resposta"]} for i in range(len(questoes))]
+    return form
+
+
+def Questao_TIPOS():
+    from .models import Questao
+
+    return Questao.TIPOS
+
+
+@papel_requerido("professor")
+def revisar_questoes(request, turma_pk):
+    from .models import Questao
+
+    turma = get_object_or_404(Turma, pk=turma_pk, professor=request.user)
+    gerado = request.session.get(CHAVE_GERACAO)
+    if not gerado or gerado.get("turma") != turma.pk:
+        return redirect("aulas:gerar_questoes_via_pdf", turma_pk=turma.pk)
+    questoes = gerado["questoes"]
+    form = _form_revisao(questoes, request.POST if request.method == "POST" else None)
+    titulo = request.POST.get("titulo", gerado["titulo"]) if request.method == "POST" else gerado["titulo"]
+    conteudo = request.POST.get("conteudo", gerado["conteudo"]) if request.method == "POST" else gerado["conteudo"]
+    if request.method == "POST" and form.is_valid() and titulo.strip() and conteudo.strip():
+        d = form.cleaned_data
+        with transaction.atomic():
+            aula = Aula.objects.create(turma=turma, titulo=titulo.strip()[:200], conteudo=conteudo.strip(), publicada=False)
+            for i in range(len(questoes)):
+                tipo = d[f"{i}_tipo"]
+                alts = [d[f"{i}_alt_{x}"].strip() for x in "abcd" if d[f"{i}_alt_{x}"].strip()]
+                correta = "abcd".index(d.get(f"{i}_correta") or "a")
+                Questao.objects.create(
+                    aula=aula, ordem=i + 1, tipo=tipo, enunciado=d[f"{i}_enunciado"].strip(),
+                    alternativas=alts if tipo == "multipla" else [],
+                    indice_correto=min(correta, len(alts) - 1) if tipo == "multipla" and alts else None,
+                    resposta_referencia="" if tipo == "multipla" else d[f"{i}_resposta"].strip(),
+                )
+        request.session.pop(CHAVE_GERACAO, None)
+        messages.success(request, "Aula criada como rascunho com as questões aprovadas.")
+        return redirect("aulas:detalhe_professor", pk=aula.pk)
+    return render(request, "aulas/revisar_questoes.html", {"turma": turma, "form": form, "titulo": titulo, "conteudo": conteudo})

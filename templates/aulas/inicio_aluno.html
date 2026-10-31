@@ -15,9 +15,9 @@
           <a href="{% url 'aulas:ver' aula.pk %}" class="cartao flex items-center justify-between hover:ring-2 hover:ring-indigo-200">
             <span class="text-lg font-medium">{{ aula.titulo }}</span>
             {% if aula.respondida %}
-              <span class="text-xs rounded-full bg-green-100 text-green-800 px-2 py-1">Respondida</span>
+              <span class="etiqueta bg-green-100 text-green-800">Respondida</span>
             {% else %}
-              <span class="text-xs rounded-full bg-indigo-100 text-indigo-800 px-2 py-1">Nova</span>
+              <span class="etiqueta bg-indigo-100 text-indigo-800">Nova</span>
             {% endif %}
           </a>
         </li>

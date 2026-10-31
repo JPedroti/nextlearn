@@ -2,6 +2,9 @@
 REM Salva e envia para o GitHub as suas mudancas do prototipo (usa o seu login do Git no Windows).
 REM So entram as pastas do prototipo e os docs do Thiago. Nunca faz force push e nao mexe na main.
 cd /d "%~dp0"
+if exist .git\MERGE_HEAD exit /b 0
+if exist .git\index.lock exit /b 0
+git fetch origin --prune >> envio_git.log 2>&1
 set BRANCH=thiago/prototipo-neuro
 for /f %%b in ('git rev-parse --abbrev-ref HEAD') do set ATUAL=%%b
 if not "%ATUAL%"=="%BRANCH%" (

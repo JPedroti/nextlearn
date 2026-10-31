@@ -3,7 +3,7 @@ from django.db import models
 
 
 class Usuario(AbstractUser):
-    """Usuário do NextLearn. O `papel` decide quais telas a pessoa vê."""
+    """Usuário do Chamilion. O `papel` decide quais telas a pessoa vê."""
 
     class Papel(models.TextChoices):
         PROFESSOR = "professor", "Professor(a)"

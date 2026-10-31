@@ -1,48 +1,185 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block titulo %}{{ aula.titulo }} · Chamilion{% endblock %}
 
 {% block conteudo %}
 <a href="{% url 'aulas:inicio' %}" class="voltar">← Minhas aulas</a>
-<h1 class="text-2xl font-semibold mt-3 mb-4">{{ aula.titulo }}</h1>
 
-<article class="cartao mb-8 text-lg leading-relaxed space-y-4">{{ conteudo|linebreaks }}</article>
+<div class="flex flex-wrap items-center justify-between gap-3 mt-3 mb-4">
+  <h1 id="titulo-aula" class="text-2xl font-semibold">{{ aula.titulo }}</h1>
+  <div class="flex flex-wrap items-center gap-2">
+    <button type="button" class="botao-ouvir" data-ouvir="titulo-aula texto-aula">Ouvir o texto</button>
+    <button type="button" class="btn-sec text-sm" data-tela-cheia hidden title="Tela cheia, sem o resto do navegador">Modo concentração</button>
+  </div>
+</div>
 
-<h2 class="text-xl font-semibold mb-3">Questões</h2>
+{% if passos|length > 1 %}
+  <section class="cartao mb-6" data-paginas="Passo" aria-label="Texto da aula, em passos">
+    <p class="text-sm font-medium text-slate-600 mb-3" data-contador aria-live="polite" hidden></p>
+    <div id="texto-aula" class="text-lg leading-relaxed">
+      {% for passo in passos %}
+        <div class="space-y-4 mb-6" data-pagina>{{ passo|linebreaks }}</div>
+      {% endfor %}
+    </div>
+    <div class="flex flex-wrap justify-between gap-3" data-navegacao hidden>
+      <button type="button" class="btn-sec" data-anterior>← Passo anterior</button>
+      <button type="button" class="btn" data-proximo data-rotulo="Próximo passo →" data-rotulo-fim="Ir para as questões ↓" data-ir-para="questoes">Próximo passo →</button>
+    </div>
+  </section>
+{% else %}
+  <article id="texto-aula" class="cartao mb-6 text-lg leading-relaxed space-y-4">{{ conteudo|linebreaks }}</article>
+{% endif %}
+
+{# Flashcards (revisão): frente/verso, sem correção #}
+{% if itens_abertos %}
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+    <h2 id="flashcards" class="text-xl font-semibold">Cartões de revisão</h2>
+  </div>
+  <section class="mb-6">
+    {% for item in itens_abertos %}
+      {% if item.questao.tipo == "flashcard" %}
+        <div class="cartao mb-4">
+          <button type="button" class="flashcard w-full text-left" data-verso="{{ item.questao.resposta_referencia|escape }}" data-aberto="false" aria-expanded="false">
+            <div class="flash-frente">
+              <p class="text-sm text-slate-500 mb-1">Frente</p>
+              <p class="font-medium text-lg">{{ item.enunciado|linebreaksbr }}</p>
+              <p class="text-sm text-indigo-600 mt-2">Toque para ver a resposta ↩</p>
+            </div>
+            <div class="flash-verso" hidden>
+              <p class="text-sm text-slate-500 mb-1">Verso</p>
+              <p class="text-lg">{{ item.questao.resposta_referencia|linebreaksbr }}</p>
+            </div>
+          </button>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </section>
+{% endif %}
+
+{# Questões para escrever (resposta livre + autoavaliação) #}
+{% if itens_abertos %}
+  <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+    <h2 id="escrever" class="text-xl font-semibold">Escreva com suas palavras</h2>
+  </div>
+  <section class="mb-6">
+    {% for item in itens_abertos %}
+      {% if item.questao.tipo == "escrever" %}
+        <div class="cartao mb-4">
+          <p class="font-medium mb-2">{{ item.enunciado|linebreaksbr }}</p>
+          <textarea class="w-full" rows="4" name="resposta_aberta_{{ item.questao.pk }}" placeholder="Escreva aqui a sua resposta…"></textarea>
+          <button type="button" class="btn-sec text-sm mt-3 ver-referencia" data-referencia="{{ item.questao.resposta_referencia|escape }}">
+            Ver um exemplo de resposta
+          </button>
+          <div class="referencia mt-3" hidden>
+            <p class="text-sm font-medium text-slate-500">Um exemplo de resposta (para você conferir):</p>
+            <p class="text-slate-700 mt-1">{{ item.questao.resposta_referencia|linebreaksbr }}</p>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </section>
+{% endif %}
+
+{# Múltipla escolha (com gabarito do professor) #}
+<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+  <h2 id="questoes" class="text-xl font-semibold">Questões</h2>
+  {% if respondida %}<span class="text-sm text-slate-600">{{ acertos }} de {{ itens_multipla|length }} acertos</span>{% endif %}
+</div>
 
 {% if respondida %}
-  <p class="mb-4 font-medium">Você acertou {{ acertos }} de {{ itens|length }}.</p>
-  {% for item in itens %}
-    <div class="cartao mb-4">
-      <p class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</p>
-      <ul class="space-y-1">
-        {% for alternativa in item.questao.alternativas %}
-          {% with escolhida=item.resposta.indice_escolhido correta=item.questao.indice_correto %}
-            <li class="rounded px-2 py-1 {% if forloop.counter0 == correta %}bg-green-50 text-green-900{% elif forloop.counter0 == escolhida %}bg-red-50 text-red-900{% endif %}">
-              {{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}
-              {% if forloop.counter0 == escolhida %}· sua resposta{% endif %}
-              {% if forloop.counter0 == correta %}· correta{% endif %}
-            </li>
-          {% endwith %}
-        {% endfor %}
-      </ul>
-    </div>
-  {% endfor %}
-{% else %}
-  <form method="post">
-    {% csrf_token %}
-    {% for item in itens %}
-      <fieldset class="cartao mb-4">
-        <legend class="float-left w-full font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</legend>
-        {% for alternativa in item.questao.alternativas %}
-          <label class="flex items-start gap-2 rounded px-2 py-1 hover:bg-slate-50">
-            <input type="radio" name="questao_{{ item.questao.pk }}" value="{{ forloop.counter0 }}" required class="mt-1.5">
-            <span>{{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}</span>
-          </label>
-        {% endfor %}
-      </fieldset>
+  <section data-paginas="Questão" aria-label="Correção das questões">
+    <p class="text-sm font-medium text-slate-600 mb-2" data-contador aria-live="polite" hidden></p>
+    {% for item in itens_multipla %}
+      <div class="cartao mb-4" data-pagina>
+        <p id="questao-{{ forloop.counter }}-enunciado" class="font-medium mb-2">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</p>
+        <ul id="questao-{{ forloop.counter }}-alternativas" class="space-y-1">
+          {% for alternativa in item.questao.alternativas %}
+            {% with escolhida=item.resposta.indice_escolhido correta=item.questao.indice_correto %}
+              <li class="rounded px-2 py-1 {% if forloop.counter0 == correta %}bg-green-50 text-green-900{% elif forloop.counter0 == escolhida %}bg-red-50 text-red-900{% endif %}">
+                {{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}
+                {% if forloop.counter0 == escolhida %}· sua resposta{% endif %}
+                {% if forloop.counter0 == correta %}· correta{% endif %}
+              </li>
+            {% endwith %}
+          {% endfor %}
+        </ul>
+        <button type="button" class="botao-ouvir mt-3" data-ouvir="questao-{{ forloop.counter }}-enunciado questao-{{ forloop.counter }}-alternativas">Ouvir a questão</button>
+      </div>
     {% endfor %}
-    <button type="submit" class="btn">Enviar respostas</button>
+    <div class="flex justify-between gap-3" data-navegacao hidden>
+      <button type="button" class="btn-sec" data-anterior>← Anterior</button>
+      <button type="button" class="btn-sec" data-proximo data-rotulo="Próxima →" data-rotulo-fim="Fim da correção">Próxima →</button>
+    </div>
+  </section>
+{% else %}
+  <form method="post" data-paginas="Questão" data-respostas aria-label="Questões da aula">
+    {% csrf_token %}
+    <div class="mb-4" data-progresso hidden>
+      <div class="flex justify-between text-sm text-slate-600 mb-1">
+        <span data-contador aria-live="polite"></span>
+        <span data-respondidas></span>
+      </div>
+      <div class="h-2 bg-slate-200 rounded-full" aria-hidden="true">
+        <div class="h-2 bg-indigo-600 rounded-full" data-barra style="width: 0%"></div>
+      </div>
+    </div>
+
+    {% for item in itens_multipla %}
+      <fieldset class="cartao mb-4" data-pagina>
+        <legend id="questao-{{ forloop.counter }}-enunciado" class="float-left w-full font-medium mb-3">{{ forloop.counter }}. {{ item.enunciado|linebreaksbr }}</legend>
+        <div id="questao-{{ forloop.counter }}-alternativas" class="clear-both space-y-1">
+          {% for alternativa in item.questao.alternativas %}
+            <label class="flex items-start gap-3 rounded border border-transparent px-3 py-3 hover:bg-slate-50 hover:border-indigo-200 cursor-pointer">
+              <input type="radio" name="questao_{{ item.questao.pk }}" value="{{ forloop.counter0 }}" required class="mt-1 h-5 w-5 shrink-0">
+              <span class="text-lg">{{ forloop.counter|add:64|stringformat:"c" }}) {{ alternativa }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        <button type="button" class="botao-ouvir mt-3" data-ouvir="questao-{{ forloop.counter }}-enunciado questao-{{ forloop.counter }}-alternativas">Ouvir a questão</button>
+      </fieldset>
+    {% empty %}
+      <p class="cartao text-slate-600">Esta aula não tem questões de múltipla escolha.</p>
+    {% endfor %}
+
+    {% if itens_multipla %}
+      <div class="flex justify-between gap-3 mb-6" data-navegacao hidden>
+        <button type="button" class="btn-sec" data-anterior>← Anterior</button>
+        <button type="button" class="btn-sec" data-proximo data-rotulo="Próxima →" data-rotulo-fim="Última questão">Próxima →</button>
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="btn text-lg px-10 py-3">Enviar respostas</button>
+        <p class="text-sm text-amber-800 mt-2" data-faltam hidden>Responda todas as questões antes de enviar.</p>
+      </div>
+    {% endif %}
   </form>
 {% endif %}
+{% endblock %}
+
+{% block scripts_extra %}
+  <script src="{% static 'js/aula.js' %}"></script>
+  <script>
+    // Flashcard: virar frente/verso
+    document.querySelectorAll(".flashcard").forEach(function (cartao) {
+      cartao.addEventListener("click", function () {
+        var frente = cartao.querySelector(".flash-frente");
+        var verso = cartao.querySelector(".flash-verso");
+        var aberto = cartao.getAttribute("data-aberto") === "true";
+        cartao.setAttribute("data-aberto", aberto ? "false" : "true");
+        cartao.setAttribute("aria-expanded", aberto ? "false" : "true");
+        frente.hidden = !aberto;
+        verso.hidden = aberto;
+      });
+    });
+
+    // "Ver um exemplo de resposta"
+    document.querySelectorAll(".ver-referencia").forEach(function (botao) {
+      botao.addEventListener("click", function () {
+        var ref = botao.nextElementSibling;
+        ref.hidden = !ref.hidden;
+        botao.textContent = ref.hidden ? "Ver um exemplo de resposta" : "Esconder exemplo";
+      });
+    });
+  </script>
 {% endblock %}

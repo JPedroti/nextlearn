@@ -97,3 +97,30 @@ def responder_sugestao(request, pk, aceitar):
     if url_has_allowed_host_and_scheme(destino, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
         return redirect(destino)
     return redirect("perfis:editar_apoios", aluno_pk=sugestao.aluno_id)
+
+
+
+@papel_requerido("aluno")
+def alternar_preferencia(request):
+    """Aluno liga/desliga um apoio de leitura (vale na sessão). Ligar registra um EventoUso (base de sugestões)."""
+    from django.http import JsonResponse
+
+    from apps.aulas.models import Aula, EventoUso
+
+    from .context_processors import CHAVE_SESSAO
+    from .models import PREFERENCIAS
+
+    campo = request.POST.get("campo")
+    if request.method != "POST" or campo not in PREFERENCIAS:
+        return JsonResponse({"erro": "campo inválido"}, status=400)
+    valor = request.POST.get("valor") == "1"
+    prefs = request.session.get(CHAVE_SESSAO, {})
+    prefs[campo] = valor
+    request.session[CHAVE_SESSAO] = prefs
+    aluno = Aluno.objects.filter(usuario=request.user).first()
+    if valor and aluno:
+        aula = Aula.objects.filter(pk=request.POST.get("aula") or 0, turma=aluno.turma).first()
+        EventoUso.objects.create(aluno=aluno, aula=aula, tipo=f"ativou_{campo}")
+    if request.headers.get("X-Requested-With") == "fetch":
+        return JsonResponse({"campo": campo, "valor": valor})
+    return redirect(request.POST.get("next") or "aulas:inicio")

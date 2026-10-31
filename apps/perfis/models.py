@@ -11,6 +11,10 @@ APOIOS = [
 ]
 
 
+# Preferências de interface (sem IA), ligadas pelo professor ou pelo próprio aluno na barra
+PREFERENCIAS = ["fonte_dislexia", "leitura_voz", "modo_limpo"]
+
+
 def calcular_mascara(foco, textual, concreto):
     """F*4 + S*2 + C*1 → número de 0 a 7. Zero é a aula original do professor."""
     return int(foco) * 4 + int(textual) * 2 + int(concreto)
@@ -79,6 +83,10 @@ class RespostaQuestionario(models.Model):
     preenchido_por = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="questionarios_preenchidos"
     )
+    nome_aluno = models.CharField("Nome do aluno", max_length=120, blank=True,
+                                  help_text="Como a família chama o aluno (apelido ou nome de casa).")
+    observacoes = models.TextField("O que mais o professor deve saber?", blank=True,
+                                   help_text="Informações que a família quer compartilhar sobre como o aluno aprende melhor. Só o professor lê; não vai para a IA.")
     criado_em = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -99,6 +107,7 @@ class SugestaoPerfil(models.Model):
     class Origem(models.TextChoices):
         QUESTIONARIO = "questionario", "Questionário da família"
         USO = "uso", "Uso da plataforma"
+        PADRAO_ERRO = "padrao_erro", "Acertos nas aulas"
 
     CAMPOS = [
         ("foco", "Atenção e foco"),

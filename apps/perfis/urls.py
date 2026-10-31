@@ -7,6 +7,7 @@ app_name = "perfis"
 urlpatterns = [
     # Família
     path("familia/", views.inicio, name="inicio"),
+    path("aluno/preferencias/", views.alternar_preferencia, name="alternar_preferencia"),
     path("familia/alunos/<int:aluno_pk>/questionario/", views.questionario, name="questionario"),
     # Professor
     path("professor/alunos/<int:aluno_pk>/apoios/", views.editar_apoios, name="editar_apoios"),

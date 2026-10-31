@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="utf-8">
@@ -6,55 +6,267 @@
   <title>{% block titulo %}Chamilion{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style type="text/tailwindcss">
-    /* Estilo padrão dos formulários e botões usados em todas as páginas */
-    main input[type=text], main input[type=password], main textarea, main select {
-      @apply w-full rounded border border-slate-300 bg-white px-3 py-2;
+    /* ============================================================
+       Chamilion Design System — v2
+       Paleta: Indigo como ação, Slate como neutro, Emerald/Warm
+       como feedback. Tipografia: system font stack nativa.
+       Inspirado nos princípios de design do Anthropic:
+       - Uma família tipográfica, escala clara
+       - Cores nomeadas (4-6), sem gradientes decorativos
+       - Estrutura que codifica informação, não apenas decora
+       - Motion deliberado, não scatter
+       ============================================================ */
+
+    /* --- Tipografia --- */
+    html { font-size: 16px; }
+    body {
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
     }
-    .errorlist { @apply mt-1 text-sm text-red-700; }
-    .helptext, .helptext ul { @apply block mt-1 text-xs text-slate-500; }
-    .btn { @apply inline-block rounded bg-indigo-700 px-4 py-2 font-medium text-white hover:bg-indigo-800; }
-    .btn-sec { @apply inline-block rounded border border-slate-300 bg-white px-4 py-2 font-medium text-slate-700 hover:bg-slate-100; }
-    .cartao { @apply rounded-lg bg-white p-6 shadow; }
-    .voltar { @apply text-sm text-indigo-700 hover:underline; }
+    /* Escala tipográfica: 12, 14, 16, 18, 20, 24, 30, 36px */
+    .text-meta  { font-size: 0.75rem; line-height: 1.5; color: #64748b; }
+    .text-small { font-size: 0.875rem; line-height: 1.5; }
+
+    /* --- Layout --- */
+    .max-readable { max-width: 42rem; }    /* ~75 chars — ideal para leitura */
+    .max-content { max-width: 56rem; }     /* ~100 chars — conteúdo técnico */
+
+    /* --- Cores do Design System --- */
+    :root {
+      --color-primary:       #4f46e5;  /* indigo-600 */
+      --color-primary-hover: #4338ca;  /* indigo-700 */
+      --color-primary-light: #eef2ff;  /* indigo-50  */
+      --color-success:       #059669;  /* emerald-600 */
+      --color-warning:       #d97706;  /* amber-600 */
+      --color-error:         #dc2626;  /* red-600 */
+      --color-surface:       #ffffff;
+      --color-bg:            #f8fafc;  /* slate-50 */
+      --color-border:        #e2e8f0;  /* slate-200 */
+      --color-text:          #1e293b;  /* slate-800 */
+      --color-text-secondary:#64748b;  /* slate-500 */
+      --color-text-muted:    #94a3b8;  /* slate-400 */
+    }
+
+    /* --- Botões --- */
+    .btn {
+      @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium transition-colors duration-150;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover  { background: var(--color-primary-hover); }
+    .btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-secondary {
+      @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium transition-colors duration-150;
+      background: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .btn-secondary:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+    .btn-ghost {
+      @apply inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150;
+      background: transparent;
+      color: var(--color-primary);
+      border: none;
+      cursor: pointer;
+    }
+    .btn-ghost:hover { background: var(--color-primary-light); }
+
+    /* Mantendo classes antigas como aliases */
+    .btn-sec { @apply btn-secondary; }
+
+    /* --- Cartões (diferenciados por contexto, não todos iguais) --- */
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+    }
+    .card-elevated {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04), 0 1px 2px rgba(0,0,0,.03);
+    }
+    .card-highlight {
+      background: var(--color-primary-light);
+      border: 1px solid #c7d2fe;
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+    }
+    /* Alias para templates existentes */
+    .cartao { @apply card-elevated; }
+
+    /* --- Formulários --- */
+    main input[type="text"],
+    main input[type="password"],
+    main input[type="email"],
+    main textarea,
+    main select {
+      @apply w-full rounded-lg border px-3 py-2.5 text-sm transition-colors duration-150;
+      border-color: var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text);
+    }
+    main input:focus,
+    main textarea:focus,
+    main select:focus {
+      border-color: var(--color-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79,70,229,.1);
+    }
+    .errorlist { @apply mt-1 text-sm; color: var(--color-error); }
+    .helptext  { @apply block mt-1 text-xs; color: var(--color-text-secondary); }
+
+    /* --- Etiquetas / Tags --- */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 9999px;
+      padding: 0.125rem 0.625rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    .tag-amber  { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+    .tag-sky    { background: #f0f9ff; color: #075985; border: 1px solid #bae6fd; }
+    .tag-slate  { background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+    .tag-green  { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+    .tag-indigo { background: #eef2ff; color: #3730a3; border: 1px solid #c7d2fe; }
+    /* Alias */
+    .etiqueta { @apply tag tag-slate; }
+    .bg-amber-100 { background: #fffbeb; } .text-amber-900 { color: #92400e; }
+    .bg-sky-100   { background: #f0f9ff; } .text-sky-900   { color: #075985; }
+    .bg-indigo-100 { background: #eef2ff; } .text-indigo-900 { color: #3730a3; }
+    .bg-green-100  { background: #ecfdf5; } .text-green-900  { color: #065f46; }
+    .bg-red-100    { background: #fef2f2; } .text-red-900    { color: #991b1b; }
+
+    /* --- Navegação --- */
+    .voltar { @apply text-sm font-medium transition-colors duration-150; color: var(--color-primary); }
+    .voltar:hover { color: var(--color-primary-hover); text-decoration: underline; }
+
+    /* --- Feedback (mensagens) --- */
+    .mensagem {
+      @apply mb-4 rounded-lg border px-4 py-3 text-sm;
+    }
+    .mensagem-success { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+    .mensagem-error   { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+    .mensagem-info    { background: #eef2ff; border-color: #c7d2fe; color: #3730a3; }
+
+    /* --- Barra de preferências --- */
+    .pref-botao {
+      @apply inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium transition-colors duration-150;
+      border-color: var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-secondary);
+      cursor: pointer;
+    }
+    .pref-botao:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .pref-botao[aria-pressed="true"] {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    /* --- Botão Ouvir --- */
+    .botao-ouvir {
+      @apply inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors duration-150;
+      border-color: #c7d2fe;
+      background: #eef2ff;
+      color: #4338ca;
+      cursor: pointer;
+    }
+    .botao-ouvir:hover { background: #e0e7ff; }
+
+    /* --- Tabelas --- */
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-weight: 500; color: var(--color-text-secondary); font-size: 0.8125rem; }
+    td, th { padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--color-border); }
+    tr:last-child td { border-bottom: none; }
+
+    /* --- Transições --- */
+    .transition-fade { transition: opacity .15s ease, transform .15s ease; }
+
+    /* --- Responsivo --- */
+    @media (max-width: 640px) {
+      .card, .card-elevated, .card-highlight { padding: 1rem; border-radius: 0.5rem; }
+      main { padding-left: 0.75rem; padding-right: 0.75rem; }
+    }
+
+    /* --- Acessibilidade --- */
+    :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* --- Micro-interações --- */
+    a, button { transition: all .15s ease; }
+    a:hover { opacity: 0.85; }
+    .card-elevated:hover { border-color: #c7d2fe; }
+    .btn:active { transform: scale(0.97); }
+    .btn-secondary:active { transform: scale(0.97); }
   </style>
+  <link rel="stylesheet" href="{% static 'css/preferencias.css' %}">
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-800">
-  <header class="bg-white border-b border-slate-200">
-    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="{% url 'contas:inicio' %}" class="text-xl font-bold text-indigo-700">Chamilion</a>
+<body class="min-h-screen{% if preferencias.fonte_dislexia %} fonte-dislexia{% endif %}{% if preferencias.leitura_voz %} leitura-voz{% endif %}{% if preferencias.modo_limpo %} modo-limpo{% endif %}" style="background: var(--color-bg);">
+  <header style="background: var(--color-surface); border-bottom: 1px solid var(--color-border);">
+    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+      <a href="{% url 'contas:inicio' %}" class="text-lg font-bold tracking-tight" style="color: var(--color-primary); text-decoration: none;">Chamilion</a>
       {% if user.is_authenticated %}
-        <div class="flex items-center gap-4 text-sm">
-          <span>{{ user }} · {{ user.get_papel_display }}</span>
+        <div class="flex items-center gap-3">
+          <span class="text-xs" style="color: var(--color-text-muted);">
+            {{ user.get_full_name|default:user.username }}
+          </span>
+          <span class="text-xs tag {% if user.papel == 'professor' %}tag-indigo{% elif user.papel == 'familia' %}tag-green{% else %}tag-sky{% endif %}">
+            {{ user.get_papel_display }}
+          </span>
           {% if user.is_staff %}
-            <a href="{% url 'admin:index' %}" class="text-indigo-700 hover:underline">Administração</a>
+            <a href="{% url 'admin:index' %}" class="text-xs" style="color: var(--color-text-muted);">Admin</a>
           {% endif %}
           <form method="post" action="{% url 'contas:sair' %}">
             {% csrf_token %}
-            <button type="submit" class="text-slate-600 hover:text-slate-900 underline">Sair</button>
+            <button type="submit" class="text-xs font-medium" style="color: var(--color-text-muted); background: none; border: none; cursor: pointer; padding: 0;">Sair</button>
           </form>
         </div>
       {% endif %}
     </div>
   </header>
 
-  <main class="max-w-4xl mx-auto px-4 py-8">
+  {% if barra_preferencias %}
+    {% include "_barra_preferencias.html" %}
+  {% endif %}
+
+  <main class="max-w-5xl mx-auto px-4 py-8">
     {% if messages %}
       {% for message in messages %}
-        <p class="mb-4 rounded border px-4 py-2 {% if message.tags == 'error' %}bg-red-50 border-red-200 text-red-800{% else %}bg-indigo-50 border-indigo-200{% endif %}">{{ message }}</p>
+        <div class="mensagem {% if message.tags == 'error' %}mensagem-error{% else %}mensagem-info{% endif %}">{{ message }}</div>
       {% endfor %}
     {% endif %}
     {% block conteudo %}{% endblock %}
   </main>
 
   <script>
-    // Formulários que chamam a IA: evita clique duplo e avisa que pode demorar.
     document.querySelectorAll("form[data-gerar]").forEach(function (form) {
       form.addEventListener("submit", function () {
         var botao = form.querySelector("button");
-        botao.disabled = true;
-        botao.textContent = "Gerando… (pode levar até 1 minuto)";
+        if (botao) { botao.disabled = true; botao.textContent = "Gerando…"; }
       });
     });
   </script>
+  {% if barra_preferencias %}
+    <script src="{% static 'js/preferencias.js' %}"></script>
+    <script src="{% static 'js/leitura_voz.js' %}"></script>
+  {% endif %}
+  {% block scripts_extra %}{% endblock %}
 </body>
 </html>

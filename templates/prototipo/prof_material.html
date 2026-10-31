@@ -6,7 +6,8 @@
   <main class="pg">
     {% include "prototipo/_msgs.html" %}
     <section class="pg-hero"><div><p class="pg-sobre">Material → trilha</p><h1>Envie o material da aula</h1>
-      <p class="pg-sub">PDF, TXT ou texto colado. Vira um mundo de até 10 fases curtas (blocos de ~110 palavras, cada uma com roteiro). Tudo entra como rascunho: os alunos só veem depois que você publica.</p></div></section>
+      <p class="pg-sub">PDF, TXT ou texto colado. {% if ia_ok %}A IA lê o material e{% else %}O Chamilion lê o material e{% endif %} cria um módulo de questões: um mundo de até 10 fases curtas, cada uma com questões. Tudo entra como rascunho: os alunos só veem depois que você publica.</p></div>
+      <div class="pg-estado estado-{% if ia_ok %}ok{% else %}atencao{% endif %}"><span class="pg-ponto"></span>{% if ia_ok %}IA conectada{% else %}IA não configurada: questões de rascunho locais{% endif %}</div></section>
     <section class="pg-grade">
       <form class="cartao-pg form-material" method="post" enctype="multipart/form-data">
         {% csrf_token %}
@@ -23,7 +24,7 @@
         <ol class="passos-mat">
           <li><strong>Dividimos</strong> em fases curtas (memória de trabalho, P3) e pomos "Hoje vamos…" no começo (previsibilidade, P4).</li>
           <li><strong>Medimos</strong> a acessibilidade de cada fase (frases, blocos, duração, exemplo concreto…).</li>
-          <li><strong>Você adiciona as questões</strong> e, se quiser, gera as versões adaptadas com IA para revisar e aprovar.</li>
+          <li><strong>Criamos as questões</strong> de cada fase (múltipla escolha + cartão de revisão) — pela IA quando ela está configurada; senão, um rascunho local. Você corrige o que quiser.</li>
           <li><strong>Publica</strong>: a fase entra no mundo da trilha de cada aluno, no formato dele.</li>
         </ol>
         <p class="pg-nota">A IA nunca publica sozinha e nunca muda o gabarito (Parecer CNE/CP 15/2026).</p>
@@ -32,15 +33,15 @@
     {% if criadas %}
     <section class="cartao-pg">
       <header><h2>Fases criadas</h2>
-        <form method="post" action="{% url 'prototipo:prof_publicar' %}">{% csrf_token %}<button class="btn-missao">Publicar as que têm questões</button></form></header>
+        <form method="post" action="{% url 'prototipo:prof_publicar' %}">{% csrf_token %}<button class="btn-missao">Publicar o módulo na trilha</button></form></header>
       <table class="tabela-aulas">
         <thead><tr><th>Fase</th><th>Tamanho</th><th>Acessibilidade</th><th>Melhorar</th><th>Questões</th><th></th></tr></thead>
         <tbody>{% for c in criadas %}
           <tr><td><strong>{{ c.assunto }}</strong></td><td>{{ c.palavras }} palavras · ~{{ c.minutos }} min</td>
             <td><span class="indice {% if c.indice >= 75 %}bom{% elif c.indice >= 50 %}medio{% else %}baixo{% endif %}">{{ c.indice }}</span></td>
             <td>{% for f in c.faltam %}<span class="chip">{{ f }}</span>{% empty %}<span class="chip ok">ok</span>{% endfor %}</td>
-            <td>{% if c.n_q %}<span class="chip ok">{{ c.n_q }}</span>{% else %}<span class="chip">falta</span>{% endif %}</td>
-            <td class="acoes-linha"><a class="btn-contorno" href="{% url 'aulas:editar' c.aula.pk %}">Editar e pôr questões</a><a class="btn-link" href="{% url 'prototipo:prof_analise' c.aula.pk %}">Análise</a></td></tr>
+            <td>{% if c.n_q %}<span class="chip ok">{{ c.n_q }}</span>{% for q in c.questoes %}<span class="mini q-prev">{{ forloop.counter }}. {{ q.enunciado|truncatechars:70 }}</span>{% endfor %}{% else %}<span class="chip">falta</span>{% endif %}</td>
+            <td class="acoes-linha"><a class="btn-contorno" href="{% url 'aulas:editar' c.aula.pk %}">Revisar questões</a><a class="btn-link" href="{% url 'prototipo:prof_analise' c.aula.pk %}">Análise</a></td></tr>
         {% endfor %}</tbody>
       </table>
     </section>
