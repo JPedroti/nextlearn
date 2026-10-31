@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "apps.perfis",
     "apps.aulas",
     "apps.painel",
+    "apps.prototipo",  # Protótipo de gamificação (Thiago)
 ]
 
 MIDDLEWARE = [
