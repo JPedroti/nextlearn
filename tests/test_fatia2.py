@@ -1,6 +1,6 @@
 from unittest import mock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.aulas.models import Aula, Questao, Resposta, VersaoAdaptada
@@ -144,6 +144,7 @@ class GerarVersaoTests(Fatia2Base):
         self.assertEqual((self.q2.enunciado, self.q2.alternativas, self.q2.indice_correto), ("Original 2", ["Sim", "Não"], 1))
 
 
+@override_settings(GEMINI_API_KEY="chave-de-teste")
 @mock.patch("ia.cliente.gerar")
 class ProfessorVersaoTests(Fatia2Base):
     def setUp(self):
@@ -216,6 +217,27 @@ class ProfessorVersaoTests(Fatia2Base):
         self.client.login(username="outro", password=SENHA)
         resposta = self.client.post(reverse("aulas:gerar_versao", args=[self.aula.pk, 4]))
         self.assertEqual(resposta.status_code, 404)
+        gerar.assert_not_called()
+
+
+@override_settings(GEMINI_API_KEY="")
+@mock.patch("ia.cliente.gerar")
+class IASemChaveTests(Fatia2Base):
+    """Sem chave de API, a tela avisa e o botão fica desligado, em vez de falhar depois do clique."""
+
+    def setUp(self):
+        super().setUp()
+        self.criar_aluno("ana", foco=True)
+        self.client.login(username="prof", password=SENHA)
+
+    def test_tela_avisa_e_nao_oferece_o_botao(self, gerar):
+        resposta = self.client.get(reverse("aulas:detalhe_professor", args=[self.aula.pk]))
+        self.assertContains(resposta, "não está ligada neste servidor")
+        self.assertNotContains(resposta, reverse("aulas:gerar_versao", args=[self.aula.pk, 4]))
+
+    def test_pedido_direto_nao_chama_a_ia(self, gerar):
+        resposta = self.client.post(reverse("aulas:gerar_versao", args=[self.aula.pk, 4]), follow=True)
+        self.assertContains(resposta, "não está ligada neste servidor")
         gerar.assert_not_called()
 
 

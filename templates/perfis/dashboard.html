@@ -11,7 +11,7 @@
   <a href="{% url 'perfis:editar_apoios' aluno.pk %}" class="text-sm text-indigo-700 hover:underline">Ajustar apoios</a>
 </div>
 
-{% if total_questoes == 0 %}
+{% if not geral.total %}
   <div class="cartao max-w-xl">
     <p class="text-slate-600">Nenhuma atividade ainda. Os dados aparecem aqui assim que o aluno responder a primeira aula.</p>
   </div>
@@ -19,8 +19,8 @@
   <!-- Cards de resumo -->
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     <div class="cartao text-center">
-      <p class="text-3xl font-bold text-indigo-700">{{ pct_total }}%</p>
-      <p class="text-xs text-slate-500">acertos ({{ acertos }}/{{ total_questoes }})</p>
+      <p class="text-3xl font-bold text-indigo-700">{{ geral.pct }}%</p>
+      <p class="text-xs text-slate-500">acertos ({{ geral.acertos }}/{{ geral.total }})</p>
     </div>
     <div class="cartao text-center">
       <p class="text-3xl font-bold text-indigo-700">{{ aulas_respondidas }}</p>
@@ -28,10 +28,10 @@
     </div>
     <div class="cartao text-center">
       <p class="text-3xl font-bold text-indigo-700">{{ tempo_total_min }}min</p>
-      <p class="text-xs text-slate-500">tempo total de uso</p>
+      <p class="text-xs text-slate-500">tempo nas aulas (da abertura ao envio)</p>
     </div>
     <div class="cartao text-center">
-      <p class="text-3xl font-bold text-indigo-700">{{ num_adaptada }}</p>
+      <p class="text-3xl font-bold text-indigo-700">{{ adaptada.total }}</p>
       <p class="text-xs text-slate-500">questões na versão adaptada</p>
     </div>
   </div>
@@ -40,28 +40,22 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
     <div class="cartao">
       <h2 class="font-semibold mb-3">Aula original vs. adaptada</h2>
-      {% if pct_original is not None and pct_adaptada is not None %}
+      {% if original.total and adaptada.total %}
         <div class="flex gap-6">
           <div class="flex-1 text-center">
             <p class="text-sm text-slate-500">Original</p>
-            <p class="text-2xl font-bold {% if pct_original >= 70 %}text-green-700{% elif pct_original >= 50 %}text-amber-700{% else %}text-red-700{% endif %}">
-              {{ pct_original }}%
-            </p>
-            <p class="text-xs text-slate-400">{{ num_original }} questões</p>
+            <p class="text-2xl font-bold">{{ original.pct }}%</p>
+            <p class="text-xs text-slate-500">{{ original.acertos }} de {{ original.total }} questões</p>
           </div>
           <div class="flex-1 text-center">
             <p class="text-sm text-slate-500">Adaptada</p>
-            <p class="text-2xl font-bold {% if pct_adaptada >= 70 %}text-green-700{% elif pct_adaptada >= 50 %}text-amber-700{% else %}text-red-700{% endif %}">
-              {{ pct_adaptada }}%
-            </p>
-            <p class="text-xs text-slate-400">{{ num_adaptada }} questões</p>
+            <p class="text-2xl font-bold">{{ adaptada.pct }}%</p>
+            <p class="text-xs text-slate-500">{{ adaptada.acertos }} de {{ adaptada.total }} questões</p>
           </div>
         </div>
-        {% if pct_adaptada and pct_original and pct_adaptada > pct_original %}
-          <p class="mt-3 text-sm text-green-700">As adaptações estão ajudando!</p>
-        {% endif %}
+        <p class="mt-3 text-xs text-slate-500">As questões podem ser de aulas diferentes; quanto mais aulas, mais confiável a comparação.</p>
       {% else %}
-        <p class="text-sm text-slate-400">Dados insuficientes para comparar.</p>
+        <p class="text-sm text-slate-500">Para comparar, o aluno precisa ter respondido questões nas duas versões.</p>
       {% endif %}
     </div>
 
@@ -85,9 +79,6 @@
             </li>
           {% endfor %}
         </ul>
-      {% endif %}
-      {% if perfil.contexto_familia %}
-        <p class="mt-3 text-xs text-slate-400 italic">"{{ perfil.contexto_familia|truncatechars:120 }}"</p>
       {% endif %}
     </div>
   </div>

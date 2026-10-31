@@ -63,6 +63,26 @@ class RelatorioFamiliaTests(Base):
         self.assertEqual(self.client.get(self.url).status_code, 403)
 
 
+class PaginaDoAlunoParaOProfessorTests(Base):
+    def setUp(self):
+        super().setUp()
+        self.url = reverse("perfis:dashboard", args=[self.aluno.pk])
+        self.client.login(username="prof", password=SENHA)
+
+    def test_tempo_conta_uma_vez_por_aula(self):
+        self.respostas(acertos=2, erros=1)
+        Resposta.objects.update(tempo_ms=120000)  # a aula levou 2 minutos; o valor se repete nas 3 respostas
+        resposta = self.client.get(self.url)
+        self.assertEqual(resposta.context["tempo_total_min"], 2.0)
+        self.assertEqual(resposta.context["geral"], {"acertos": 2, "total": 3, "pct": 67})
+        self.assertEqual(resposta.context["evolucao"][0]["aula"], "Frações")
+
+    def test_so_o_professor_da_turma(self):
+        Usuario.objects.create_user("outro", password=SENHA, papel=Usuario.Papel.PROFESSOR)
+        self.client.login(username="outro", password=SENHA)
+        self.assertEqual(self.client.get(self.url).status_code, 404)
+
+
 class SugestaoPorAcertosTests(Base):
     def test_poucos_acertos_viram_sugestao_de_linguagem_simples(self):
         self.respostas(acertos=2, erros=MINIMO_DE_RESPOSTAS - 2)

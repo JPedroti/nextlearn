@@ -30,6 +30,12 @@
     Uma versão para cada combinação de apoios presente na turma, gerada pela IA a partir do texto abaixo.
     Os alunos só veem uma versão depois que você aprova; até lá, veem a original.
   </p>
+  {% if linhas_versoes and not ia_configurada %}
+    <p class="mb-3 rounded border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">
+      A geração com IA não está ligada neste servidor (falta a chave <code>GEMINI_API_KEY</code>).
+      Os alunos continuam vendo a aula original.
+    </p>
+  {% endif %}
   {% if linhas_versoes %}
     <ul class="cartao divide-y divide-slate-100 p-0">
       {% for linha in linhas_versoes %}
@@ -41,10 +47,14 @@
           <span class="flex items-center gap-3">
             {% if not linha.versao %}
               <span class="text-xs rounded-full bg-slate-100 text-slate-700 px-2 py-1">Não gerada</span>
-              <form method="post" action="{% url 'aulas:gerar_versao' aula.pk linha.mascara %}" data-gerar>
-                {% csrf_token %}
-                <button type="submit" class="btn">Gerar com IA</button>
-              </form>
+              {% if ia_configurada %}
+                <form method="post" action="{% url 'aulas:gerar_versao' aula.pk linha.mascara %}" data-gerar>
+                  {% csrf_token %}
+                  <button type="submit" class="btn">Gerar com IA</button>
+                </form>
+              {% else %}
+                <button type="button" class="btn opacity-50 cursor-not-allowed" disabled>Gerar com IA</button>
+              {% endif %}
             {% elif linha.versao.aprovada %}
               <span class="text-xs rounded-full bg-green-100 text-green-800 px-2 py-1">Aprovada</span>
               <a href="{% url 'aulas:revisar_versao' aula.pk linha.mascara %}" class="btn-sec">Ver</a>

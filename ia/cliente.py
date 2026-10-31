@@ -13,9 +13,14 @@ class SaidaVersao(BaseModel):
     enunciados: list[str]
 
 
+def configurado():
+    """True quando há chave de API. Sem ela, a tela do professor avisa em vez de oferecer a geração."""
+    return bool(settings.GEMINI_API_KEY.strip())
+
+
 def gerar(system_prompt, mensagem):
     """Envia o prompt e devolve um SaidaVersao. Erros da API sobem como exceção para quem chamou."""
-    if not settings.GEMINI_API_KEY:
+    if not configurado():
         raise RuntimeError("GEMINI_API_KEY não está configurada.")
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
     resposta = client.models.generate_content(

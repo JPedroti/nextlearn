@@ -111,14 +111,6 @@ def relatorio(request, aluno_pk):
     original = placar([r for r in respostas if r.versao_mascara == 0])
     adaptada = placar([r for r in respostas if r.versao_mascara != 0])
     diferenca = adaptada["pct"] - original["pct"] if original["total"] and adaptada["total"] else None
-
-    vezes = dict(EventoUso.objects.filter(aluno=aluno).values_list("tipo").annotate(vezes=Count("id")))
-    usos = [
-        {"rotulo": Perfil._meta.get_field(campo).verbose_name, "vezes": vezes[f"ativou_{campo}"]}
-        for campo in PREFERENCIAS
-        if vezes.get(f"ativou_{campo}")
-    ]
-
     contexto = {
         "aluno": aluno,
         "perfil": perfil,
@@ -128,7 +120,7 @@ def relatorio(request, aluno_pk):
         "adaptada": adaptada,
         "diferenca": diferenca,
         "diferenca_absoluta": abs(diferenca) if diferenca is not None else None,
-        "usos": usos,
+        "usos": _usos_de_leitura(aluno),
     }
     return render(request, "perfis/relatorio.html", contexto)
 
@@ -185,96 +177,41 @@ def responder_sugestao(request, pk, aceitar):
 
 @papel_requerido("professor")
 def dashboard(request, aluno_pk):
-    """Dashboard individual do aluno: métricas de uso, progresso, acertos e apoios."""
-    aluno = get_object_or_404(
-        Aluno.objects.select_related("usuario", "turma", "perfil"),
-        pk=aluno_pk,
-        turma__professor=request.user,
-    )
-    perfil = _perfil(aluno) if hasattr(aluno, "perfil") else None
+    """Página de um aluno para o professor: acertos por aula, original × adaptada, apoios de leitura e sugestões."""
+    aluno = get_object_or_404(Aluno.objects.select_related("usuario", "turma"), pk=aluno_pk, turma__professor=request.user)
+    perfil, _ = Perfil.objects.get_or_create(aluno=aluno)
+    respostas = list(Resposta.objects.filter(aluno=aluno).select_related("questao__aula").order_by("criado_em"))
 
-    respostas = list(
-        Resposta.objects.filter(aluno=aluno)
-        .select_related("questao__aula")
-        .order_by("-criado_em")
-    )
-    total_questoes = len(respostas)
-    acertos = sum(1 for r in respostas if r.correta)
-
-    # Tempo total de uso (ms → minutos)
-    tempos = [r.tempo_ms for r in respostas if r.tempo_ms]
-    tempo_total_min = round(sum(tempos) / 60000, 1) if tempos else 0
-
-    # Aulas distintas respondidas
-    aulas_ids = list(dict.fromkeys(r.questao.aula_id for r in respostas))
-    aulas_respondidas = len(aulas_ids)
-
-    # Comparação original vs adaptada
-    originais = [r for r in respostas if r.versao_mascara == 0]
-    adaptadas = [r for r in respostas if r.versao_mascara != 0]
-    pct_original = round(100 * sum(1 for r in originais if r.correta) / len(originais)) if originais else None
-    pct_adaptada = round(100 * sum(1 for r in adaptadas if r.correta) / len(adaptadas)) if adaptadas else None
-
-    # Evolução: agrupa respostas por aula
-    from collections import defaultdict
-    evolucao = []
-    for aula_id in aulas_ids:
-        suas = [r for r in respostas if r.questao.aula_id == aula_id]
-        if suas:
-            aula_nome = suas[0].questao.aula.titulo
-            data = suas[0].criado_em
-            evolucao.append({
-                "aula": aula_nome,
-                "data": data,
-                "acertos": sum(1 for r in suas if r.correta),
-                "total": len(suas),
-                "pct": round(100 * sum(1 for r in suas if r.correta) / len(suas)),
-                "mascara": suas[0].versao_mascara,
-            })
-    evolucao.sort(key=lambda e: e["data"])
-
-    # Eventos de uso
-    from apps.aulas.models import EventoUso
-    usos = (
-        EventoUso.objects.filter(aluno=aluno)
-        .values("tipo")
-        .annotate(vezes=Count("id"))
-        .order_by("-vezes")
-    )
-    rotulos_uso = {
-        "ativou_fonte_dislexia": "Fonte para dislexia",
-        "ativou_leitura_voz": "Leitura em voz alta",
-        "ativou_modo_limpo": "Modo limpo",
-    }
-
-    # Sugestões pendentes
-    sugestoes = aluno.sugestoes.filter(status=SugestaoPerfil.Status.PENDENTE)
-
-    # Último questionário
-    ultimo_q = aluno.questionarios.first()
+    por_aula = {}
+    for resposta in respostas:
+        por_aula.setdefault(resposta.questao.aula, []).append(resposta)
+    evolucao = [
+        {"aula": aula.titulo, "data": suas[0].criado_em, "mascara": suas[0].versao_mascara, **placar(suas)}
+        for aula, suas in por_aula.items()
+    ]
+    # O tempo é medido por aula (da abertura ao envio) e fica repetido em cada resposta dela: conta uma vez por aula.
+    tempos = [suas[0].tempo_ms for suas in por_aula.values() if suas[0].tempo_ms]
 
     contexto = {
         "aluno": aluno,
         "perfil": perfil,
-        "total_questoes": total_questoes,
-        "acertos": acertos,
-        "pct_total": round(100 * acertos / total_questoes) if total_questoes else None,
-        "tempo_total_min": tempo_total_min,
-        "aulas_respondidas": aulas_respondidas,
-        "pct_original": pct_original,
-        "pct_adaptada": pct_adaptada,
-        "num_original": len(originais),
-        "num_adaptada": len(adaptadas),
+        "geral": placar(respostas),
+        "aulas_respondidas": len(por_aula),
+        "tempo_total_min": round(sum(tempos) / 60000, 1) if tempos else 0,
+        "original": placar([r for r in respostas if r.versao_mascara == 0]),
+        "adaptada": placar([r for r in respostas if r.versao_mascara != 0]),
         "evolucao": evolucao,
-        "usos": [{"rotulo": rotulos_uso.get(u["tipo"], u["tipo"]), "vezes": u["vezes"]} for u in usos],
-        "sugestoes": sugestoes,
-        "ultimo_questionario": ultimo_q,
+        "usos": _usos_de_leitura(aluno),
+        "sugestoes": aluno.sugestoes.filter(status=SugestaoPerfil.Status.PENDENTE),
     }
     return render(request, "perfis/dashboard.html", contexto)
 
 
-def _perfil(aluno):
-    try:
-        return aluno.perfil
-    except Perfil.DoesNotExist:
-        return None
+def _usos_de_leitura(aluno):
+    """[{"rotulo", "vezes"}] de cada apoio de leitura que o aluno ligou, na ordem da barra."""
+    vezes = dict(EventoUso.objects.filter(aluno=aluno).values_list("tipo").annotate(vezes=Count("id")))
+    return [
+        {"rotulo": Perfil._meta.get_field(campo).verbose_name, "vezes": vezes[f"ativou_{campo}"]}
+        for campo in PREFERENCIAS
+        if vezes.get(f"ativou_{campo}")
+    ]

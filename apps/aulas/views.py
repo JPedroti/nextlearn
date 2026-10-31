@@ -11,12 +11,18 @@ from apps.contas.decorators import papel_requerido
 from apps.perfis.analise import criar_sugestoes_por_padrao
 from apps.perfis.models import Perfil, nomes_da_mascara
 from apps.turmas.models import Aluno, Turma
+from ia import cliente
 from ia.gerar_versao import ErroGeracao, gerar_versao
 
 from .forms import AulaForm, QuestaoFormSet, VersaoForm
 from .models import Aula, Resposta, VersaoAdaptada
 from .pdf import ErroPDF, extrair_texto, sugerir_titulo
-from .versoes import versao_para_aluno
+from .versoes import dividir_em_passos, versao_para_aluno
+
+AVISO_IA_NAO_CONFIGURADA = (
+    "A geração com IA não está ligada neste servidor (falta a chave GEMINI_API_KEY). "
+    "Os alunos continuam vendo a aula original."
+)
 
 # ---------------------------------------------------------------------------
 # Professor
@@ -127,6 +133,7 @@ def detalhe_professor(request, pk):
         "total_alunos": aula.turma.alunos.count(),
         "linhas_versoes": linhas_versoes,
         "faltam_aprovar": any(not (linha["versao"] and linha["versao"].aprovada) for linha in linhas_versoes),
+        "ia_configurada": cliente.configurado(),
     }
     return render(request, "aulas/detalhe_professor.html", contexto)
 
@@ -138,6 +145,9 @@ def gerar(request, pk, mascara):
     aula = get_object_or_404(Aula, pk=pk, turma__professor=request.user)
     if not 1 <= mascara <= 7:
         raise Http404
+    if not cliente.configurado():
+        messages.error(request, AVISO_IA_NAO_CONFIGURADA)
+        return redirect("aulas:detalhe_professor", pk=aula.pk)
     try:
         gerar_versao(aula, mascara, forcar=request.POST.get("forcar") == "1")
     except ErroGeracao as erro:
@@ -160,7 +170,13 @@ def revisar_versao(request, pk, mascara):
         versao.save()
         messages.success(request, "Versão aprovada: os alunos com esses apoios já veem esta versão.")
         return redirect("aulas:detalhe_professor", pk=aula.pk)
-    contexto = {"aula": aula, "versao": versao, "apoios": nomes_da_mascara(mascara), "form": form}
+    contexto = {
+        "aula": aula,
+        "versao": versao,
+        "apoios": nomes_da_mascara(mascara),
+        "form": form,
+        "ia_configurada": cliente.configurado(),
+    }
     return render(request, "aulas/revisar_versao.html", contexto)
 
 
@@ -253,6 +269,8 @@ def ver_aula(request, pk):
     contexto = {
         "aula": aula,
         "conteudo": conteudo,
+        # Apoio de foco (bit 4): o texto aparece um passo por vez. Nas outras versões, inteiro.
+        "passos": dividir_em_passos(conteudo) if mascara_vista & 4 else [],
         "itens": itens,
         "respondida": bool(respostas),
         "acertos": sum(1 for r in respostas.values() if r.correta),

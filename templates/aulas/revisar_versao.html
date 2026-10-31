@@ -13,11 +13,13 @@
       Você pode corrigir o texto antes de aprovar.
     </p>
   </div>
-  <form method="post" action="{% url 'aulas:gerar_versao' aula.pk versao.mascara %}" data-gerar>
-    {% csrf_token %}
-    <input type="hidden" name="forcar" value="1">
-    <button type="submit" class="btn-sec">Gerar de novo</button>
-  </form>
+  {% if ia_configurada %}
+    <form method="post" action="{% url 'aulas:gerar_versao' aula.pk versao.mascara %}" data-gerar>
+      {% csrf_token %}
+      <input type="hidden" name="forcar" value="1">
+      <button type="submit" class="btn-sec">Gerar de novo</button>
+    </form>
+  {% endif %}
 </div>
 
 <form method="post">

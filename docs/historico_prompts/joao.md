@@ -373,6 +373,21 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 > Ajustar outros nomes? R: Os próximos commits do João saem como "João"; "Gabriel Franco" fica como está.
 > Rascunhos para quem está dormindo? R: "Só continue o trabalho. A delegação de tarefas virou algo flexível e, portanto, podemos continuar fazendo o que eles estavam fazendo para adiantar."
 
+**Perguntas da IA durante a execução (o Cauã enviou trabalho novo às 06h17 e 06h33) e respostas do João (por botões):**
+
+> O texto livre da família e um histórico do aluno passaram a ir para o prompt da IA, contra a regra de privacidade. R: Restaurar a regra (o texto da família fica só para o professor ler; a IA volta a receber só os apoios e a aula).
+> O botão "Nova aula via PDF" dá erro e não salva a aula. R: Consertar.
+> Relatório da família e sugestões por padrão de erro. R: Manter e corrigir.
+> O comando `criar_aula_demo` cria professor e alunos de mentira, o que o CLAUDE.md proíbe. R: Apagar o comando e passar a aula para um texto que o professor cola no app (`docs/aula_exemplo.md`).
+
+**Resumo da resposta da IA:** _(preencher ao final)_
+
+---
+
+## Prompt 37 — 31/10/2026, 06:47 (BRT) — autor: João — ferramenta: Claude Code
+
+> Antes de continuar, quero que voce faça tudo de modo automático, isto é, que eu não precise interagir com você enquanto voce estiver executando o planejamento do prompt anterior. Entendido? Pode continuar o que estava fazendo quando te interrompi
+
 **Resumo da resposta da IA:** _(preencher ao final)_
 
 ---
