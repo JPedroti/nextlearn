@@ -320,8 +320,18 @@ def painel_aluno(request):
             if no["url"] == "treino:revisao":
                 no["url"] = reverse("prototipo:treino", args=["revisao"])
     mundo_atual = next((u for u in trilha if u["atual"]), trilha[0] if trilha else None)
-    cartoes = [dict(i, faixa=faixa_nota(i["nota"])) for i in contexto["feitas"]]  # mais recentes primeiro
+    cartoes = [dict(i, faixa=faixa_nota(i["nota"]), pizza=_pizza(i["acertos"], i["total"], faixa_nota(i["nota"])["classe"])) for i in contexto["feitas"]]
+    modo = modo_da_tela(a, perfil_dev)
+    tres = sum(1 for i in contexto["feitas"] if i["acertos"] == i["total"])
+    desafios = [
+        {"nome": "Mestre das 3 estrelas", "desc": "Tire 3 estrelas em 5 fases", "feito": min(tres, 5), "meta": 5},
+        {"nome": "Explorador", "desc": "Complete um mundo inteiro (10 fases)", "feito": max((u["feitas"] for u in trilha), default=0), "meta": 10},
+        {"nome": "Memória de elefante", "desc": "Faça 3 revisões", "feito": 0, "meta": 3},
+    ]
+    for dsf in desafios:
+        dsf["pct"] = int(100 * dsf["feito"] / dsf["meta"])
     contexto.update(aluno=aluno, perfil=perfil, apoios=perfil.nomes_apoios() if perfil else [],
+                    modo=modo, modo_nome=MODO_NOME[modo], desafios=desafios,
                     foco=a["foco"], textual=a["textual"], concreto=a["concreto"], limpo=a["limpo"], voz=a["voz"],
                     letras=a["letras"], alvos=a["alvos"], tema=tema, tema_nome=TEMAS_ALUNO[tema],
                     dev=settings.DEBUG, perfil_dev=perfil_dev, ambiente_dev=ambiente_dev, ambientes=AMBIENTES_LISTA(), perfis_dev=PERFIS_DEV, ia=status_ia(),
@@ -374,6 +384,30 @@ def _apoios_visuais(perfil, perfil_dev):
     else:
         tema = next((t for t in ("foco", "textual", "concreto") if a[t]), "base")
     return a, tema, intensidade_por_apoios(a)
+
+
+# "Cara" da plataforma por perfil: muda a ESTRUTURA da página, não só as cores.
+MODO_DEV = {"nenhum": "padrao", "tdah": "missao", "tea": "agenda", "tea_tdah": "agenda", "dislexia": "leitura",
+            "discalculia": "visual", "tdl": "leitura", "di": "missao", "tdc": "padrao", "ah": "desafio", "limpo": "limpo"}
+MODO_NOME = {"padrao": "Trilha completa", "missao": "Modo missão (uma coisa por vez)", "agenda": "Modo agenda (previsível)",
+             "leitura": "Modo leitura (ouvir e ler fácil)", "visual": "Modo visual (números em figuras)",
+             "desafio": "Modo desafio (painel completo)", "limpo": "Modo limpo"}
+
+
+def modo_da_tela(apoios, perfil_dev):
+    if perfil_dev in MODO_DEV:
+        return MODO_DEV[perfil_dev]
+    if apoios["limpo"]:
+        return "limpo"
+    if apoios["foco"] and apoios["textual"]:
+        return "agenda"
+    if apoios["foco"]:
+        return "missao"
+    if apoios["textual"]:
+        return "leitura"
+    if apoios["concreto"]:
+        return "visual"
+    return "padrao"
 
 
 ICONE_MATERIA = {"Matemática": "fracao", "Português": "livro", "Ciências": "gota"}
@@ -448,6 +482,21 @@ def _trilha(contexto, aluno, apoios, intensidade, ambiente_forcado=""):
     for m in mundos:
         m["aberta"] = m["atual"] or not foco
     return mundos
+
+
+def _pizza(acertos, total, classe):
+    """Figura de pizza (acertos/total) para o modo visual: número vira quantidade que se vê."""
+    import math
+
+    if not total:
+        return ""
+    fatias = []
+    for k in range(total):
+        a0, a1 = 2 * math.pi * k / total - math.pi / 2, 2 * math.pi * (k + 1) / total - math.pi / 2
+        x0, y0, x1, y1 = 20 + 18 * math.cos(a0), 20 + 18 * math.sin(a0), 20 + 18 * math.cos(a1), 20 + 18 * math.sin(a1)
+        cor = "var(--cor)" if k < acertos else "#FFFFFF"
+        fatias.append(f'<path d="M20 20 L{x0:.1f} {y0:.1f} A18 18 0 0 1 {x1:.1f} {y1:.1f}Z" fill="{cor}" stroke="var(--tom)" stroke-width="1.5"/>')
+    return f'<svg class="pizza" viewBox="0 0 40 40" role="img" aria-label="{acertos} de {total} certas">' + "".join(fatias) + "</svg>"
 
 
 def AMBIENTES_LISTA():

@@ -51,6 +51,24 @@
   escalarMapas(); addEventListener("resize", escalarMapas);
   $$("details.unidade").forEach(function (d) { d.addEventListener("toggle", escalarMapas); });
 
+  // ---------- Botões "Ouvir" em cada bloco (modo leitura ou preferência de ouvir) ----------
+  if ("speechSynthesis" in window && (b.dataset.modo === "leitura" || b.classList.contains("com-voz"))) {
+    var alvos = $$(".missao-texto h1, .lado .bloco > header h2, .lado .bloco > h2");
+    alvos.forEach(function (h) {
+      var bt = el("button", "btn-ouvir", "🔊 Ouvir"); bt.type = "button";
+      bt.setAttribute("aria-label", "Ouvir: " + h.textContent.trim());
+      bt.addEventListener("click", function () {
+        if (speechSynthesis.speaking) { speechSynthesis.cancel(); bt.textContent = "🔊 Ouvir"; return; }
+        var bloco = h.closest(".bloco, .missao-texto");
+        var texto = (bloco ? bloco.innerText : h.textContent).replace(/🔊 Ouvir|■ Parar/g, "").slice(0, 600);
+        var u = new SpeechSynthesisUtterance(texto); u.lang = "pt-BR"; u.rate = .95;
+        u.onend = function () { bt.textContent = "🔊 Ouvir"; };
+        speechSynthesis.speak(u); bt.textContent = "■ Parar";
+      });
+      h.appendChild(bt);
+    });
+  }
+
   // ---------- Chat com o Next ----------
   var chatBox = $("[data-chat]"), chatBt = $("[data-chat-abrir]");
   if (chatBox) {
