@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 12:30 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 12:23 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -79,7 +79,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
-- 31/10, 12:30 — Trilha do aluno (bolinhas e cenário) confirmada na branch do Thiago e sempre aberta; site público reiniciado com a correção.
+- 31/10, 12:23 — Trilha do aluno (bolinhas e cenário) confirmada na branch do Thiago e sempre aberta; site público reiniciado com a correção.
 - 31/10, 12:19 — Site no ar por túnel temporário da Cloudflare (servidor do computador do João, branch `thiago/prototipo-neuro`, DEBUG desligado; só funciona com o computador e o servidor ligados). Contas de teste do vídeo e da banca criadas só no banco local (professor, aluno, família com e sem questionário).
 - 31/10, 07:45 — Decisão do grupo: o MVP roda localmente. README reorganizado (como rodar no computador primeiro; deploy vira nota de "depois do hackathon"); a chave de IA saiu da lista de variáveis pedidas pelo Render. O Thiago vai mandar um frontend novo para o app seguir.
 - 31/10, 07:24 — Testes automáticos no GitHub (`.github/workflows/testes.yml`). Tela de login sem as dicas de usuários e senha de contas de mentira. App conferido em modo de produção (`DEBUG` desligado): arquivos estáticos, página 404 em português e todas as migrações num banco novo. 120 testes passando.
