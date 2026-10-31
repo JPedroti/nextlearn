@@ -591,3 +591,18 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** mostrou onde está a conta de professor de teste (arquivo `contas_locais.txt`, só no computador do João, fora do Git), enviou o arquivo e explicou como criar as contas de aluno e família pelo próprio app e como criar outra conta com `createsuperuser`, se preferir.
 
 ---
+
+## Prompt 48 — 31/10/2026, 11:12 (BRT) — autor: João — ferramenta: Claude Code
+
+> mandaram eu mandar isso para voce:
+> "
+>
+> (roteiro colado de outro integrante, com cenas do "Chamilion": login do Chamilion; professor envia PDF, vê fases, questões e índice de acessibilidade e publica o módulo na trilha; análise de uma aula com 9 critérios; aluno vê a fase piscando na trilha, responde e usa Ouvir; professor muda os apoios e a tela do aluno muda; aula online com narração e legenda e chat do mascote; família "familia.teste" com resumo, combinados de tempo de tela e dica de atividade em casa; fechamento. Termina em "Para convencer o juiz".)
+>
+> "
+>
+> "Manda isso pro claude que ta com o contexto do p[roblema e pede um roteiro pra ele, extamente o que vamos falar"
+
+**Resumo da resposta da IA:** avisou que o roteiro colado mostra funções que só existem nas branches de protótipo do Thiago (trilha, índice de acessibilidade, aula narrada, chat do mascote, combinados), não na `main` que vai para a banca, e que gravar isso seria risco de demo de fachada e de desencontro entre vídeo e código. Reescreveu `docs/roteiro_demo.md` com as falas exatas, cena a cena, para o app da `main` (cerca de 4min40), com fala alternativa se não houver chave de IA e um resumo do que cada pilar da banca procura.
+
+---
