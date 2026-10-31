@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 07:24 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 07:45 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -19,7 +19,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 | Entrega | Responsável | Status | Observação |
 |---|---|---|---|
-| Deploy da aplicação para a banca testar | João | ⚠️ | O grupo cogitou deixar o app só local, mas o deploy é entrega obrigatória e o pilar Tech avalia se a solução funciona. Configuração pronta (`render.yaml`, `build.sh`); banco criado no Neon; o Blueprint do Render parou na tela de variáveis. Dá para publicar **sem chave de IA**: o app funciona inteiro e o botão "Gerar com IA" fica desligado, com aviso. Depois: testar no ar e pôr o link no README |
+| Aplicação para a banca testar | João | ✅ decisão · ⚠️ | **Decisão do grupo (31/10, 07h44): o MVP roda localmente.** O README põe em destaque como rodar no Windows, no macOS e no Linux e um teste de 5 minutos. A configuração do Render fica pronta para depois. ⚠️ O `CLAUDE.md` listava o deploy como entrega (tirado das anotações da abertura; o texto do manual não fala de deploy): vale confirmar com a organização que app local é aceito. ⚠️ Sem chave de IA, quem rodar o app vê o botão "Gerar com IA" desligado: o vídeo precisa mostrar a geração funcionando |
 | Vídeo de demo (até 5 min) | Cauã (roteiro e narração), Gabriel (edição) | 🔄 | Rascunho do roteiro de telas em `docs/roteiro_demo.md` e aula para colar em `docs/aula_exemplo.md`. Falta gravar, narrar e editar |
 | Plano de negócio em PDF | Gabriel | 🔄 | Base em `docs/plano_negocio.md` (números conferidos com link, hipóteses marcadas, preço a definir). Falta o Gabriel fechar o texto e gerar o PDF (PDFs não vão para o repositório) |
 | Repositório público ou com acesso para a banca | João | ⏳ | Fazer antes das 12h: o agente que avalia o pilar Tech precisa ler o código |
@@ -61,6 +61,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 - ⚠️ A branch partiu da `main` das 01h32; a `main` mudou muito desde então (Fatias 3–5, visual novo do Cauã). Atualizar a branch antes de qualquer merge
 - ⚠️ Os documentos antigos dele (ex.: `docs/TESE_PRODUTO.md`, que descreve outro produto) ganham um aviso no topo e um índice em `docs/README.md`, sem apagar nada
 - ⚠️ O mockup em `design/` é uma tela estática: não pode aparecer no vídeo como se fosse o app funcionando
+- 🔄 (07h44, pelo João) O Thiago está fazendo um frontend novo e vai pedir para o João seguir o estilo dele; talvez mande um meta prompt para guiar a IA. Quando ele fizer commit, a IA do João aplica o estilo nas telas reais. Cuidados: combinar com o Cauã, que mudou o visual entre 06h46 e 07h00, para o app ter um estilo só; construir em cima da `main` atual; nada de dados de exemplo nas telas
 
 ### Cauã (Conteúdo: aula de exemplo, questionário, blocos pedagógicos, roteiro e narração do vídeo)
 
@@ -78,6 +79,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 07:45 — Decisão do grupo: o MVP roda localmente. README reorganizado (como rodar no computador primeiro; deploy vira nota de "depois do hackathon"); a chave de IA saiu da lista de variáveis pedidas pelo Render. O Thiago vai mandar um frontend novo para o app seguir.
 - 31/10, 07:24 — Testes automáticos no GitHub (`.github/workflows/testes.yml`). Tela de login sem as dicas de usuários e senha de contas de mentira. App conferido em modo de produção (`DEBUG` desligado): arquivos estáticos, página 404 em português e todas as migrações num banco novo. 120 testes passando.
 - 31/10, 07:12 — Rascunhos de `docs/roteiro_demo.md` (roteiro de telas do vídeo) e `docs/plano_negocio.md` (base do plano de negócio, só com números de fonte conferida).
 - 31/10, 07:05 — Documentos organizados para a banca: índice `docs/README.md` e aviso no topo dos rascunhos antigos; fonte pública do 6,4% (Instituto Rodrigo Mendes); README, arquitetura e decisões atualizados. Barra de apoios voltou a mudar de cor na hora.

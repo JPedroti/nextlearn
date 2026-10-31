@@ -5,7 +5,7 @@ O professor prepara a aula **uma vez** e cada aluno recebe a **mesma aula** no f
 
 Projeto do 1º Hackathon LEPV × FGV (tema: Educação, patrocínio Teachy) — Desafio 1: Inclusão e acessibilidade.
 
-- **Deploy:** _(link do Render, preencher após o primeiro deploy)_
+- **Como rodar:** o MVP roda no seu computador em poucos minutos: [Windows](#como-rodar-no-windows) · [macOS ou Linux](#como-rodar-no-macos-ou-no-linux) · [testar em 5 minutos](#testar-em-5-minutos)
 - **O problema, com os dados do Inep:** [docs/contexto.md](docs/contexto.md)
 - **Arquitetura e modelo de dados:** [docs/arquitetura.md](docs/arquitetura.md)
 - **Decisões técnicas e de produto (e por quê):** [docs/decisoes.md](docs/decisoes.md)
@@ -16,53 +16,6 @@ Projeto do 1º Hackathon LEPV × FGV (tema: Educação, patrocínio Teachy) — 
 ## Equipe
 
 João, Thiago, Cauã e Gabriel Franco (IME, 4º período).
-
-## Como funciona
-
-1. **Contas de professor** são criadas em `/admin/`, em **Usuários → Adicionar**, escolhendo o **papel**.
-   As contas de aluno e de família o próprio professor cria nas telas da turma.
-2. O **professor** cria uma turma e, dentro dela:
-   - **Cadastrar aluno**: cria o usuário e a senha de primeiro acesso do aluno;
-   - **Nova aula**: escreve o texto e as questões de múltipla escolha (2 a 4 alternativas, com a correta marcada).
-     **Criar via PDF** copia o texto de um PDF para essa mesma tela, para o professor revisar e completar.
-     A aula nasce como rascunho; **Publicar para a turma** libera para os alunos.
-3. **Cadastrar família** cria o login do responsável. A família responde 9 perguntas sobre o dia a dia do aluno
-   (sem laudo e sem diagnóstico) e pode deixar observações. As respostas viram **sugestões de apoio**, que o professor
-   aceita ou recusa na tela de **Apoios** do aluno. As observações da família ficam só para o professor ler: não vão
-   para a IA.
-4. Em **Apoios** (na lista de alunos da turma), o professor marca o que ajuda cada aluno: **Atenção e foco**, **Acessibilidade textual**
-   e/ou **Interativo e concreto**. Cada combinação vira uma máscara de 3 bits (F×4 + S×2 + C×1, de 0 a 7);
-   0 é a aula original.
-5. Na página da aula, em **Versões adaptadas**, aparece uma linha para cada combinação presente na turma.
-   **Gerar com IA** cria a versão (o texto e os enunciados reescritos). O professor revisa, pode corrigir e clica em
-   **Aprovar versão**. Cada versão é gerada uma vez e fica guardada (cache); **Gerar de novo** refaz.
-   Sem chave de IA configurada, o botão fica desligado e a tela avisa; o resto do app funciona normalmente.
-6. O **aluno** vê as aulas publicadas na versão aprovada da sua combinação (ou a original, enquanto não houver versão
-   aprovada). Com o apoio de foco, o texto aparece **um passo por vez**. As questões vêm uma por vez, com barra de
-   progresso, e o **modo concentração** abre a aula em tela cheia. A correção usa sempre o gabarito do professor:
-   a IA nunca mexe em alternativas nem na resposta certa.
-7. A barra **Apoios de leitura** (sem IA) vale para qualquer aluno: **Fonte para dislexia** (OpenDyslexic, com mais
-   espaço entre as letras), **Leitura em voz alta** (voz do próprio navegador) e **Modo limpo**. O professor escolhe o
-   que já vem ligado; o aluno liga e desliga quando quiser, e cada vez que ele liga um apoio o sistema registra o uso.
-8. O professor acompanha tudo, calculado na hora a partir do uso real:
-   - **Painel da turma** (botão **Ver painel**): acertos por aluno e por questão, comparação entre a aula original e as versões adaptadas,
-     uso dos apoios de leitura e as **sugestões de ajuste de perfil** (do questionário da família, do uso dos apoios
-     e dos acertos). Nada muda sem o professor aceitar;
-   - **Página de cada aluno** (link "Dashboard" na turma): acertos por aula, tempo nas aulas e apoios usados.
-9. A **família** vê o **relatório** do próprio filho: acertos, versão original × adaptada e apoios de leitura usados.
-
-A IA recebe só os apoios ligados e o conteúdo da aula: nunca nome, login, respostas, questionário ou observações do aluno.
-
-| Papel | Página inicial |
-|---|---|
-| Professor | `/professor/` |
-| Família | `/familia/` |
-| Aluno | `/aluno/` |
-
-## Stack
-
-Python + Django 5.2, templates do Django com Tailwind (CDN), SQLite no computador e Postgres (Neon) em produção,
-IA pelo Gemini (`google-genai`) ou por uma API compatível com a da OpenAI (`openai`), deploy no Render.
 
 ## Como rodar no Windows
 
@@ -119,8 +72,9 @@ python manage.py runserver
 
 Tudo é feito pela própria pessoa que testa: o repositório não traz alunos, respostas nem aulas prontas.
 
-1. Com o servidor rodando, entre em `/admin/` com o administrador e crie um usuário com papel **Professor**.
-2. Entre como esse professor, crie uma turma e cadastre dois alunos.
+1. Com o servidor rodando, entre com o administrador. Se no `createsuperuser` você escolheu o papel **professor**, ele
+   já serve; senão, crie em `/admin/` um usuário com papel **Professor** e entre com ele.
+2. Crie uma turma e cadastre dois alunos.
 3. Em **Apoios**, ligue **Atenção e foco** para um dos alunos.
 4. Crie uma aula: o texto e as questões de [docs/aula_exemplo.md](docs/aula_exemplo.md) servem, ou use **Criar via PDF**.
    Publique a aula.
@@ -140,6 +94,53 @@ python manage.py test
 São 120 testes, em `tests/`. A chamada à IA é simulada, então não precisam de chave nem de internet.
 No GitHub, eles rodam sozinhos a cada envio para a `main` ([.github/workflows/testes.yml](.github/workflows/testes.yml)).
 
+## Como funciona
+
+1. **Contas de professor** são criadas em `/admin/`, em **Usuários → Adicionar**, escolhendo o **papel**.
+   As contas de aluno e de família o próprio professor cria nas telas da turma.
+2. O **professor** cria uma turma e, dentro dela:
+   - **Cadastrar aluno**: cria o usuário e a senha de primeiro acesso do aluno;
+   - **Nova aula**: escreve o texto e as questões de múltipla escolha (2 a 4 alternativas, com a correta marcada).
+     **Criar via PDF** copia o texto de um PDF para essa mesma tela, para o professor revisar e completar.
+     A aula nasce como rascunho; **Publicar para a turma** libera para os alunos.
+3. **Cadastrar família** cria o login do responsável. A família responde 9 perguntas sobre o dia a dia do aluno
+   (sem laudo e sem diagnóstico) e pode deixar observações. As respostas viram **sugestões de apoio**, que o professor
+   aceita ou recusa na tela de **Apoios** do aluno. As observações da família ficam só para o professor ler: não vão
+   para a IA.
+4. Em **Apoios** (na lista de alunos da turma), o professor marca o que ajuda cada aluno: **Atenção e foco**, **Acessibilidade textual**
+   e/ou **Interativo e concreto**. Cada combinação vira uma máscara de 3 bits (F×4 + S×2 + C×1, de 0 a 7);
+   0 é a aula original.
+5. Na página da aula, em **Versões adaptadas**, aparece uma linha para cada combinação presente na turma.
+   **Gerar com IA** cria a versão (o texto e os enunciados reescritos). O professor revisa, pode corrigir e clica em
+   **Aprovar versão**. Cada versão é gerada uma vez e fica guardada (cache); **Gerar de novo** refaz.
+   Sem chave de IA configurada, o botão fica desligado e a tela avisa; o resto do app funciona normalmente.
+6. O **aluno** vê as aulas publicadas na versão aprovada da sua combinação (ou a original, enquanto não houver versão
+   aprovada). Com o apoio de foco, o texto aparece **um passo por vez**. As questões vêm uma por vez, com barra de
+   progresso, e o **modo concentração** abre a aula em tela cheia. A correção usa sempre o gabarito do professor:
+   a IA nunca mexe em alternativas nem na resposta certa.
+7. A barra **Apoios de leitura** (sem IA) vale para qualquer aluno: **Fonte para dislexia** (OpenDyslexic, com mais
+   espaço entre as letras), **Leitura em voz alta** (voz do próprio navegador) e **Modo limpo**. O professor escolhe o
+   que já vem ligado; o aluno liga e desliga quando quiser, e cada vez que ele liga um apoio o sistema registra o uso.
+8. O professor acompanha tudo, calculado na hora a partir do uso real:
+   - **Painel da turma** (botão **Ver painel**): acertos por aluno e por questão, comparação entre a aula original e as versões adaptadas,
+     uso dos apoios de leitura e as **sugestões de ajuste de perfil** (do questionário da família, do uso dos apoios
+     e dos acertos). Nada muda sem o professor aceitar;
+   - **Página de cada aluno** (link "Dashboard" na turma): acertos por aula, tempo nas aulas e apoios usados.
+9. A **família** vê o **relatório** do próprio filho: acertos, versão original × adaptada e apoios de leitura usados.
+
+A IA recebe só os apoios ligados e o conteúdo da aula: nunca nome, login, respostas, questionário ou observações do aluno.
+
+| Papel | Página inicial |
+|---|---|
+| Professor | `/professor/` |
+| Família | `/familia/` |
+| Aluno | `/aluno/` |
+
+## Stack
+
+Python + Django 5.2, templates do Django com Tailwind (CDN), SQLite no computador e Postgres (Neon) em produção,
+IA pelo Gemini (`google-genai`) ou por uma API compatível com a da OpenAI (`openai`), deploy no Render.
+
 ## Variáveis de ambiente
 
 Ficam no `.env` (local, fora do Git) ou no painel do Render (produção). Modelo em [.env.example](.env.example).
@@ -151,16 +152,16 @@ Ficam no `.env` (local, fora do Git) ou no painel do Render (produção). Modelo
 | `ALLOWED_HOSTS` | Endereços aceitos. O endereço do Render entra sozinho |
 | `DATABASE_URL` | Connection string do Postgres (Neon). Vazia = SQLite local |
 | `IA_PROVEDOR` | `gemini` (padrão) ou `openai` (qualquer API compatível com a da OpenAI) |
-| `GEMINI_API_KEY` | Chave do Google AI Studio. Vazia = geração com IA desligada, com aviso na tela |
+| `GEMINI_API_KEY` | Chave do Google AI Studio. Vazia ou ausente = geração com IA desligada, com aviso na tela |
 | `GEMINI_MODEL` | Modelo do Gemini (padrão: `gemini-flash-latest`) |
 | `IA_API_KEY`, `IA_BASE_URL`, `IA_MODEL` | Chave, endereço e modelo quando `IA_PROVEDOR=openai` (ex.: DeepSeek, Groq, OpenAI) |
 | `DJANGO_SUPERUSER_*` | Só no Render: cria o primeiro administrador durante o deploy |
 
-## Deploy (Render)
+## Publicar na internet (depois do hackathon)
 
-O arquivo [render.yaml](render.yaml) descreve o serviço. A cada push na `main`, o Render roda
-[build.sh](build.sh) (instala dependências, `collectstatic`, `migrate` e cria o administrador se ainda não existir)
-e inicia o site com `gunicorn`. O site funciona mesmo sem chave de IA: só a geração de versões fica desligada.
+Para o hackathon, o MVP roda no computador (decisão do grupo). O repositório já tem a configuração para publicar
+no Render quando a equipe quiser: [render.yaml](render.yaml) descreve o serviço e [build.sh](build.sh) instala as
+dependências, prepara os arquivos estáticos, cria as tabelas e o primeiro administrador.
 
 ## Créditos
 

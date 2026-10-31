@@ -37,7 +37,7 @@ Faça commit do cronograma junto com o trabalho da vez.
 **Entregas da Fase 1 (até 13h):**
 1. vídeo de demo de até 5 min;
 2. plano de negócio em PDF;
-3. **deploy da aplicação para a banca testar.**
+3. **deploy da aplicação para a banca testar.** (Decisão do grupo em 31/10, 07h44: o MVP roda localmente, com instruções no README; a configuração do Render fica pronta para depois.)
 
 **Avaliação da Fase 1:** 4 pilares de 2,5 pontos cada. **Ficar abaixo de 1,0 em qualquer pilar elimina o grupo.**
 
@@ -99,7 +99,7 @@ Faça commit do cronograma junto com o trabalho da vez.
 | **Postgres no Neon** em produção, **SQLite** local | Postgres grátis é fácil de conseguir; no Django, a troca é só a `DATABASE_URL` (via `dj-database-url`). A equipe pensou em MySQL, mas trocou por causa do deploy |
 | **Sem LangChain** | O app só precisa montar um prompt por blocos e fazer uma chamada com saída JSON. O SDK resolve em poucas linhas, é mais fácil de explicar e quebra menos. O LangChain só valeria para RAG, agentes com ferramentas, memória de chat ou vários provedores |
 | **Gemini via SDK `google-genai`**, com saída estruturada (`response_schema` com Pydantic) | Chave gratuita no Google AI Studio. Só `ia/cliente.py` conhece o provedor, então trocar de modelo é mudar um arquivo |
-| **Deploy no Render** (gunicorn + whitenoise), configurado por `render.yaml` | Publica direto do GitHub |
+| **Deploy no Render** (gunicorn + whitenoise), configurado por `render.yaml` | Publica direto do GitHub. Para o hackathon, o MVP roda local (decisão de 31/10); a configuração fica pronta |
 | **Configuração por variáveis de ambiente** (`.env` local, painel do Render em produção) | Nenhum segredo no código |
 | Nomes de domínio (models, URLs, telas) **em português**; o resto do código em inglês | A banca entende o domínio |
 

@@ -391,3 +391,27 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** seguiu o plano sem novas perguntas, decidindo pelo `CLAUDE.md`. Fez: texto em passos para o apoio de foco; aviso e botão desligado quando não há chave de IA; páginas de erro em português; junção do cliente de IA com vários provedores do Cauã (faltava a biblioteca `openai`); correção da barra de apoios e da tela de login (dicas de contas de mentira); fonte pública do 6,4% (Instituto Rodrigo Mendes); índice `docs/README.md` com aviso nos rascunhos antigos; README, arquitetura e decisões atualizados; rascunhos do roteiro do vídeo e da base do plano de negócio; testes automáticos no GitHub. Conferiu o app no navegador (computador e celular) e em modo de produção. 120 testes passando; tudo publicado na `main`.
 
 ---
+
+## Prompt 38 — 31/10/2026, 07:27 (BRT) — autor: João — ferramenta: Claude Code
+
+> Retomar o deploy
+
+**Resumo da resposta da IA:** começou a preparar o deploy no Render (tirou a chave de IA da lista de variáveis pedidas na criação do serviço e escreveu o passo a passo no README). Parou quando o João interrompeu para perguntar se o grupo não tinha escolhido rodar o MVP só local (prompt 39). Nada foi publicado nesse meio-tempo.
+
+---
+
+## Prompt 39 — 31/10/2026, 07:29 (BRT) — autor: João — ferramenta: Claude Code
+
+> Antes disso, queria apenas entender: nós não tinhamos escolhido que, para o MVP, tudo ia rodar local?
+
+**Resumo da resposta da IA:** explicou que, na conversa, o grupo só tinha comentado a ideia (prompt 33) e a IA havia recomendado o deploy, porque o `CLAUDE.md` lista o deploy como entrega; mas avisou que essa exigência não aparece no texto do manual e veio das anotações da equipe sobre a abertura, então a decisão é do grupo. Listou o que já tinha mudado sem publicar e perguntou se ficava só local.
+
+---
+
+## Prompt 40 — 31/10/2026, 07:44 (BRT) — autor: João — ferramenta: Claude Code
+
+> Sim. A ideia é rodarmos o mvp local. Além disso, recebi a informacao de que o Thiago está fazendo um frontend muito bom e que ele vai pedir para eu seguir o estilo dele depois, então quando ele der commit teremos nocao do que fazer e ele ainda falou da possibilidade de ele mandar um meta prompt para te guiar melhor
+
+**Resumo da resposta da IA:** registrou a decisão (MVP local) no `CLAUDE.md`, em `docs/decisoes.md` e no cronograma, com o aviso de confirmar com a organização que app local é aceito. Reorganizou o README para pôr em destaque como rodar no computador (Windows, macOS/Linux, teste de 5 minutos) e trocou o passo a passo de deploy por uma nota de "depois do hackathon"; a configuração do Render fica pronta. Anotou no cronograma que o Thiago vai mandar um frontend e talvez um meta prompt, com os cuidados para juntar (um estilo só com o do Cauã, em cima da `main` atual, sem dados de exemplo). 120 testes passando.
+
+---

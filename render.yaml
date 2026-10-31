@@ -17,12 +17,11 @@ services:
         value: "False"
       - key: DATABASE_URL
         sync: false
-      # IA: Gemini por padrão. Para usar uma API compatível com a da OpenAI, troque IA_PROVEDOR para "openai"
-      # e crie IA_API_KEY, IA_BASE_URL e IA_MODEL no painel (Environment). Sem chave, o app avisa e não gera.
+      # IA: Gemini por padrão. A chave não é pedida na criação: o app funciona sem ela (o botão "Gerar com IA"
+      # fica desligado, com aviso). Quando a equipe escolher o provedor, crie no painel do serviço (Environment)
+      # a GEMINI_API_KEY, ou troque IA_PROVEDOR para "openai" e crie IA_API_KEY, IA_BASE_URL e IA_MODEL.
       - key: IA_PROVEDOR
         value: gemini
-      - key: GEMINI_API_KEY
-        sync: false
       - key: GEMINI_MODEL
         value: gemini-flash-latest
       - key: DJANGO_SUPERUSER_USERNAME
