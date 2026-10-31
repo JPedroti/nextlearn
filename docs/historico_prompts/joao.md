@@ -556,3 +556,14 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** fez o plano e executou: juntou a aplicação da skill design-neuro com a `main` (migração renumerada depois da do Cauã), tirou da `main` o app de protótipo (rota /jogo/, aluno fictício, contas de teste), tirou as métricas das turmas do prompt da IA (com teste), conferiu as migrações num banco novo e publicou. 131 testes passando. Lembrou o João de deixar o repositório público e de pedir ao grupo que não envie mais nada à `main`.
 
 ---
+
+## Prompt 44 — 31/10/2026, 11:02 (BRT) — autor: João — ferramenta: Claude Code
+
+> resumo do que o thiago me mandou em aúdio agora (até o teoricamente ele realmente falou)
+>
+> teoricamente, fazer o login do familiar e do professor e o thiago já fez, ent é só eu testar (teoricamente) e
+> ficar pedindo para o Claude colcocar elementos graficos para enriquecer o projeto. Como, por exemplo, colocar um camaleao que parece um pai e uma mae na area dos pais e um que parece com professor na area dos professores, etc
+
+**Resumo da resposta da IA:** conferiu o GitHub: o login do Thiago está só nas branches de protótipo; a `main` já tem login real para professor, família e aluno. Explicou que os camaleões dá para fazer como desenhos SVG nas telas reais, sem emoji e com descrição para leitor de tela, mas que o código já congelou e faltam menos de 1 hora para a submissão; perguntou se faz agora.
+
+---
