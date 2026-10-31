@@ -55,10 +55,16 @@ Abra http://127.0.0.1:8000 e entre com o usuário criado.
 - *Erro de certificado SSL no `pip install`*: atualize o pip (`python -m pip install --upgrade pip --use-feature=truststore`)
   e repita o passo 3.
 
-### Criar outros usuários
+### Como usar (o que já funciona)
 
-Por enquanto, os usuários (professor, família, aluno) são criados em http://127.0.0.1:8000/admin/,
-em **Usuários → Adicionar**, escolhendo o **papel**. Cada papel tem a sua página inicial:
+1. **Contas de professor e de família** são criadas em http://127.0.0.1:8000/admin/, em **Usuários → Adicionar**,
+   escolhendo o **papel**.
+2. O **professor** entra e, em **Minhas turmas**, cria uma turma. Dentro dela:
+   - **Cadastrar aluno**: cria o usuário e a senha de primeiro acesso do aluno;
+   - **Nova aula**: escreve o texto da aula e as questões de múltipla escolha (2 a 4 alternativas, com a correta marcada).
+     A aula nasce como rascunho; o botão **Publicar para a turma** libera para os alunos.
+3. O **aluno** entra, vê as aulas publicadas da turma, lê o texto, responde e vê na hora quantas acertou.
+   A correção usa sempre o gabarito do professor.
 
 | Papel | Página inicial |
 |---|---|

@@ -196,6 +196,6 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 
 > Pode começar, mas, antes disso, separe o histórico de prompts para João, Thiago, Gabriel e Cauã, considerando que, até agora, o histórico só contem prompts do João. E que eu sou o João nessa conversa.
 
-**Resumo da resposta da IA:** _(preenchido ao final)_
+**Resumo da resposta da IA:** histórico separado em `docs/historico_prompts/`, com um arquivo por integrante e um índice (numeração própria em cada arquivo; CLAUDE.md atualizado). Fatia 1 feita na branch `fatia-1`: modelos Turma, Aluno, Aula, Questao e Resposta; o professor cria turma, cadastra aluno, cria/edita aula com questões e publica; o aluno vê a versão original (000), responde e recebe a correção pelo gabarito do professor. 19 testes passando e fluxo conferido no navegador local.
 
 ---
