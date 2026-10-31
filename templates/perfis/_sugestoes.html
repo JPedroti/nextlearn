@@ -1,0 +1,25 @@
+{# Sugestões pendentes com Aceitar/Recusar. Uso: {% include "perfis/_sugestoes.html" with sugestoes=lista mostrar_aluno=True %} #}
+<ul class="divide-y divide-slate-100">
+  {% for sugestao in sugestoes %}
+    <li class="py-3 flex flex-wrap items-start justify-between gap-3">
+      <div class="max-w-xl">
+        <p class="font-medium">
+          {{ sugestao.descricao }}{% if mostrar_aluno %} para {{ sugestao.aluno.usuario.get_full_name|default:sugestao.aluno.usuario.username }}{% endif %}
+        </p>
+        <p class="text-sm text-slate-600">{{ sugestao.get_origem_display }}. {{ sugestao.motivo }}</p>
+      </div>
+      <div class="flex gap-2">
+        <form method="post" action="{% url 'perfis:aceitar_sugestao' sugestao.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn">Aceitar</button>
+        </form>
+        <form method="post" action="{% url 'perfis:recusar_sugestao' sugestao.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <button type="submit" class="btn-sec">Recusar</button>
+        </form>
+      </div>
+    </li>
+  {% endfor %}
+</ul>

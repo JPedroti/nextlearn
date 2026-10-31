@@ -1,12 +1,13 @@
 from django.contrib import messages
 from django.db import transaction
+from django.db.models import Count, Max, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.contas.decorators import papel_requerido
 from apps.contas.models import Usuario
 from apps.perfis.models import Perfil
 
-from .forms import NovoAlunoForm, TurmaForm
+from .forms import NovaFamiliaForm, NovoAlunoForm, TurmaForm
 from .models import Aluno, Turma
 
 
@@ -28,7 +29,10 @@ def detalhe(request, pk):
     turma = get_object_or_404(Turma, pk=pk, professor=request.user)
     contexto = {
         "turma": turma,
-        "alunos": turma.alunos.select_related("usuario", "perfil"),
+        "alunos": turma.alunos.select_related("usuario", "perfil", "responsavel").annotate(
+            sugestoes_pendentes=Count("sugestoes", filter=Q(sugestoes__status="pendente"), distinct=True),
+            ultimo_questionario=Max("questionarios__criado_em"),
+        ),
         "aulas": turma.aulas.all(),
     }
     return render(request, "turmas/detalhe.html", contexto)
@@ -50,3 +54,28 @@ def novo_aluno(request, pk):
         )
         return redirect("turmas:detalhe", pk=turma.pk)
     return render(request, "turmas/novo_aluno.html", {"turma": turma, "form": form})
+
+
+@papel_requerido("professor")
+def nova_familia(request, pk, aluno_pk):
+    """O professor cria o login da família do aluno, que depois responde o questionário."""
+    turma = get_object_or_404(Turma, pk=pk, professor=request.user)
+    aluno = get_object_or_404(Aluno.objects.select_related("usuario", "responsavel"), pk=aluno_pk, turma=turma)
+    if aluno.responsavel:
+        messages.error(request, f"{aluno} já tem uma família cadastrada (usuário “{aluno.responsavel.username}”).")
+        return redirect("turmas:detalhe", pk=turma.pk)
+    form = NovaFamiliaForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        with transaction.atomic():
+            usuario = form.save(commit=False)
+            usuario.papel = Usuario.Papel.FAMILIA
+            usuario.save()
+            aluno.responsavel = usuario
+            aluno.save(update_fields=["responsavel"])
+        messages.success(
+            request,
+            f"Família de {aluno} cadastrada. Passe o usuário “{usuario.username}” e a senha: "
+            "ao entrar, a família responde o questionário.",
+        )
+        return redirect("turmas:detalhe", pk=turma.pk)
+    return render(request, "turmas/nova_familia.html", {"turma": turma, "aluno": aluno, "form": form})

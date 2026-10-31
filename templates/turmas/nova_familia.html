@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block titulo %}Cadastrar família · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'turmas:detalhe' turma.pk %}" class="voltar">← {{ turma.nome }}</a>
+<div class="cartao max-w-lg mt-3">
+  <h1 class="text-2xl font-semibold mb-1">Família de {{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</h1>
+  <p class="text-sm text-slate-600 mb-4">
+    Crie o login do responsável. Ao entrar, a família responde algumas perguntas sobre o dia a dia do aluno
+    (sem laudo e sem diagnóstico). As respostas viram sugestões de apoio, e quem decide é você.
+  </p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for campo in form %}
+      {% include "_campo.html" %}
+    {% endfor %}
+    <button type="submit" class="btn">Cadastrar família</button>
+  </form>
+</div>
+{% endblock %}

@@ -43,6 +43,14 @@
           <span>
             <span class="block">{{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</span>
             <span class="block text-sm text-slate-500">usuário: {{ aluno.usuario.username }}</span>
+            <span class="block text-sm text-slate-500">
+              {% if aluno.responsavel %}
+                Família: {{ aluno.responsavel.get_full_name|default:aluno.responsavel.username }} (usuário: {{ aluno.responsavel.username }})
+                · {% if aluno.ultimo_questionario %}questionário respondido em {{ aluno.ultimo_questionario|date:"d/m H:i" }}{% else %}questionário ainda não respondido{% endif %}
+              {% else %}
+                <a href="{% url 'turmas:nova_familia' turma.pk aluno.pk %}" class="text-indigo-700 hover:underline">Cadastrar família</a>
+              {% endif %}
+            </span>
           </span>
           <span class="flex flex-wrap items-center gap-2 text-xs">
             {% for apoio in aluno.perfil.nomes_apoios %}
@@ -50,6 +58,9 @@
             {% empty %}
               <span class="rounded-full bg-slate-100 text-slate-700 px-2 py-1">Aula original</span>
             {% endfor %}
+            {% if aluno.sugestoes_pendentes %}
+              <span class="rounded-full bg-indigo-600 text-white px-2 py-1">{{ aluno.sugestoes_pendentes }} sugest{{ aluno.sugestoes_pendentes|pluralize:"ão,ões" }}</span>
+            {% endif %}
             <a href="{% url 'perfis:editar_apoios' aluno.pk %}" class="text-sm text-indigo-700 hover:underline ml-2">Ajustar apoios</a>
           </span>
         </li>
