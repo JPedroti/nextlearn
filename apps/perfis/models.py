@@ -67,6 +67,13 @@ class Perfil(models.Model):
         help_text="Informações que a família compartilhou sobre como o aluno aprende. O professor revisa e edita. "
         "Quando preenchido, é incluído como contexto adicional na geração das aulas adaptadas.",
     )
+    historico_ia = models.TextField(
+        "Histórico de interações",
+        blank=True,
+        help_text="Registro acumulado de interações do aluno com as versões adaptadas: "
+        "quais máscaras foram usadas, quantos acertos, quais apoios de leitura foram ativados. "
+        "Incluído no system prompt para dar contexto real à IA.",
+    )
     revisado_pelo_professor = models.BooleanField(default=False)
     atualizado_em = models.DateTimeField(auto_now=True)
 
@@ -82,6 +89,13 @@ class Perfil(models.Model):
 
     def nomes_preferencias(self):
         return [self._meta.get_field(campo).verbose_name for campo in PREFERENCIAS if getattr(self, campo)]
+
+    def acrescentar_ao_historico(self, linha):
+        """Adiciona uma linha ao histórico de interações, mantendo no máximo as 20 mais recentes."""
+        linhas = [l for l in self.historico_ia.strip().split("\n") if l.strip()] if self.historico_ia else []
+        linhas.append(linha)
+        self.historico_ia = "\n".join(linhas[-20:])
+        self.save(update_fields=["historico_ia"])
 
 
 class RespostaQuestionario(models.Model):
@@ -123,6 +137,7 @@ class SugestaoPerfil(models.Model):
     class Origem(models.TextChoices):
         QUESTIONARIO = "questionario", "Questionário da família"
         USO = "uso", "Uso da plataforma"
+        PADRAO_ERRO = "padrao_erro", "Padrão de erro detectado"
 
     CAMPOS = [
         ("foco", "Atenção e foco"),

@@ -16,6 +16,7 @@
         <h2 class="text-lg font-semibold">{{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</h2>
         <p class="text-sm text-slate-600">Turma: {{ aluno.turma.nome }}</p>
       </div>
+      <a href="{% url 'perfis:relatorio' aluno.pk %}" class="btn-sec">Ver relatório</a>
       <a href="{% url 'perfis:questionario' aluno.pk %}" class="{% if aluno.ultimo_questionario %}btn-sec{% else %}btn{% endif %}">
         {% if aluno.ultimo_questionario %}Responder de novo{% else %}Responder o questionário{% endif %}
       </a>

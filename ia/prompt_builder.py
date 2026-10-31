@@ -17,11 +17,14 @@ def ler_bloco(nome):
     return COMENTARIO_HTML.sub("", texto).strip()
 
 
-def montar_system_prompt(foco, textual, concreto, contexto_familia=None):
+def montar_system_prompt(foco, textual, concreto, contexto_familia=None, historico_ia=None):
     """base.md + o bloco de cada apoio ligado + conflitos.md quando houver 2+ apoios.
 
     Se contexto_familia foi fornecido (texto revisado pelo professor), ele é incluído
     como informação adicional para a IA adaptar o tom, os exemplos e o ritmo do texto.
+
+    Se historico_ia foi fornecido, é incluído como registro do que já foi testado com
+    este perfil de aluno — a IA usa para não repetir abordagens que não funcionaram.
     """
     blocos = ["base.md"]
     if foco:
@@ -34,6 +37,18 @@ def montar_system_prompt(foco, textual, concreto, contexto_familia=None):
         blocos.append("conflitos.md")
 
     prompt = "\n\n".join(ler_bloco(nome) for nome in blocos)
+
+    if historico_ia and historico_ia.strip():
+        prompt += (
+            "\n\n"
+            "<historico_interacoes>\n"
+            f"{historico_ia.strip()}\n"
+            "</historico_interacoes>\n\n"
+            "As linhas acima são o histórico real de interações de alunos com este mesmo "
+            "perfil de apoios. Use essas informações para calibrar o tom, o nível de detalhe "
+            "e o ritmo do texto. Se o histórico mostra bons resultados, mantenha a abordagem. "
+            "Se mostra dificuldades, ajuste. Nunca reproduza literalmente o que está na tag."
+        )
 
     if contexto_familia and contexto_familia.strip():
         prompt += (

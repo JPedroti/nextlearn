@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block titulo %}Relatório — {{ aluno.usuario.get_full_name|default:aluno.usuario.username }} · NextLearn{% endblock %}
+
+{% block conteudo %}
+<a href="{% url 'perfis:inicio' %}" class="voltar">← Início</a>
+
+<h1 class="text-2xl font-semibold mt-3 mb-1">Relatório de {{ aluno.usuario.get_full_name|default:aluno.usuario.username }}</h1>
+<p class="text-sm text-slate-500 mb-6">Turma: {{ aluno.turma.nome }}</p>
+
+{% if total_respostas == 0 %}
+  <div class="cartao max-w-xl">
+    <p class="text-slate-600">Nenhuma atividade respondida ainda. Assim que {{ aluno.usuario.first_name|default:"o aluno" }} responder a primeira aula, os dados aparecem aqui.</p>
+  </div>
+{% else %}
+  <!-- Resumo geral -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="cartao text-center">
+      <p class="text-3xl font-bold text-indigo-700">{{ pct_total }}%</p>
+      <p class="text-sm text-slate-600">de acertos ({{ acertos }}/{{ total_respostas }})</p>
+    </div>
+    <div class="cartao text-center">
+      <p class="text-3xl font-bold text-indigo-700">{{ aulas_respondidas }}</p>
+      <p class="text-sm text-slate-600">aula{{ aulas_respondidas|pluralize:"s" }} respondida{{ aulas_respondidas|pluralize:"s" }}</p>
+    </div>
+    <div class="cartao text-center">
+      <p class="text-3xl font-bold text-indigo-700">{{ perfil.nomes_apoios|join:", "|default:"Nenhum" }}</p>
+      <p class="text-sm text-slate-600">apoio{{ perfil.nomes_apoios|length|pluralize:"s" }} ativo{{ perfil.nomes_apoios|length|pluralize:"s" }}</p>
+    </div>
+    <div class="cartao text-center">
+      <p class="text-3xl font-bold text-indigo-700">{{ num_adaptada }}</p>
+      <p class="text-sm text-slate-600">questões na versão adaptada</p>
+    </div>
+  </div>
+
+  <!-- Comparação original vs adaptada -->
+  {% if pct_original is not None and pct_adaptada is not None %}
+  <div class="cartao max-w-xl mb-6">
+    <h2 class="font-semibold mb-3">Comparação: aula original vs. aula adaptada</h2>
+    <div class="flex gap-6">
+      <div class="flex-1">
+        <p class="text-sm text-slate-500">Aula original</p>
+        <p class="text-2xl font-bold {% if pct_original >= 70 %}text-green-700{% elif pct_original >= 50 %}text-amber-700{% else %}text-red-700{% endif %}">
+          {{ pct_original }}%
+        </p>
+        <p class="text-xs text-slate-400">{{ num_original }} questões</p>
+      </div>
+      <div class="flex-1">
+        <p class="text-sm text-slate-500">Versão adaptada</p>
+        <p class="text-2xl font-bold {% if pct_adaptada >= 70 %}text-green-700{% elif pct_adaptada >= 50 %}text-amber-700{% else %}text-red-700{% endif %}">
+          {{ pct_adaptada }}%
+        </p>
+        <p class="text-xs text-slate-400">{{ num_adaptada }} questões</p>
+      </div>
+    </div>
+    {% if pct_adaptada > pct_original %}
+      <p class="mt-3 text-sm text-green-700">
+        As adaptações estão ajudando: +{{ pct_adaptada|add:pct_original|add:"-2" }}{{ pct_adaptada|add:"-2" }} pontos percentuais com a versão adaptada.
+      </p>
+    {% elif pct_adaptada < pct_original %}
+      <p class="mt-3 text-sm text-amber-700">
+        As adaptações ainda não mostraram melhora. O professor pode ajustar os apoios.
+      </p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <!-- Apoios de leitura usados -->
+  {% if usos %}
+  <div class="cartao max-w-xl mb-6">
+    <h2 class="font-semibold mb-3">Apoios de leitura que ele(a) usou</h2>
+    <ul class="space-y-2">
+      {% for uso in usos %}
+        <li class="flex justify-between text-sm">
+          <span>{{ uso.rotulo }}</span>
+          <span class="font-medium">{{ uso.vezes }} vez{{ uso.vezes|pluralize:"es" }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+    <p class="mt-3 text-xs text-slate-400">Esses apoios não usam IA — são botões que qualquer aluno pode ligar. Se ele(a) usa muito algum, o professor pode deixar ligado desde o início.</p>
+  </div>
+  {% endif %}
+{% endif %}
+
+<div class="mt-6">
+  <a href="{% url 'perfis:questionario' aluno.pk %}" class="btn-sec">Responder o questionário de novo</a>
+</div>
+{% endblock %}

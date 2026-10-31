@@ -12,7 +12,10 @@
 <section class="mb-8">
   <div class="flex items-center justify-between mb-3">
     <h2 class="text-xl font-semibold">Aulas</h2>
-    <a href="{% url 'aulas:nova' turma.pk %}" class="btn">Nova aula</a>
+    <div class="flex gap-2">
+      <a href="{% url 'aulas:nova' turma.pk %}" class="btn">Nova aula</a>
+      <a href="{% url 'aulas:nova_via_pdf' turma.pk %}" class="btn-sec">Nova aula via PDF</a>
+    </div>
   </div>
   {% if aulas %}
     <ul class="cartao divide-y divide-slate-100 p-0">
