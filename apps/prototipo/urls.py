@@ -7,6 +7,7 @@ app_name = "prototipo"
 urlpatterns = [
     path("", views.inicio, name="inicio"),
     path("entrar/", views.entrada, name="entrada"),
+    path("login/", views.Login.as_view(), name="login"),
     path("aluno/", views.aluno, name="aluno"),
     path("aluno/aula/", views.aula, name="aula"),
     path("professor/", views.professor, name="professor"),

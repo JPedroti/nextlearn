@@ -20,3 +20,6 @@ referencias/
 !.env.example
 .vscode/
 .idea/
+
+# Contas de teste locais (senhas geradas)
+contas_teste_local.txt

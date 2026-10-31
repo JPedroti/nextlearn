@@ -144,17 +144,17 @@
     <h2 id="janela-titulo" data-titulo>Entrar como</h2>
     <p class="janela-sub" data-sub>Escolha quem você é. Depois é só usuário e senha.</p>
     <ul class="opcoes">
-      <li><a class="opcao-papel" href="{% url 'contas:entrar' %}?perfil=professor">
+      <li><a class="opcao-papel" href="{% url 'prototipo:login' %}?perfil=professor">
         <span class="papel-nome">Professor(a)</span>
         <span class="papel-desc" data-desc-entrar>Prepare a aula uma vez. Revise as versões e os apoios da turma.</span>
         <span class="papel-desc" data-desc-cadastro hidden>O acesso de professor é criado pela escola. Peça à coordenação.</span>
       </a></li>
-      <li><a class="opcao-papel" href="{% url 'contas:entrar' %}?perfil=aluno">
+      <li><a class="opcao-papel" href="{% url 'prototipo:login' %}?perfil=aluno">
         <span class="papel-nome">Aluno(a)</span>
         <span class="papel-desc" data-desc-entrar>Veja suas aulas no formato que ajuda você a aprender.</span>
         <span class="papel-desc" data-desc-cadastro hidden>Seu professor cria o seu usuário e a primeira senha.</span>
       </a></li>
-      <li><a class="opcao-papel" href="{% url 'contas:entrar' %}?perfil=familia">
+      <li><a class="opcao-papel" href="{% url 'prototipo:login' %}?perfil=familia">
         <span class="papel-nome">Família</span>
         <span class="papel-desc" data-desc-entrar>Conte como é o dia a dia de estudo e acompanhe os apoios.</span>
         <span class="papel-desc" data-desc-cadastro hidden>O professor cria o acesso da família junto com o do aluno.</span>

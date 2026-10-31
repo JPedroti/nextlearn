@@ -60,9 +60,9 @@ body.no-mar .ator { --pele: #2FA38F; --pele-escura: #1C6F61; --barriga: #8ED8C9;
 .next-svg .perna-frente { transform: rotate(var(--pf, 0deg)); }
 .next-svg .perna-tras { transform: rotate(var(--pt, 0deg)); }
 .next-svg .prop { display: none; }
-[data-pose="passos"] .prop-passos, [data-pose="livro"] .prop-livro, [data-pose="pizza"] .prop-pizza,
+[data-pose="livro"] .prop-livro, [data-pose="pizza"] .prop-pizza,
 [data-pose="fone"] .prop-fone, [data-pose="nadar"] .prop-mascara { display: inline; }
-[data-pose="passos"] .prop-passos, [data-pose="livro"] .prop-livro, [data-pose="pizza"] .prop-pizza, [data-pose="fone"] .prop-fone { animation: surgir .5s ease-out; }
+[data-pose="livro"] .prop-livro, [data-pose="pizza"] .prop-pizza, [data-pose="fone"] .prop-fone { animation: surgir .5s ease-out; }
 @keyframes surgir { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .next-svg .pupila { animation: olhar 6s infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes olhar { 0%, 40%, 100% { transform: translateX(0); } 50%, 80% { transform: translateX(-4px); } }

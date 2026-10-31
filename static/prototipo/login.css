@@ -1,0 +1,55 @@
+/* Login do protótipo: deserto calmo, Next na cor do perfil e um cartão simples. Contraste >= 4,5:1. */
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; font-family: "Atkinson Hyperlegible", system-ui, sans-serif; color: #3B2A17;
+  background: linear-gradient(#FBEFD5, #F3D9A7); --destaque: #8F4F15; }
+body[data-cor="laranja"] { --pele: #E08A35; --pele-escura: #9C5A1F; --barriga: #F2B36E; }
+body[data-cor="azul"]    { --pele: #5B9FD0; --pele-escura: #2F6E9C; --barriga: #B9D9EE; }
+body[data-cor="lilas"]   { --pele: #9B8CF5; --pele-escura: #5F51C7; --barriga: #C9C0FF; }
+:focus-visible { outline: 3px solid #FFB020; outline-offset: 3px; }
+
+.topo { padding: 20px clamp(16px, 4vw, 48px); }
+.marca { font-size: 1.375rem; font-weight: 700; color: #3B2A17; text-decoration: none; }
+
+.login { display: grid; grid-template-columns: 1fr minmax(320px, 420px); gap: clamp(24px, 5vw, 72px); align-items: center;
+  max-width: 1080px; margin: 0 auto; padding: 4vh clamp(16px, 4vw, 48px) 48px; }
+
+.lado-next { position: relative; display: flex; flex-direction: column; align-items: center; }
+.balao { position: relative; max-width: 360px; margin: 0 0 12px; padding: 14px 18px; border-radius: 18px; background: #FFF8EC;
+  font-size: 1.25rem; font-weight: 700; box-shadow: 0 6px 20px rgba(59, 42, 23, .12); }
+.balao::after { content: ""; position: absolute; left: 50%; bottom: -10px; border: 10px solid transparent; border-top-color: #FFF8EC; border-bottom: 0; }
+.next-login { width: min(420px, 90%); }
+.chao { width: min(520px, 100%); height: 28px; margin-top: -18px; border-radius: 50%; background: #D9A866; }
+
+/* SVG do Next (mesmas classes do _next.html) */
+.next-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.next-svg .pele { fill: var(--pele); }
+.next-svg .pele-traco { stroke: var(--pele); }
+.next-svg .pele-escura-traco { stroke: var(--pele-escura); }
+.next-svg .pele-escura-fill { fill: var(--pele-escura); }
+.next-svg .barriga { stroke: var(--barriga); }
+.next-svg .destaque-fill { fill: var(--destaque); }
+.next-svg .destaque-traco { stroke: var(--destaque); }
+.next-svg .prop { display: none; }
+[data-pose="livro"] .prop-livro, [data-pose="pizza"] .prop-pizza, [data-pose="fone"] .prop-fone { display: inline; }
+.next-login { animation: respirar 4s ease-in-out infinite; }
+@keyframes respirar { 50% { transform: translateY(-6px); } }
+
+.cartao { padding: 28px; border-radius: 24px; background: #FFFFFF; box-shadow: 0 12px 40px rgba(59, 42, 23, .15); color: #1F2933; }
+.abas { display: flex; gap: 4px; padding: 4px; margin-bottom: 20px; border-radius: 999px; background: #F3EEE6; }
+.aba { flex: 1; min-height: 44px; display: grid; place-items: center; border-radius: 999px; color: #52606D; font-weight: 700; text-decoration: none; font-size: .95rem; }
+.aba.ativa { background: #FFFFFF; color: #1F2933; box-shadow: 0 2px 6px rgba(0, 0, 0, .08); }
+h1 { margin: 0 0 16px; font-size: 1.5rem; }
+label { display: block; margin: 14px 0 6px; font-weight: 700; }
+input[type="text"], input[type="password"] { width: 100%; min-height: 48px; padding: 0 14px; border: 2px solid #CBD2D9; border-radius: 12px; font: inherit; }
+input:focus { border-color: #8F4F15; outline: none; }
+.btn-entrar { width: 100%; min-height: 52px; margin-top: 22px; border: 0; border-radius: 999px; background: #8F4F15; color: #FFFFFF; font: inherit; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+.btn-entrar:hover { background: #733E0F; }
+.erro { margin: 0 0 8px; padding: 10px 14px; border-radius: 12px; background: #FDECEA; color: #8A1C12; }
+.ajuda { margin: 18px 0 0; color: #52606D; font-size: .95rem; }
+
+@media (max-width: 760px) {
+  .login { grid-template-columns: 1fr; padding-top: 0; }
+  .next-login { width: 220px; }
+  .balao { font-size: 1.05rem; }
+}
+@media (prefers-reduced-motion: reduce) { .next-login { animation: none; } }

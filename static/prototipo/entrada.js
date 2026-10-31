@@ -110,27 +110,38 @@
     nadador.style.setProperty("--pt", (40 - Math.sin(y / 60) * 25) + "deg");
     if (W < 760) return;
 
+    if (pegouMosca) return;
     var rM = mosca.getBoundingClientRect();
-    var cy = rM.top + rM.height / 2;
-    var t = faixa(cy, H * 0.75, H * 0.30);              // 0 quando a mosca entra embaixo, 1 quando sobe
-    if (t <= 0 || t >= 1) { lingua.style.display = "none"; mosca.style.visibility = t >= 1 ? "hidden" : "visible"; return; }
+    if (rM.top + rM.height / 2 < H * 0.55 && rM.bottom > 0) disparaLingua();   // passou do ponto: pega uma vez
+  }
 
-    // Boca do Next: centro do nadador + vetor da boca girado (ponto 265,135 do desenho de 340x260)
-    var rN = nadador.getBoundingClientRect();
-    var k = nadador.offsetWidth / 340, a = ang * Math.PI / 180;
-    var vx = 95 * k, vy = 5 * k;
-    var bx = rN.left + rN.width / 2 + vx * Math.cos(a) - vy * Math.sin(a);
-    var by = rN.top + rN.height / 2 + vx * Math.sin(a) + vy * Math.cos(a);
-    var mx = rM.left + rM.width / 2, my = cy;
-    var dist = Math.hypot(mx - bx, my - by);
-    var estica = t < 0.5 ? suave(t / 0.5) : 1 - suave((t - 0.5) / 0.5);   // vai e volta
-    lingua.style.display = "block";
-    lingua.style.left = bx + "px"; lingua.style.top = (by - 6) + "px";
-    lingua.style.width = (dist * estica) + "px";
-    lingua.style.transform = "rotate(" + Math.atan2(my - by, mx - bx) + "rad)";
-    var pegou = t >= 0.5;
-    lingua.classList.toggle("pegou", pegou);
-    mosca.style.visibility = pegou ? "hidden" : "visible";
+  // A língua roda uma única vez, por tempo (não acompanha o scroll). Voltar a rolar não devolve a mosca.
+  var pegouMosca = false;
+  function disparaLingua() {
+    pegouMosca = true;
+    var inicio = performance.now(), duracao = 750;
+    function passo(agora) {
+      var t = Math.min(1, (agora - inicio) / duracao);
+      var ang = 72 + Math.sin(scrollY / 140) * 5;
+      var rN = nadador.getBoundingClientRect(), rM = mosca.getBoundingClientRect();
+      // Boca do Next: centro do nadador + vetor da boca girado (ponto 265,135 do desenho de 340x260)
+      var k = nadador.offsetWidth / 340, a = ang * Math.PI / 180;
+      var vx = 95 * k, vy = 5 * k;
+      var bx = rN.left + rN.width / 2 + vx * Math.cos(a) - vy * Math.sin(a);
+      var by = rN.top + rN.height / 2 + vx * Math.sin(a) + vy * Math.cos(a);
+      var mx = rM.left + rM.width / 2, my = rM.top + rM.height / 2;
+      var dist = Math.hypot(mx - bx, my - by);
+      var estica = t < 0.45 ? suave(t / 0.45) : 1 - suave((t - 0.45) / 0.55);   // vai e volta
+      var pegou = t >= 0.45;
+      lingua.style.display = "block";
+      lingua.style.left = bx + "px"; lingua.style.top = (by - 6) + "px";
+      lingua.style.width = (dist * estica) + "px";
+      lingua.style.transform = "rotate(" + Math.atan2(my - by, mx - bx) + "rad)";
+      lingua.classList.toggle("pegou", pegou);
+      if (pegou) mosca.style.visibility = "hidden";
+      if (t < 1) requestAnimationFrame(passo); else lingua.style.display = "none";
+    }
+    requestAnimationFrame(passo);
   }
 
   function quadro() { var y = scrollY; cena(y); saiba(y); }

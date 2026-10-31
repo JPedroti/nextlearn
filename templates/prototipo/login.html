@@ -1,0 +1,54 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar · NextLearn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'prototipo/login.css' %}">
+</head>
+<body data-cor="{{ perfil.cor }}">
+  <header class="topo">
+    <a href="{% url 'prototipo:entrada' %}" class="marca">NextLearn</a>
+  </header>
+
+  <main class="login">
+    <div class="lado-next" aria-hidden="true">
+      <p class="balao">{{ perfil.fala }}</p>
+      <div class="next-login" data-pose="{{ perfil.pose }}">{% include "prototipo/_next.html" %}</div>
+      <div class="chao"></div>
+    </div>
+
+    <section class="cartao" aria-labelledby="titulo">
+      <nav class="abas" aria-label="Quem está entrando">
+        {% for chave, p in perfis.items %}
+          <a href="?perfil={{ chave }}{% if next %}&amp;next={{ next|urlencode }}{% endif %}" class="aba{% if chave == perfil_chave %} ativa{% endif %}"{% if chave == perfil_chave %} aria-current="page"{% endif %}>{{ p.nome }}</a>
+        {% endfor %}
+      </nav>
+
+      <h1 id="titulo">Entrar como {{ perfil.nome|lower }}</h1>
+
+      {% if form.non_field_errors %}
+        <p class="erro" role="alert">Usuário ou senha não conferem. Confira e tente de novo.</p>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="perfil" value="{{ perfil_chave }}">
+        <input type="hidden" name="next" value="{{ next }}">
+        <label for="id_username">Usuário</label>
+        <input type="text" name="username" id="id_username" value="{{ form.username.value|default:'' }}" autocomplete="username" required autofocus>
+        <label for="id_password">Senha</label>
+        <input type="password" name="password" id="id_password" autocomplete="current-password" required>
+        <button type="submit" class="btn-entrar">Entrar</button>
+      </form>
+
+      <p class="ajuda">
+        {% if perfil_chave == "professor" %}O acesso de professor é criado pela escola.
+        {% else %}Ainda não tem acesso? O professor cria o seu usuário e a primeira senha.{% endif %}
+      </p>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,5 +1,6 @@
 """Views do protótipo de design. Sem login e sem banco: tudo vem de dados.py, para desenhar a estrutura."""
 
+from django.contrib.auth.views import LoginView
 from django.shortcuts import render
 
 from apps.perfis.models import APOIOS, nomes_da_mascara
@@ -116,3 +117,25 @@ CENAS = [
 def entrada(request):
     """Tela de entrada com o mascote Next. Os botões levam ao login real (contas:entrar)."""
     return render(request, "prototipo/entrada.html", {"cenas": CENAS})
+
+
+# Login real no visual do protótipo: autentica no Usuario do time e manda para contas:inicio,
+# que redireciona pelo papel (professor -> painel, aluno -> aulas, família -> perfis).
+PERFIS_LOGIN = {
+    "professor": {"nome": "Professor(a)", "cor": "azul", "pose": "livro", "fala": "Bem-vindo de volta! Suas turmas estão te esperando."},
+    "aluno": {"nome": "Aluno(a)", "cor": "laranja", "pose": "fone", "fala": "Oi! Bora aprender do seu jeito?"},
+    "familia": {"nome": "Família", "cor": "lilas", "pose": "pizza", "fala": "Que bom ter vocês aqui. A família faz parte."},
+}
+
+
+class Login(LoginView):
+    template_name = "prototipo/login.html"
+    redirect_authenticated_user = True
+
+    def get_context_data(self, **kwargs):
+        contexto = super().get_context_data(**kwargs)
+        chave = self.request.GET.get("perfil") or self.request.POST.get("perfil") or "aluno"
+        contexto["perfil_chave"] = chave if chave in PERFIS_LOGIN else "aluno"
+        contexto["perfil"] = PERFIS_LOGIN[contexto["perfil_chave"]]
+        contexto["perfis"] = PERFIS_LOGIN
+        return contexto
