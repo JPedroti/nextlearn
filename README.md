@@ -14,7 +14,7 @@ Projeto do 1º Hackathon LEPV × FGV (tema: Educação, patrocínio Teachy) — 
 
 ## Equipe
 
-João Pedroti, Thiago, Cauã e Gabriel Franco (IME, 4º período).
+João, Thiago, Cauã e Gabriel Franco (IME, 4º período).
 
 ## Stack
 

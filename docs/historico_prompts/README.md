@@ -6,7 +6,7 @@ o texto do prompt sem edição e um resumo da resposta da IA.
 
 | Integrante | Papel na equipe | Ferramentas | Arquivo |
 |---|---|---|---|
-| João Pedroti | Produto: contas, turma, aula, questionário da família, painel, deploy | Claude (claude.ai e Claude Code) | [joao.md](joao.md) |
+| João | Produto: contas, turma, aula, questionário da família, painel, deploy | Claude (claude.ai e Claude Code) | [joao.md](joao.md) |
 | Thiago | Produto: motor de IA, tela do aluno, preferências de interface | Claude | [thiago.md](thiago.md) e a pasta [`prompts/`](../../prompts/) (prompts 0001–0020, um arquivo por prompt) |
 | Cauã | Conteúdo: aula de exemplo, questionário, blocos pedagógicos dos prompts, roteiro do vídeo | Qwen | [caua.md](caua.md) |
 | Gabriel Franco | Negócio: plano de negócio, edição do vídeo | ChatGPT | [gabriel.md](gabriel.md) |

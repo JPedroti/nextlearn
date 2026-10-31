@@ -1,4 +1,4 @@
-# Histórico de prompts — João Pedroti
+# Histórico de prompts — João
 
 **Hackathon LEPV × FGV (Teachy) — Out/2026.** Índice da equipe: [README.md](README.md)
 **Ferramentas de IA:** Claude no claude.ai (prompts 01–14) e Claude Code (a partir do 15)
@@ -351,5 +351,28 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 > Tudo o que eu fiz, aquela parada do neon console e etc por exemplo, eu consigo voltar atrás? E outra pergunta: se eu nao voltar atras pode dar algum problema para mim? Tem algum custo envolvido? Como eu cancelo?
 
 **Resumo da resposta da IA:** explicou que tudo dá para desfazer (excluir o projeto e a conta no Neon, o serviço/Blueprint e a conta no Render, a chave no Google AI Studio e o acesso do Render ao GitHub) e que, nos planos grátis sem cartão cadastrado, deixar como está não gera cobrança. Orientou a conferir a página de cobrança de cada serviço e recomendou não cancelar nada antes de o grupo decidir sobre o deploy.
+
+---
+
+## Prompt 35 — 31/10/2026, 06:04 (BRT) — autor: João — ferramenta: Claude Code
+
+> Depois que acabar o hackathon me lembre de desativar toda essa parte e, por exemplo, voltar atrás com o que eu fiz no Neon. Nao faça nada, só responda brevemente
+
+**Resumo da resposta da IA:** explicou que não consegue lembrar sozinho numa conversa futura e ofereceu duas opções (anotar na memória do Claude Code ou criar um lembrete agendado), sem fazer nada. Registrado depois, junto com o 36, porque o autor pediu para a IA não mexer em nada naquele momento.
+
+---
+
+## Prompt 36 — 31/10/2026, 06:08 (BRT) — autor: João — ferramenta: Claude Code
+
+> Perfeito. Agora quero que você faça um plano do que vamos fazer (o que falta para o projeto) de acordo com a sua exploração do github atualizado. Os outros integrantes estão no período de sono, então a ideia é você fazer o plano e, depois, ficar executando ele por um bom tempo, até bastante tokens serem utilizados. Outra coisa também: somos um grupo, então não tem como você deixar apenas o meu nome como João Pedroti no nosso repositório (nos README e etc) enquanto o nome dos outros integrantes são apenas o primeiro nome. Então troque por apenas João.
+
+**Perguntas da IA antes de executar e respostas do João (por botões):**
+
+> Visual do protótipo do Thiago nas telas reais? R: Só o passo a passo do apoio de foco e a acessibilidade; cores por apoio e painel novo ficam para o Thiago.
+> Documentos antigos do Thiago (ex.: TESE_PRODUTO, que descreve outro produto)? R: Índice + aviso no topo, sem apagar nem mover.
+> Ajustar outros nomes? R: Os próximos commits do João saem como "João"; "Gabriel Franco" fica como está.
+> Rascunhos para quem está dormindo? R: "Só continue o trabalho. A delegação de tarefas virou algo flexível e, portanto, podemos continuar fazendo o que eles estavam fazendo para adiantar."
+
+**Resumo da resposta da IA:** _(preencher ao final)_
 
 ---

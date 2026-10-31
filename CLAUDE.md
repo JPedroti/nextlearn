@@ -27,7 +27,7 @@ Faça commit do cronograma junto com o trabalho da vez.
 ## 1. Situação
 
 - **Evento:** 1º Hackathon LEPV (Liga de Empreendedorismo da Praia Vermelha, IME) × FGV, patrocínio Teachy. Tema: Educação.
-- **Equipe (alunos do IME, 4º período):** João Pedroti (dono do repositório), Thiago, Cauã, Gabriel Franco.
+- **Equipe (alunos do IME, 4º período):** João (dono do repositório), Thiago, Cauã, Gabriel Franco.
 - **Repositório remoto:** https://github.com/JPedroti/nextlearn (hoje privado).
 - **Prazo final: sábado, 31/10/2026, às 13h00 (BRT), sem prorrogação.** A equipe submete às 12h. **O código congela às 10h30.**
 - A equipe virou a noite e **não domina a stack**. Programa com IA. Explique o que fizer em linguagem simples e prefira soluções convencionais, que a IA erra menos.
