@@ -426,7 +426,7 @@ body.modo-limpo .mapa-fundo { filter: saturate(.25) brightness(1.15); }
 .chat-sugestoes { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 8px; }
 .chat-sugestoes button { min-height: 40px; padding: 0 12px; border: 2px solid var(--borda); border-radius: 999px; background: var(--cartao); color: var(--texto); font: inherit; font-size: .88rem; cursor: pointer; }
 .chat-form { display: flex; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--borda); }
-.chat-form input { flex: 1; min-height: 48px; padding: 0 12px; border: 2px solid var(--borda); border-radius: 14px; font: inherit; }
+.chat-form input { flex: 1; min-width: 0; min-height: 48px; padding: 0 12px; border: 2px solid var(--borda); border-radius: 14px; font: inherit; }
 .chat-form button { min-height: 48px; padding: 0 16px; border: 0; border-radius: 14px; background: var(--destaque); color: #FFFFFF; font: inherit; font-weight: 700; cursor: pointer; }
 .chat-aviso { margin: 0; padding: 0 14px 12px; font-size: .78rem; color: var(--suave); }
 @media (max-width: 520px) { .chat-abrir span:last-child { display: none; } .chat-abrir { padding-right: 6px; } }
