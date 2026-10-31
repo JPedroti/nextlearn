@@ -4,7 +4,7 @@
 {% block titulo %}{{ aula.titulo }} · Chamaleon{% endblock %}
 
 {% block conteudo %}
-<a href="{% url 'aulas:inicio' %}" class="voltar">← Minhas aulas</a>
+<a href="{% url 'prototipo:painel_aluno' %}" class="voltar">← Minha trilha</a>
 
 <div class="flex flex-wrap items-center justify-between gap-3 mt-3 mb-4">
   <h1 id="titulo-aula" class="text-2xl font-semibold">{{ aula.titulo }}</h1>

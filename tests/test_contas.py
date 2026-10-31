@@ -13,13 +13,17 @@ def criar_usuario(username, papel):
 class LoginTests(TestCase):
     def test_visitante_sem_login_vai_para_tela_de_entrar(self):
         resposta = self.client.get(reverse("contas:inicio"))
-        self.assertRedirects(resposta, reverse("contas:entrar") + "?next=/")
+        self.assertRedirects(resposta, reverse("contas:entrar") + "?next=/", target_status_code=302)
+
+    def test_endereco_de_entrar_leva_para_a_tela_de_entrada_da_chamaleon(self):
+        resposta = self.client.get(reverse("contas:entrar") + "?next=/")
+        self.assertRedirects(resposta, reverse("prototipo:entrada") + "?next=%2F")
 
     def test_cada_papel_cai_na_sua_pagina_inicial(self):
         casos = [
-            ("prof", Usuario.Papel.PROFESSOR, "painel:inicio"),
-            ("familia", Usuario.Papel.FAMILIA, "perfis:inicio"),
-            ("aluno", Usuario.Papel.ALUNO, "aulas:inicio"),
+            ("prof", Usuario.Papel.PROFESSOR, "prototipo:professor"),
+            ("familia", Usuario.Papel.FAMILIA, "prototipo:familia"),
+            ("aluno", Usuario.Papel.ALUNO, "prototipo:painel_aluno"),
         ]
         for username, papel, destino in casos:
             with self.subTest(papel=papel):
@@ -46,5 +50,20 @@ class LoginTests(TestCase):
         criar_usuario("prof", Usuario.Papel.PROFESSOR)
         self.client.login(username="prof", password=SENHA)
         resposta = self.client.post(reverse("contas:sair"))
-        self.assertRedirects(resposta, reverse("contas:entrar"))
-        self.assertRedirects(self.client.get(reverse("painel:inicio")), reverse("contas:entrar") + "?next=/professor/")
+        self.assertRedirects(resposta, reverse("contas:entrar"), target_status_code=302)
+        self.assertRedirects(
+            self.client.get(reverse("painel:inicio")), reverse("contas:entrar") + "?next=/professor/", target_status_code=302
+        )
+
+    def test_enderecos_antigos_levam_para_as_areas_novas(self):
+        casos = [
+            ("prof", Usuario.Papel.PROFESSOR, "painel:inicio", "prototipo:professor"),
+            ("familia", Usuario.Papel.FAMILIA, "perfis:inicio", "prototipo:familia"),
+            ("aluno", Usuario.Papel.ALUNO, "aulas:inicio", "prototipo:painel_aluno"),
+        ]
+        for username, papel, antigo, novo in casos:
+            with self.subTest(papel=papel):
+                criar_usuario(username, papel)
+                self.client.login(username=username, password=SENHA)
+                self.assertRedirects(self.client.get(reverse(antigo)), reverse(novo))
+                self.client.post(reverse("contas:sair"))

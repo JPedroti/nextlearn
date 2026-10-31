@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Max
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
@@ -19,13 +18,8 @@ from .questionario import criar_sugestoes, respostas_legiveis
 
 @papel_requerido("familia")
 def inicio(request):
-    """Página inicial da família: os filhos vinculados a esta conta."""
-    dependentes = (
-        Aluno.objects.filter(responsavel=request.user)
-        .select_related("usuario", "turma", "perfil")
-        .annotate(ultimo_questionario=Max("questionarios__criado_em"))
-    )
-    return render(request, "perfis/inicio_familia.html", {"dependentes": dependentes})
+    """Endereço antigo da área da família: leva para a área nova."""
+    return redirect("prototipo:familia")
 
 
 @papel_requerido("familia")

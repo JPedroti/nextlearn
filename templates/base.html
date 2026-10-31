@@ -221,9 +221,23 @@
 <body class="min-h-screen{% if preferencias.fonte_dislexia %} fonte-dislexia{% endif %}{% if preferencias.leitura_voz %} leitura-voz{% endif %}{% if preferencias.modo_limpo %} modo-limpo{% endif %}" style="background: var(--color-bg);">
   <header style="background: var(--color-surface); border-bottom: 1px solid var(--color-border);">
     <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-      <a href="{% url 'contas:inicio' %}" class="text-lg font-bold tracking-tight" style="color: var(--color-primary); text-decoration: none;">Chamaleon</a>
+      <a href="{% url 'contas:inicio' %}" class="flex items-center" style="text-decoration: none;">
+        <img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon, voltar para a minha área" class="h-9 w-auto">
+      </a>
       {% if user.is_authenticated %}
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center justify-end gap-3">
+          {# Caminho de volta para a área de cada papel (as telas novas da Chamaleon). #}
+          <nav class="flex flex-wrap items-center gap-2" aria-label="Minha área">
+            {% if user.papel == "professor" %}
+              <a href="{% url 'prototipo:professor' %}" class="btn-sec text-xs">Minha turma</a>
+              <a href="{% url 'prototipo:prof_material' %}" class="btn-sec text-xs">Enviar material</a>
+              <a href="{% url 'prototipo:prof_aulas' %}" class="btn-sec text-xs">Análise das aulas</a>
+            {% elif user.papel == "familia" %}
+              <a href="{% url 'prototipo:familia' %}" class="btn-sec text-xs">Minha área</a>
+            {% else %}
+              <a href="{% url 'prototipo:painel_aluno' %}" class="btn-sec text-xs">Minha trilha</a>
+            {% endif %}
+          </nav>
           <span class="text-xs" style="color: var(--color-text-muted);">
             {{ user.get_full_name|default:user.username }}
           </span>

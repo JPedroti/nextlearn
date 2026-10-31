@@ -5,10 +5,9 @@ from . import views
 app_name = "prototipo"
 
 urlpatterns = [
-    path("", views.inicio, name="inicio"),
+    path("", views.raiz, name="inicio"),
     path("entrar/", views.entrada, name="entrada"),
     path("login/", views.Login.as_view(), name="login"),
-    path("_versao/", views.versao, name="versao"),
     path("aluno/inicio/", views.painel_aluno, name="painel_aluno"),
     path("aluno/fala/", views.fala, name="fala"),
     path("aluno/aula/<int:pk>/online/", views.aula_online, name="aula_online"),
@@ -22,8 +21,6 @@ urlpatterns = [
     path("aluno/progresso/", views.progresso, name="progresso"),
     path("aluno/treino/<str:tipo>/", views.treino, name="treino"),
     path("aluno/treino/<str:tipo>/concluido/", views.treino_concluido, name="treino_concluido"),
-    path("aluno/", views.aluno, name="aluno"),
-    path("aluno/aula/", views.aula, name="aula"),
     path("professor/", views.professor, name="professor"),
     path("professor/alunos/cadastrar/", views.prof_cadastrar, name="prof_cadastrar"),
     path("professor/alunos/<int:pk>/", views.prof_aluno, name="prof_aluno"),

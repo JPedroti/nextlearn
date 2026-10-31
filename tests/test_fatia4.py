@@ -61,7 +61,9 @@ class CadastroFamiliaTests(Fatia4Base):
         self.assertEqual(self.aluno.responsavel.papel, Usuario.Papel.FAMILIA)
 
         self.client.login(username="maria", password=SENHA)
-        self.assertContains(self.client.get(reverse("perfis:inicio")), "Responder o questionário")
+        area = self.client.get(reverse("perfis:inicio"), follow=True)  # endereço antigo leva para a área nova
+        self.assertContains(area, "Questionário do dia a dia")
+        self.assertContains(area, reverse("perfis:questionario", args=[self.aluno.pk]))
 
     def test_outro_professor_nao_cadastra(self):
         Usuario.objects.create_user("outro", password=SENHA, papel=Usuario.Papel.PROFESSOR)

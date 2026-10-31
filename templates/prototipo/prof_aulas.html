@@ -4,7 +4,7 @@
 <body class="pg-progresso tema-base">
   <header class="topo">
     <a href="{% url 'prototipo:prof_aulas' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="marca-logo"> · Professor</a>
-    <nav class="topo-direita"><a class="btn-contorno" href="{% url 'painel:inicio' %}">Painel completo</a>
+    <nav class="topo-direita"><a class="btn-contorno" href="{% url 'prototipo:professor' %}">Minha turma</a><a class="btn-contorno" href="{% url 'prototipo:prof_material' %}">Enviar material</a>
       <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form></nav>
   </header>
   <main class="pg">

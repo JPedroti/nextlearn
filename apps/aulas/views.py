@@ -162,17 +162,8 @@ def _aluno_do_usuario(usuario):
 
 @papel_requerido("aluno")
 def inicio(request):
-    """Página inicial do aluno: as aulas publicadas da sua turma."""
-    aluno = _aluno_do_usuario(request.user)
-    aulas = []
-    if aluno:
-        respondidas = set(
-            Resposta.objects.filter(aluno=aluno).values_list("questao__aula_id", flat=True).distinct()
-        )
-        for aula in aluno.turma.aulas.filter(publicada=True):
-            aula.respondida = aula.pk in respondidas
-            aulas.append(aula)
-    return render(request, "aulas/inicio_aluno.html", {"aluno": aluno, "aulas": aulas})
+    """Endereço antigo da área do aluno: leva para a área nova (trilha, aulas e treinos)."""
+    return redirect("prototipo:painel_aluno")
 
 
 @papel_requerido("aluno")

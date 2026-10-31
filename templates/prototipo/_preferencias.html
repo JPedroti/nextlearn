@@ -1,9 +1,0 @@
-<section aria-labelledby="pref-titulo" class="cartao">
-  <h2 id="pref-titulo" class="text-base font-bold">Como prefiro ler</h2>
-  <p class="mt-1 text-sm texto-suave">Só muda para você. Liga e desliga quando quiser.</p>
-  <div class="mt-3 flex flex-wrap gap-2">
-    <button type="button" class="interruptor" data-pref="letras" aria-pressed="false">Letras espaçadas</button>
-    <button type="button" class="interruptor" data-pref="voz" aria-pressed="false">Botões de ouvir</button>
-    <a class="interruptor" href="?perfil={{ mascara }}{% if not limpo %}&limpo=1{% endif %}" aria-pressed="{% if limpo %}true{% else %}false{% endif %}">Modo limpo</a>
-  </div>
-</section>

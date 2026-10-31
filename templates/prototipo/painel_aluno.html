@@ -13,7 +13,7 @@
   <header class="topo">
     <a href="{% url 'prototipo:painel_aluno' %}" class="marca"><img src="{% static 'img/logo_chamaleon.png' %}" alt="Chamaleon" class="marca-logo"></a>
     <div class="topo-direita">
-      <span class="quem">{{ aluno.usuario.first_name|default:aluno.usuario.username }} · {{ aluno.turma.nome }}</span>
+      <span class="quem">{{ request.user.first_name|default:request.user.username }}{% if aluno %} · {{ aluno.turma.nome }}{% endif %}</span>
       {% if not sem_turma %}<a class="btn-contorno" href="{% url 'prototipo:progresso' %}{% if perfil_dev %}?perfil_dev={{ perfil_dev }}{% endif %}"><svg class="ico" aria-hidden="true"><use href="#i-estrela"/></svg>Meu progresso</a>
       <button type="button" class="btn-contorno" data-abrir-calendario><svg class="ico" aria-hidden="true"><use href="#i-calendario"/></svg>Calendário</button>{% endif %}
       <form method="post" action="{% url 'contas:sair' %}">{% csrf_token %}<button class="btn-link">Sair</button></form>
@@ -253,6 +253,5 @@
   {% endif %}
   <script src="{% static 'prototipo/aluno_painel.js' %}"></script>
 <script src="{% static 'prototipo/brilho.js' %}"></script>
-<script src="{% static 'prototipo/ao_vivo.js' %}"></script>
 </body>
 </html>

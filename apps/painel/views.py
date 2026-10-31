@@ -1,14 +1,9 @@
-from django.db.models import Count
-from django.shortcuts import render
+from django.shortcuts import redirect
 
 from apps.contas.decorators import papel_requerido
 
 
 @papel_requerido("professor")
 def inicio(request):
-    """Página inicial do professor: as suas turmas."""
-    turmas = request.user.turmas.annotate(
-        num_alunos=Count("alunos", distinct=True),
-        num_aulas=Count("aulas", distinct=True),
-    )
-    return render(request, "painel/inicio_professor.html", {"turmas": turmas})
+    """Endereço antigo da área do professor: leva para a área nova (Minha turma)."""
+    return redirect("prototipo:professor")
