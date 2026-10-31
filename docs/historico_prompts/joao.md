@@ -645,3 +645,15 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 **Resumo da resposta da IA:** na branch `thiago/prototipo-neuro`, abriu todas as páginas como visitante, professor, família e aluno (todas respondem; os testes da branch passam) e olhou as áreas do professor e da família no navegador. Corrigiu o camaleão gigante (a branch não usa Tailwind), o nome do aluno quebrando na tabela e um emoji usado como ícone. Conferiu o roteiro do Chamilion com o site: as telas existem (inclusive os 9 critérios da análise), mas a conta "familia.teste" vem de um comando com aluno fictício e a criação de questões precisa de chave de IA. Apontou os dois principais riscos da solução. Registrado às 11:28.
 
 ---
+
+## Prompt 53 — 31/10/2026, 11:30 (BRT) — autor: João (repassando pedidos do grupo) — ferramenta: Claude Code
+
+> Coisas URGENTES
+> - Nome da empresa vai ser chamaleon
+> - O BANCO DE QUESTOES ESTA HORRIVEL, ESSA É A MAIOR PRIORIDADE AGORA, POIS PRECISA AUMENTAR A ACESSIBILIDADE DE QUEM ESTA USANDO. OU SEJA, DEPENDENDO DO PERFIL O QUESTIONARIO DEVE SE ADPTAR COM ELEMENTOS GRAFICOS, POR EXEMPLO UM MASCOTE DE CAMALEAO, E CORES DENTRO DAS "CAIXAS" DAS QUESTOES. pOR EXEMPLO PARA UM CARA QUE TEM DIFICULDADE EM SE CONCENTRAR O IDEAL É NAO TER UM ENUNCIADO MUITO LONGO, MAS PARA UM CARA QUE TEM HIPERFOCO ISSO PODE AJUDAR ELE A APRENDER. 
+> - Melhorar a plataforma dos pais para diexar mais intuitiva
+> - faca pelo menos um perfil para cada tipo de aluno, dando nomes e dentro do login do p[rofessor deve aparecer todos essses alunos. A partir de agora o login vai ser com o mesmo nome, mas a senha de todos vai ser 1234. Alem disso, faca o perfil de cada aluno, ou sejja davi.teste, lucas.teste, voce vai inventar os nomes. Com isso, tire a ferramenta de desenvolvedor, pois isso é um produto que eu vou ter que entregar de fato. Essa já vai ser a ultima versao
+
+**Resumo da resposta da IA:** na branch `thiago/prototipo-neuro`: trocou o nome para Chamaleon em todas as telas; caixas de questão nas cores do apoio do aluno, com faixa de destaque e o camaleão, enunciado maior e em linha curta com o apoio de foco e letra maior com o apoio textual (aula e treino); tirou a ferramenta de desenvolvedor (simular e comparar perfis). Criou só no banco do computador do João (fora do Git) um professor, uma família e 8 alunos, um por combinação de apoios, com senha 1234 e sem respostas inventadas. Não deu tempo de mudar a área da família nem de fazer enunciado longo para "hiperfoco" (não é um apoio do app). 74 testes passando.
+
+---
