@@ -1,9 +1,9 @@
-# Histórico de prompts — Hackathon LEPV × FGV (Teachy) — Out/2026
+# Histórico de prompts — João Pedroti
 
-**Equipe:** João, Thiago, Cauã, Gabriel Franco (IME, 4º período)
-**Ferramenta de IA:** Claude (Anthropic)
+**Hackathon LEPV × FGV (Teachy) — Out/2026.** Índice da equipe: [README.md](README.md)
+**Ferramentas de IA:** Claude no claude.ai (prompts 01–14) e Claude Code (a partir do 15)
 
-Registro cronológico e literal de todos os prompts enviados à IA durante o hackathon, mantido para consulta da banca avaliadora.
+Registro cronológico e literal dos prompts que o João enviou à IA durante o hackathon, mantido para consulta da banca avaliadora.
 
 ---
 
@@ -189,5 +189,13 @@ Registro cronológico e literal de todos os prompts enviados à IA durante o hac
 > Explique cada passo em linguagem simples, porque não domino Django.
 
 **Resumo da resposta da IA:** Fatia 0 feita. Repositório iniciado (o remoto estava vazio) e PDFs movidos para `referencias/`, fora do Git. Esqueleto Django 5.2 com os 5 apps, `Usuario` com papel, login/logout e uma página inicial por papel, configuração por variáveis de ambiente, `render.yaml` + `build.sh` (collectstatic, migrate, criação do administrador), README para Windows e 5 testes de login. Build do Render simulado localmente, login conferido no servidor local e passo a passo do Render entregue ao João.
+
+---
+
+## Prompt 16 — 30/10/2026, 23:29 (BRT) — autor: João — ferramenta: Claude Code
+
+> Pode começar, mas, antes disso, separe o histórico de prompts para João, Thiago, Gabriel e Cauã, considerando que, até agora, o histórico só contem prompts do João. E que eu sou o João nessa conversa.
+
+**Resumo da resposta da IA:** _(preenchido ao final)_
 
 ---

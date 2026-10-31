@@ -2,7 +2,7 @@
 
 > Leia este arquivo inteiro antes de qualquer ação. Ele resume todas as decisões tomadas pela equipe
 > (com apoio do Claude no claude.ai) entre 19h30 e 23h10 de 30/10/2026. O histórico completo dessas
-> decisões está em `historico_prompts.md` (prompts 01–13). Idioma de trabalho: **português do Brasil**.
+> decisões está em `docs/historico_prompts/joao.md` (prompts 01–14). Idioma de trabalho: **português do Brasil**.
 
 ---
 
@@ -99,7 +99,7 @@ nextlearn/
 ├── render.yaml
 ├── manage.py
 ├── docs/
-│   ├── historico_prompts.md   # OBRIGATÓRIO, ver seção 9
+│   ├── historico_prompts/     # OBRIGATÓRIO, ver seção 9: README.md (índice) + um .md por integrante
 │   ├── arquitetura.md         # diagrama + modelo de dados
 │   └── decisoes.md            # a tabela da seção 4, expandida
 ├── config/                    # settings.py, urls.py, wsgi.py
@@ -158,9 +158,9 @@ nextlearn/
 
 ## 9. PROTOCOLO OBRIGATÓRIO: histórico de prompts
 
-A banca (e o agente que avalia "condução da IA") lê `docs/historico_prompts.md`. **Em toda mensagem que receber de um integrante, antes de qualquer outra ação:**
+A banca (e o agente que avalia "condução da IA") lê `docs/historico_prompts/`. Há **um arquivo por integrante**: `joao.md`, `thiago.md`, `caua.md`, `gabriel.md` (índice em `README.md`). **Em toda mensagem que receber de um integrante, antes de qualquer outra ação:**
 
-1. Acrescente ao fim de `docs/historico_prompts.md` uma entrada no formato já usado no arquivo:
+1. Acrescente ao fim do arquivo **do autor do prompt** uma entrada no formato já usado:
    ```
    ## Prompt NN — DD/MM/AAAA, HH:MM (BRT) — autor: <nome> — ferramenta: Claude Code
 
@@ -168,10 +168,10 @@ A banca (e o agente que avalia "condução da IA") lê `docs/historico_prompts.m
 
    **Resumo da resposta da IA:** <1–3 linhas, preenchido ao final da sua resposta>
    ```
-2. Numere em sequência, continuando do último número no arquivo. Os prompts 01–13 foram feitos no Claude (claude.ai).
+2. Numere em sequência **dentro do arquivo do autor**, continuando do último número dele. Os prompts 01–14 do João foram feitos no Claude (claude.ai).
 3. Se não souber quem é o autor, pergunte uma vez e depois mantenha.
 4. Ao final da sua resposta, preencha o "Resumo da resposta da IA" daquela entrada.
-5. Integrantes que usam outras ferramentas (Qwen, ChatGPT) podem colar os prompts deles. Registre-os também, com o nome da ferramenta.
+5. Integrantes que usam outras ferramentas (Qwen, ChatGPT) podem colar os prompts deles. Registre-os no arquivo de quem fez o prompt, com o nome da ferramenta.
 6. Faça commit do histórico junto com o trabalho da vez.
 
 **Nunca** registre segredos (chaves, connection strings) no histórico. Se um prompt contiver um segredo, substitua-o por `[REDACTED]` e avise o autor.
