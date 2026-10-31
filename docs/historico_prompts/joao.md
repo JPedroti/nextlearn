@@ -531,7 +531,7 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 >
 > """
 
-**Resumo da resposta da IA:** _(preencher ao final)_
+**Resumo da resposta da IA:** salvou a skill do Thiago em `.claude/skills/design-neuro` e a aplicou às telas reais: paleta por apoio ligada às variáveis do visual do Cauã (contraste de todos os pares conferido em teste), "Letras espaçadas" no lugar de "Fonte para dislexia", nenhum emoji como ícone, foco visível de 3 px, sem animação com o apoio de foco, texto maior com o apoio textual, barra de progresso nos passos, certo/errado escrito, aulas recolhidas com o apoio de foco e dicas para a família. A conferência no navegador ficou pela metade quando o João avisou que os tokens tinham acabado; o trabalho foi publicado no prompt 43.
 
 ---
 
@@ -553,6 +553,6 @@ Registro cronológico e literal dos prompts que o João enviou à IA durante o h
 > A aplicação da skill do Thiago (só no computador do João) entra mesmo depois do congelamento? R: Entrar.
 > Métricas de acertos de todas as turmas no prompt da IA? R: Tirar do prompt.
 
-**Resumo da resposta da IA:** _(preencher ao final)_
+**Resumo da resposta da IA:** fez o plano e executou: juntou a aplicação da skill design-neuro com a `main` (migração renumerada depois da do Cauã), tirou da `main` o app de protótipo (rota /jogo/, aluno fictício, contas de teste), tirou as métricas das turmas do prompt da IA (com teste), conferiu as migrações num banco novo e publicou. 131 testes passando. Lembrou o João de deixar o repositório público e de pedir ao grupo que não envie mais nada à `main`.
 
 ---

@@ -1,6 +1,6 @@
 # Cronograma e status do NextLearn
 
-**Última atualização:** 31/10/2026, 07:45 (BRT), por João (Claude Code)
+**Última atualização:** 31/10/2026, 10:58 (BRT), por João (Claude Code)
 
 Este arquivo mostra o que já foi feito, o que está em andamento e o que falta. A IA que estiver trabalhando com a equipe
 atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como está a parte dele.
@@ -79,6 +79,7 @@ atualiza o arquivo ao fim de cada tarefa e sempre que um integrante contar como 
 
 ## Registro de atualizações
 
+- 31/10, 10:58 — Depois do congelamento, decisões do João (prompt 43): (1) o app de protótipo (rota /jogo/, comando `contas_teste` com aluno fictício e respostas inventadas, templates `prototipo/`) saiu da `main`, por ser demo de fachada e gamificação fora da v1.0; continua no histórico do Git e nas branches do Thiago; (2) as métricas de acertos das turmas saíram do prompt da IA (a IA recebe só apoios e aula); a avaliação das versões pelo professor (`FeedbackVersao`) ficou; (3) entrou a skill design-neuro do Thiago nas telas reais (paleta por apoio com contraste testado, "Letras espaçadas", certo/errado escrito, aulas recolhidas com o apoio de foco, dicas para a família). 131 testes passando. **Até a submissão, ninguém envia nada para a `main`**; a branch `integracao/thiago-ux-mais-logica-main` não entra.
 - 31/10, 07:45 — Decisão do grupo: o MVP roda localmente. README reorganizado (como rodar no computador primeiro; deploy vira nota de "depois do hackathon"); a chave de IA saiu da lista de variáveis pedidas pelo Render. O Thiago vai mandar um frontend novo para o app seguir.
 - 31/10, 07:24 — Testes automáticos no GitHub (`.github/workflows/testes.yml`). Tela de login sem as dicas de usuários e senha de contas de mentira. App conferido em modo de produção (`DEBUG` desligado): arquivos estáticos, página 404 em português e todas as migrações num banco novo. 120 testes passando.
 - 31/10, 07:12 — Rascunhos de `docs/roteiro_demo.md` (roteiro de telas do vídeo) e `docs/plano_negocio.md` (base do plano de negócio, só com números de fonte conferida).

@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('aulas', '0004_resposta_versao_mascara'),
+        ('aulas', '0005_feedbackversao'),
     ]
 
     operations = [
