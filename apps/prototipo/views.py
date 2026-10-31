@@ -604,44 +604,73 @@ def fala(request):
 # Progresso do aluno ao longo do tempo (métricas de docs/METRICAS_ENSINO.md e docs/PERFIS_E_METRICAS.md)
 # Tudo sai das respostas guardadas no banco (Resposta: acerto, tempo e data de cada questão, de cada aluno).
 # ---------------------------------------------------------------------------
-def _grafico_linha(valores, rotulos, maximo=None, sufixo="", altura=150, cor="var(--destaque)"):
-    """SVG simples de linha com pontos e rótulos (sem biblioteca)."""
-    W, H, m = 520, altura, 28
+def _fmt(v):
+    return str(round(v, 1)).replace(".", ",").removesuffix(",0")
+
+
+def _grafico_linha(valores, rotulos, maximo=None, sufixo="", altura=190, cor="#4F46E5", id_="g", degrau=False):
+    """Linha com área em degradê, grade, eixo e pontos com dica ao passar o mouse (SVG puro)."""
+    W, H, ml, mr, mt, mb = 560, altura, 40, 16, 16, 30
     vals = [v for v in valores if v is not None]
     if not vals:
-        return '<p class="mini">Ainda sem dados.</p>'
-    top = maximo or max(vals) or 1
+        return '<p class="vazio">Ainda sem dados suficientes.</p>'
+    top = maximo or (max(vals) * 1.15 or 1)
     n = len(valores)
-    xs = [m + (W - 2 * m) * (i / max(1, n - 1)) for i in range(n)]
-    pts = [(x, H - m - (H - 2 * m) * (v / top)) for x, v in zip(xs, valores) if v is not None]
-    linha = " ".join(f"{x:.0f},{y:.0f}" for x, y in pts)
-    area = f"M{pts[0][0]:.0f},{H - m} L" + " L".join(f"{x:.0f},{y:.0f}" for x, y in pts) + f" L{pts[-1][0]:.0f},{H - m}Z"
-    s = [f'<svg class="graf" viewBox="0 0 {W} {H}" role="img" aria-label="' + ", ".join(f"{r}: {v if v is not None else '-'}{sufixo}" for r, v in zip(rotulos, valores)) + '">',
-         f'<line x1="{m}" y1="{H - m}" x2="{W - m}" y2="{H - m}" stroke="var(--borda)" stroke-width="2"/>',
-         f'<path d="{area}" fill="{cor}" opacity=".12"/><polyline points="{linha}" fill="none" stroke="{cor}" stroke-width="3" stroke-linejoin="round"/>']
-    for (x, y), v in zip(pts, vals):
-        s.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="4.5" fill="#FFFFFF" stroke="{cor}" stroke-width="3"/><text x="{x:.0f}" y="{y - 10:.0f}" text-anchor="middle" class="graf-v">{str(round(v, 1)).replace(".", ",").removesuffix(",0")}{sufixo}</text>')
-    for x, r in zip(xs, rotulos):
-        s.append(f'<text x="{x:.0f}" y="{H - 8}" text-anchor="middle" class="graf-r">{r}</text>')
+    X = lambda i: ml + (W - ml - mr) * (i / max(1, n - 1))  # noqa: E731
+    Y = lambda v: mt + (H - mt - mb) * (1 - v / top)         # noqa: E731
+    pts = [(X(i), Y(v), v, r) for i, (v, r) in enumerate(zip(valores, rotulos)) if v is not None]
+    if degrau:
+        d = f"M{pts[0][0]:.0f},{pts[0][1]:.0f}" + "".join(f" H{x:.0f} V{y:.0f}" for x, y, _, _ in pts[1:])
+    else:
+        d = f"M{pts[0][0]:.0f},{pts[0][1]:.0f}" + "".join(f" L{x:.0f},{y:.0f}" for x, y, _, _ in pts[1:])
+    area = d + f" V{H - mb} H{pts[0][0]:.0f}Z"
+    s = [f'<svg class="graf" viewBox="0 0 {W} {H}" role="img" aria-label="' + "; ".join(f"{r}: {_fmt(v)}{sufixo}" for _, _, v, r in pts) + '">',
+         f'<defs><linearGradient id="{id_}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{cor}" stop-opacity=".28"/><stop offset="1" stop-color="{cor}" stop-opacity="0"/></linearGradient></defs>']
+    for k in range(5):
+        v = top * k / 4
+        y = Y(v)
+        s.append(f'<line x1="{ml}" y1="{y:.0f}" x2="{W - mr}" y2="{y:.0f}" class="grade"/><text x="{ml - 8}" y="{y + 4:.0f}" text-anchor="end" class="graf-r">{_fmt(v)}{sufixo}</text>')
+    s.append(f'<path d="{area}" fill="url(#{id_})"/><path d="{d}" fill="none" stroke="{cor}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>')
+    passo_rot = max(1, n // 6)
+    for i, r in enumerate(rotulos):
+        if i % passo_rot == 0 or i == n - 1:
+            s.append(f'<text x="{X(i):.0f}" y="{H - 8}" text-anchor="middle" class="graf-r">{r}</text>')
+    for x, y, v, r in pts:
+        s.append(f'<g class="pt" tabindex="0"><circle cx="{x:.0f}" cy="{y:.0f}" r="14" fill="transparent"/><circle cx="{x:.0f}" cy="{y:.0f}" r="4.5" fill="#FFFFFF" stroke="{cor}" stroke-width="3"/>'
+                 f'<g class="dica"><rect x="{x - 44:.0f}" y="{y - 40:.0f}" width="88" height="26" rx="8"/><text x="{x:.0f}" y="{y - 22:.0f}" text-anchor="middle">{r}: {_fmt(v)}{sufixo}</text></g></g>')
     return "".join(s) + "</svg>"
 
 
-def _grafico_barras(valores, rotulos, sufixo="", altura=150, cor="#0F9D6E", linha=None):
-    W, H, m = 520, altura, 28
-    top = max([v for v in valores] + [linha or 0, 1])
+def _grafico_barras(valores, rotulos, sufixo="", altura=190, cor="#0F9D6E", linha=None, rot_linha=""):
+    W, H, ml, mr, mt, mb = 560, altura, 40, 16, 16, 30
+    top = max([v for v in valores] + [linha or 0, 1]) * 1.15
     n = len(valores)
-    larg = (W - 2 * m) / max(1, n)
-    s = [f'<svg class="graf" viewBox="0 0 {W} {H}" role="img" aria-label="' + ", ".join(f"{r}: {v}{sufixo}" for r, v in zip(rotulos, valores)) + '">']
+    larg = (W - ml - mr) / max(1, n)
+    Y = lambda v: mt + (H - mt - mb) * (1 - v / top)  # noqa: E731
+    s = [f'<svg class="graf" viewBox="0 0 {W} {H}" role="img" aria-label="' + "; ".join(f"{r}: {_fmt(v)}{sufixo}" for r, v in zip(rotulos, valores)) + '">']
+    for k in range(5):
+        v = top * k / 4
+        s.append(f'<line x1="{ml}" y1="{Y(v):.0f}" x2="{W - mr}" y2="{Y(v):.0f}" class="grade"/><text x="{ml - 8}" y="{Y(v) + 4:.0f}" text-anchor="end" class="graf-r">{_fmt(v)}</text>')
     if linha:
-        y = H - m - (H - 2 * m) * linha / top
-        s.append(f'<line x1="{m}" y1="{y:.0f}" x2="{W - m}" y2="{y:.0f}" stroke="{cor}" stroke-dasharray="6 6" opacity=".6"/>')
+        s.append(f'<line x1="{ml}" y1="{Y(linha):.0f}" x2="{W - mr}" y2="{Y(linha):.0f}" stroke="#B45309" stroke-dasharray="6 5" stroke-width="2"/><text x="{W - mr}" y="{Y(linha) - 6:.0f}" text-anchor="end" class="graf-r forte">{rot_linha}</text>')
     for i, (v, r) in enumerate(zip(valores, rotulos)):
-        h = (H - 2 * m) * v / top
-        x = m + i * larg + larg * .18
-        s.append(f'<rect x="{x:.0f}" y="{H - m - h:.0f}" width="{larg * .64:.0f}" height="{max(2, h):.0f}" rx="5" fill="{cor}"/>')
-        s.append(f'<text x="{x + larg * .32:.0f}" y="{H - m - h - 6:.0f}" text-anchor="middle" class="graf-v">{v:g}{sufixo}</text>')
-        s.append(f'<text x="{x + larg * .32:.0f}" y="{H - 8}" text-anchor="middle" class="graf-r">{r}</text>')
+        x = ml + i * larg + larg * .2
+        s.append(f'<g class="pt" tabindex="0"><rect x="{x:.0f}" y="{Y(v):.0f}" width="{larg * .6:.0f}" height="{max(2, H - mb - Y(v)):.0f}" rx="6" fill="{cor}"/>'
+                 f'<g class="dica"><rect x="{x + larg * .3 - 44:.0f}" y="{Y(v) - 34:.0f}" width="88" height="26" rx="8"/><text x="{x + larg * .3:.0f}" y="{Y(v) - 16:.0f}" text-anchor="middle">{r}: {_fmt(v)}{sufixo}</text></g></g>')
+        s.append(f'<text x="{x + larg * .3:.0f}" y="{H - 8}" text-anchor="middle" class="graf-r">{r}</text>')
     return "".join(s) + "</svg>"
+
+
+def _sparkline(valores, cor="#4F46E5"):
+    vals = [v for v in valores if v is not None]
+    if len(vals) < 2:
+        return ""
+    W, H = 120, 34
+    top, base = max(vals), min(vals)
+    rng = (top - base) or 1
+    pts = [(W * i / (len(vals) - 1), H - 4 - (H - 8) * (v - base) / rng) for i, v in enumerate(vals)]
+    return (f'<svg class="spark" viewBox="0 0 {W} {H}" aria-hidden="true"><polyline points="' + " ".join(f"{x:.0f},{y:.0f}" for x, y in pts) +
+            f'" fill="none" stroke="{cor}" stroke-width="2.5" stroke-linejoin="round"/><circle cx="{pts[-1][0]:.0f}" cy="{pts[-1][1]:.0f}" r="3.5" fill="{cor}"/></svg>')
 
 
 @xframe_options_sameorigin
@@ -661,6 +690,7 @@ def progresso(request):
     perfil = getattr(aluno, "perfil", None)
     perfil_dev = request.GET.get("perfil_dev", "") if settings.DEBUG else ""
     a, tema, _ = _apoios_visuais(perfil, perfil_dev)
+    modo = modo_da_tela(a, perfil_dev)
     hoje = timezone.localtime()
     resp = list(Resposta.objects.filter(aluno=aluno).select_related("questao__aula").order_by("criado_em", "questao__ordem"))
 
@@ -669,15 +699,18 @@ def progresso(request):
         return d - timedelta(days=d.weekday())
 
     semana_atual = hoje.date() - timedelta(days=hoje.weekday())
-    semanas = [semana_atual - timedelta(days=7 * k) for k in range(9, -1, -1)]   # últimas 10 semanas
+    semanas = [semana_atual - timedelta(days=7 * k) for k in range(9, -1, -1)]
     rot = [s.strftime("%d/%m") for s in semanas]
     por_sem = {s: [] for s in semanas}
-    sessoes = {}
+    sessoes, min_dia = {}, {}
     for r in resp:
         s = seg(r.criado_em)
         if s in por_sem:
             por_sem[s].append(r)
         sessoes.setdefault(r.questao.aula_id, []).append(r)
+    for rs in sessoes.values():
+        dia = timezone.localtime(rs[0].criado_em).date()
+        min_dia[dia] = min_dia.get(dia, 0) + (rs[0].tempo_ms or 0) // 60000
 
     acerto = [round(100 * sum(r.correta for r in por_sem[s]) / len(por_sem[s])) if por_sem[s] else None for s in semanas]
     minutos, n_sessoes = [], []
@@ -685,64 +718,107 @@ def progresso(request):
         aulas = {r.questao.aula_id: (r.tempo_ms or 0) for r in por_sem[s]}
         minutos.append(sum(aulas.values()) // 60000)
         n_sessoes.append(len(aulas))
-    # Métrica-norte: assuntos dominados (100%) acumulados por semana
     dominio = {}
     for aula_id, rs in sessoes.items():
         if all(r.correta for r in rs):
             dominio[aula_id] = seg(rs[0].criado_em)
     dominadas = [sum(1 for d in dominio.values() if d <= s) for s in semanas]
-    # Ofensiva semanal (meta mínima de 2 aulas)
     metas = [n >= META_SEMANAL for n in n_sessoes]
-    # Estado do aluno (ciclo semanal, versão escolar dos estados do Duolingo)
+    ofensiva = 0
+    for ok in reversed(metas[:-1] if not metas[-1] else metas):
+        if not ok:
+            break
+        ofensiva += 1
+
+    def media(lst):
+        lst = [v for v in lst if v is not None]
+        return round(sum(lst) / len(lst)) if lst else None
+
+    rec, ant = [v for v in acerto[-4:] if v is not None], [v for v in acerto[-8:-4] if v is not None]
+    acerto_rec, acerto_ant = media(rec), media(ant)
+    # Painel de especialistas: só mostrar variação quando há aulas suficientes nos dois períodos (evita ruído)
+    delta = (acerto_rec - acerto_ant) if len(rec) >= 3 and len(ant) >= 3 else None
+
     ultima = timezone.localtime(resp[-1].criado_em) if resp else None
     dias = (hoje - ultima).days if ultima else None
-    estado = "Ativo na semana" if dias is not None and dias < 7 else ("Em risco (7+ dias sem estudar)" if dias is not None and dias < 14 else "Dormente (14+ dias)")
-    # P3: queda de acerto ao longo da sessão (acerto por posição da questão)
+    if dias is None:
+        estado, estado_cls = "Ainda não começou", "neutro"
+    elif dias < 7:
+        estado, estado_cls = "Estudando com regularidade", "ok"
+    elif dias < 14:
+        estado, estado_cls = f"Sem estudar há {dias} dias", "atencao"
+    else:
+        estado, estado_cls = f"Sem estudar há {dias} dias", "alerta"
+
     pos = {}
     for rs in sessoes.values():
         for r in rs:
             pos.setdefault(r.questao.ordem, []).append(r.correta)
     acerto_pos = [round(100 * sum(v) / len(v)) for _, v in sorted(pos.items())]
-    # P3: variabilidade do tempo entre sessões (coeficiente de variação) — só para ajustar pausas, não diagnostica
     tempos = [rs[0].tempo_ms / 60000 for rs in sessoes.values() if rs[0].tempo_ms]
-    cv = round(100 * statistics.pstdev(tempos) / statistics.mean(tempos)) if len(tempos) > 2 else None
-    # Erros consecutivos (3 seguidos na mesma matéria → mudar a estratégia)
+    cv = round(100 * statistics.pstdev(tempos) / statistics.mean(tempos)) if len(tempos) > 4 else None
     seq, alertas = {}, 0
     for r in resp:
         mat = _materia(r.questao.aula.titulo)
         seq[mat] = 0 if r.correta else seq.get(mat, 0) + 1
         if seq[mat] == 3:
             alertas += 1
-    # Média por matéria ao longo do tempo (sessões em ordem)
     por_materia = {}
     for aula_id, rs in sorted(sessoes.items(), key=lambda kv: kv[1][0].criado_em):
         mat = _materia(rs[0].questao.aula.titulo)
         por_materia.setdefault(mat, []).append(round(10 * sum(r.correta for r in rs) / len(rs), 1))
 
-    cartoes = [
-        {"titulo": "Assuntos dominados (acumulado)", "valor": dominadas[-1], "unid": "assuntos", "tema": "notas",
-         "graf": _grafico_linha(dominadas, rot, cor="#1E7B4A"),
-         "porque": "Métrica-norte: aprendizagem que fica, não tempo de tela. Dominado = 100% de acerto no assunto (meta do estudo: domínio ≥ 0,95).",
-         "fonte": "METRICAS_ENSINO §3 · adaptado de Duolingo/HLR"},
-        {"titulo": "Acerto por semana", "valor": f"{next((v for v in reversed(acerto) if v is not None), '–')}%", "unid": "na última semana com aula", "tema": "notas",
-         "graf": _grafico_linha(acerto, rot, maximo=100, sufixo="%"),
-         "porque": "Comparar o aluno com ele mesmo. Zona-alvo de prática: acertar a maioria sem ser fácil demais.",
-         "fonte": "METRICAS_ENSINO camada C"},
-        {"titulo": "Minutos e aulas por semana", "valor": minutos[-1], "unid": "min nesta semana", "tema": "tempo",
-         "graf": _grafico_barras(minutos, rot, linha=None),
-         "porque": "Hábito, sem premiar tempo de uso. O limite diário é combinado com a família (ECA Digital).",
-         "fonte": "METRICAS_ENSINO camadas D e E"},
-        {"titulo": "Queda de acerto ao longo da aula", "valor": f"{acerto_pos[0] if acerto_pos else '–'}% → {acerto_pos[-1] if acerto_pos else '–'}%", "unid": "1ª questão → última", "tema": "foco",
-         "graf": _grafico_barras(acerto_pos, [f"{i + 1}ª" for i in range(len(acerto_pos))], sufixo="%", cor="#35557F"),
-         "porque": "Para quem tem apoio de foco: se o acerto cai no fim, a aula deve ser mais curta ou ter pausa.",
-         "fonte": "PERFIS_E_METRICAS P3 · [PRODUTO]"},
+    # Mapa de calor: 10 semanas x 7 dias (minutos por dia)
+    calor = []
+    for s in semanas:
+        linha = []
+        for k in range(7):
+            d = s + timedelta(days=k)
+            m = min_dia.get(d, 0)
+            nivel = 0 if not m else (1 if m < 9 else (2 if m < 12 else 3))
+            linha.append({"data": d.strftime("%d/%m"), "min": m, "nivel": nivel, "futuro": d > hoje.date()})
+        calor.append({"rot": s.strftime("%d/%m"), "dias": linha})
+
+    nome = aluno.usuario.first_name
+    melhor = max(por_materia.items(), key=lambda kv: sum(kv[1][-3:]) / len(kv[1][-3:]))[0] if por_materia else None
+    atencao = min(por_materia.items(), key=lambda kv: sum(kv[1][-3:]) / len(kv[1][-3:]))[0] if por_materia else None
+    resumo = []
+    if acerto_rec is not None:
+        resumo.append(f"Nas últimas 4 semanas, {nome} acertou em média {acerto_rec}% das questões"
+                      + (f" ({'+' if delta >= 0 else ''}{delta} pontos em relação às 4 semanas anteriores)." if delta is not None else "."))
+    if melhor:
+        resumo.append(f"Onde vai melhor agora: {melhor}. Onde vale um reforço em casa: {atencao}.")
+    resumo.append(f"Cumpriu a meta combinada (2 aulas por semana) em {sum(metas)} das últimas 10 semanas.")
+
+    sinais = [
+        {"nome": "Regularidade", "cls": estado_cls, "txt": estado},
+        {"nome": "3 erros seguidos na mesma matéria", "cls": "atencao" if alertas else "ok",
+         "txt": f"{alertas} vez{'es' if alertas != 1 else ''}" + (" — vale mudar a estratégia (exemplo resolvido, pré-requisito)" if alertas else " — sem sinal")},
+        {"nome": "Regularidade do tempo de aula", "cls": "neutro", "txt": (f"variação de {cv}% entre aulas" if cv is not None else "poucos dados")
+         + ". Indicativo para pausas; não é diagnóstico (Kofler et al., 2013)."},
+        {"nome": "Queda de acerto dentro da aula", "cls": "atencao" if acerto_pos and acerto_pos[0] - acerto_pos[-1] >= 30 else "ok",
+         "txt": (f"{acerto_pos[0]}% na 1ª questão → {acerto_pos[-1]}% na última" if acerto_pos else "poucos dados")
+         + ". Pode ser cansaço ou questões mais difíceis no fim: confira a ordem antes de concluir."},
+    ]
+    kpis = [
+        {"rot": "Assuntos dominados", "val": dominadas[-1], "sub": "provisório: confirmar na revisão de 7 dias", "spark": _sparkline(dominadas, "#1E7B4A"), "cor": "verde"},
+        {"rot": "Acerto (4 semanas)", "val": f"{acerto_rec}%" if acerto_rec is not None else "–",
+         "sub": (f"{'▲' if delta >= 0 else '▼'} {abs(delta)} pontos vs. 4 semanas antes" if delta is not None else "precisa de mais aulas para comparar"), "spark": _sparkline(acerto, "#4F46E5"), "cor": "roxo"},
+        {"rot": "Tempo por semana", "val": f"{round(sum(minutos[-4:]) / 4)} min", "sub": "média das 4 últimas semanas", "spark": _sparkline(minutos, "#0F9D6E"), "cor": "verde2"},
+        {"rot": "Ofensiva semanal", "val": f"{ofensiva} sem.", "sub": "semanas seguidas com a meta combinada", "spark": "", "cor": "laranja"},
     ]
     contexto = {
-        "aluno": aluno, "perfil": perfil, "tema": tema, "foco": a["foco"], "textual": a["textual"], "concreto": a["concreto"],
+        "aluno": aluno, "perfil": perfil, "tema": tema, "modo": modo, "foco": a["foco"], "textual": a["textual"], "concreto": a["concreto"],
         "limpo": a["limpo"], "voz": a["voz"], "letras": a["letras"], "perfil_dev": perfil_dev, "dev": settings.DEBUG,
-        "cartoes": cartoes, "metas": list(zip(rot, metas, n_sessoes)), "estado": estado, "dias": dias, "cv": cv,
-        "alertas": alertas, "por_materia": [(m, _grafico_linha(v, [str(i + 1) for i in range(len(v))], maximo=10)) for m, v in sorted(por_materia.items())],
-        "n_respostas": len(resp), "n_sessoes": len(sessoes), "hoje": hoje,
+        "kpis": kpis, "resumo": resumo, "sinais": sinais, "calor": calor, "dias_semana": ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"],
+        "g_acerto": _grafico_linha(acerto, rot, maximo=100, sufixo="%", cor="#4F46E5", id_="ga"),
+        "g_dominio": _grafico_linha(dominadas, rot, cor="#1E7B4A", id_="gd", degrau=True),
+        "g_tempo": _grafico_barras(minutos, rot, cor="#10B981", linha=None),
+        "g_pos": _grafico_barras(acerto_pos, [f"{i + 1}ª questão" for i in range(len(acerto_pos))], sufixo="%", cor="#6366F1"),
+        "metas": list(zip(rot, metas, n_sessoes)),
+        "por_materia": [(m, _grafico_linha(v, [f"aula {i + 1}" for i in range(len(v))], maximo=10, cor="#0EA5E9", id_=f"gm{k}"),
+                         _fmt(sum(v[-3:]) / len(v[-3:]))) for k, (m, v) in enumerate(sorted(por_materia.items()))],
+        "n_respostas": len(resp), "n_sessoes": len(sessoes), "hoje": hoje, "periodo": f"{rot[0]} a {hoje.strftime('%d/%m')}",
     }
     return render(request, "prototipo/progresso.html", contexto)
 
