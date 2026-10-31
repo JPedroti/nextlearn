@@ -453,3 +453,22 @@ def treino(request, tipo):
         "titulo": TREINOS[tipo][0], "descricao": TREINOS[tipo][1], "itens_json": json.dumps(itens, ensure_ascii=False),
         "n": len(itens), "foco": bool(perfil and perfil.foco), "aluno": aluno,
     })
+
+
+def versao(request):
+    """Ao vivo (só em DEBUG): devolve a data da última mudança nos arquivos do protótipo.
+    O ao_vivo.js consulta isto e recarrega a página quando muda."""
+    from pathlib import Path
+
+    from django.conf import settings
+    from django.http import Http404, JsonResponse
+
+    if not settings.DEBUG:
+        raise Http404
+    base = Path(settings.BASE_DIR)
+    maior = 0.0
+    for pasta in ("templates/prototipo", "static/prototipo", "apps/prototipo"):
+        for arq in (base / pasta).rglob("*"):
+            if arq.is_file() and arq.suffix in (".html", ".css", ".js", ".py"):
+                maior = max(maior, arq.stat().st_mtime)
+    return JsonResponse({"v": maior})

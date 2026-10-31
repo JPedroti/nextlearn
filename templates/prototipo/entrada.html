@@ -164,5 +164,6 @@
 
   <script id="dados-cenas" type="application/json">[{% for c in cenas %}{"id":"{{ c.id }}","pose":"{{ c.pose }}","fala":"{{ c.fala|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}]</script>
   <script src="{% static 'prototipo/entrada.js' %}"></script>
+<script src="{% static 'prototipo/ao_vivo.js' %}"></script>
 </body>
 </html>

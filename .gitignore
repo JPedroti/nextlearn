@@ -26,3 +26,4 @@ contas_teste_local.txt
 
 # Log do envio automatico para o GitHub
 envio_git.log
+servidor.log
